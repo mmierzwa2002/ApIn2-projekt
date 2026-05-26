@@ -65,3 +65,51 @@ CREATE TABLE harmonogram_praktyki (
     FOREIGN KEY (id_formularza) REFERENCES formularze_praktyk(id_formularza) ON DELETE CASCADE,
     UNIQUE (id_formularza, lp)
 );
+
+CREATE TABLE karty_praktyki (
+    id_karty INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_formularza INTEGER NOT NULL UNIQUE,
+    data_szkolenia_bhp DATE,
+    ocena_zakladowa INTEGER CHECK (ocena_zakladowa BETWEEN 2 AND 5),
+    ocena_uczelniana INTEGER CHECK (ocena_uczelniana BETWEEN 2 AND 5),
+    data_podpisu DATE,
+    FOREIGN KEY (id_formularza) REFERENCES formularze_praktyk(id_formularza) ON DELETE CASCADE
+);
+
+CREATE TABLE potwierdzenia_efektow (
+    id_potwierdzenia INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_formularza INTEGER NOT NULL,
+    id_efektu INTEGER NOT NULL,
+    czy_uzyskany INTEGER CHECK (czy_uzyskany IN (0, 1)),
+    FOREIGN KEY (id_formularza) REFERENCES formularze_praktyk(id_formularza) ON DELETE CASCADE,
+    FOREIGN KEY (id_efektu) REFERENCES efekty_ksztalcenia(id_efektu) ON DELETE CASCADE,
+    UNIQUE(id_formularza, id_efektu)
+);
+
+CREATE TABLE dzienniki_praktyk (
+    id_dziennika INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_formularza INTEGER NOT NULL UNIQUE,
+    status VARCHAR(50) DEFAULT 'Draft',
+    FOREIGN KEY (id_formularza) REFERENCES formularze_praktyk(id_formularza) ON DELETE CASCADE
+);
+
+CREATE TABLE wpisy_dziennika (
+    id_wpisu INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_dziennika INTEGER NOT NULL,
+    nr_dnia INTEGER CHECK (nr_dnia BETWEEN 1 AND 120),
+    data_wpisu DATE NOT NULL,
+    opis_wykonanych_prac TEXT NOT NULL,
+    id_efektu INTEGER,
+    FOREIGN KEY (id_dziennika) REFERENCES dzienniki_praktyk(id_dziennika) ON DELETE CASCADE,
+    FOREIGN KEY (id_efektu) REFERENCES efekty_ksztalcenia(id_efektu) ON DELETE SET NULL,
+    UNIQUE(id_dziennika, nr_dnia)
+);
+
+CREATE TABLE sprawozdania (
+    id_sprawozdania INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_formularza INTEGER NOT NULL UNIQUE,
+    charakterystyka_miejsca TEXT NOT NULL,
+    opis_i_analiza_prac TEXT NOT NULL,
+    samoocena_kompetencji TEXT NOT NULL,
+    FOREIGN KEY (id_formularza) REFERENCES formularze_praktyk(id_formularza) ON DELETE CASCADE
+);
