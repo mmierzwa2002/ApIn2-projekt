@@ -1,0 +1,183 @@
+openapi: 3.0.0
+info:
+  title: API Systemu Praktyk
+  description: Pełna dokumentacja REST API dla systemu obsługi praktyk studenckich (Etap 9).
+  version: 1.0.0
+paths:
+  /api/students:
+    get:
+      summary: Pobiera listę wszystkich studentów
+      responses:
+        "200":
+          description: Lista studentów pobrana pomyślnie
+    post:
+      summary: Dodaje nowego studenta
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                imie: { type: string, example: "Jan" }
+                nazwisko: { type: string, example: "Kowalski" }
+                numer_indeksu: { type: string, example: "123456" }
+                email: { type: string, example: "jan@student.uczelnia.pl" }
+      responses:
+        "201":
+          description: Student utworzony pomyślnie
+        "400":
+          description: Błąd walidacji danych (braki w polach)
+
+  /api/students/{id}:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+        description: ID studenta w bazie
+    get:
+      summary: Pobiera szczegóły konkretnego studenta
+      responses:
+        "200":
+          description: Dane studenta
+        "404":
+          description: Nie znaleziono studenta
+    put:
+      summary: Aktualizuje dane studenta
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                imie: { type: string }
+                nazwisko: { type: string }
+                numer_indeksu: { type: string }
+                email: { type: string }
+      responses:
+        "200":
+          description: Student zaktualizowany
+        "404":
+          description: Nie znaleziono studenta
+    delete:
+      summary: Usuwa studenta z bazy
+      responses:
+        "200":
+          description: Student usunięty
+        "404":
+          description: Nie znaleziono studenta
+
+  /api/internships:
+    get:
+      summary: Pobiera listę praktyk
+      parameters:
+        - in: query
+          name: student_id
+          schema:
+            type: integer
+          description: Opcjonalne filtrowanie po ID studenta
+      responses:
+        "200":
+          description: Zwraca listę praktyk
+    post:
+      summary: Rejestruje nową praktykę
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                student_id: { type: integer, example: 1 }
+                nazwa_firmy: { type: string, example: "Google Polska" }
+                data_rozpoczecia: { type: string, example: "2026-07-01" }
+                data_zakonczenia: { type: string, example: "2026-09-30" }
+                status: { type: string, example: "Oczekująca" }
+      responses:
+        "201":
+          description: Praktyka dodana
+        "400":
+          description: Błędne daty
+        "404":
+          description: Student nie istnieje
+
+  /api/internships/{id}:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+        description: ID praktyki
+    put:
+      summary: Aktualizuje status praktyki
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status: { type: string, example: "Zatwierdzona" }
+      responses:
+        "200":
+          description: Status zaktualizowany
+        "404":
+          description: Nie znaleziono praktyki
+    delete:
+      summary: Usuwa praktykę
+      responses:
+        "200":
+          description: Praktyka usunięta
+        "404":
+          description: Nie znaleziono praktyki
+
+  /api/documents:
+    get:
+      summary: Pobiera listę dokumentów
+      parameters:
+        - in: query
+          name: internship_id
+          schema:
+            type: integer
+          description: ID praktyki w celu przefiltrowania dokumentów
+      responses:
+        "200":
+          description: Lista dokumentów
+    post:
+      summary: Przesyła nowy dokument
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                identyfikator_praktyki: { type: integer, example: 1 }
+                nazwa_dokumentu: { type: string, example: "Skierowanie.pdf" }
+                typ_dokumentu: { type: string, example: "Skierowanie" }
+                komentarz_opiekuna: { type: string, example: "Brak uwag" }
+      responses:
+        "201":
+          description: Dokument przesłany
+        "404":
+          description: Przypisana praktyka nie istnieje
+
+  /api/documents/{id}:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+        description: ID dokumentu
+    delete:
+      summary: Usuwa dokument
+      responses:
+        "200":
+          description: Dokument usunięty
+        "404":
+          description: Nie znaleziono dokumentu
