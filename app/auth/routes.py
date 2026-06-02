@@ -59,15 +59,10 @@ def callback():
         db.session.commit()
 
     login_user(user)
-    return redirect(url_for('auth.dashboard'))
+    return redirect('http://127.0.0.1:5500/index.html')
 
 @auth_bp.route('/logout')
 @login_required
 def logout():
     logout_user()
-    return redirect('/')
-
-@auth_bp.route('/dashboard')
-@login_required
-def dashboard():
-    return f"Witaj, {current_user.full_name}! Twoja rola to: {current_user.role}. <br><a href='/auth/logout'>Wyloguj</a>"
+    return redirect('http://127.0.0.1:5500/index.html')
