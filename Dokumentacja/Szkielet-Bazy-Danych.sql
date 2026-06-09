@@ -1,5 +1,5 @@
 CREATE TABLE studenci (
-    id_studenta INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_studenta SERIAL PRIMARY KEY,
     imie VARCHAR(50) NOT NULL,
     nazwisko VARCHAR(50) NOT NULL,
     nr_albumu VARCHAR(20) NOT NULL UNIQUE,
@@ -8,28 +8,28 @@ CREATE TABLE studenci (
 );
 
 CREATE TABLE firmy (
-    id_firmy INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_firmy SERIAL PRIMARY KEY,
     nazwa VARCHAR(255) NOT NULL,
     adres VARCHAR(255)
 );
 
 CREATE TABLE opiekunowie (
-    id_opiekuna INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_opiekuna SERIAL PRIMARY KEY,
     imie VARCHAR(50) NOT NULL,
     nazwisko VARCHAR(50) NOT NULL,
     typ_opiekuna VARCHAR(30) NOT NULL CHECK (typ_opiekuna IN ('uczelniany', 'zakladowy'))
 );
 
 CREATE TABLE formularze_praktyk (
-    id_formularza INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_formularza SERIAL PRIMARY KEY,
     id_studenta INTEGER NOT NULL,
     id_firmy INTEGER NOT NULL,
     data_od DATE NOT NULL,
     data_do DATE NOT NULL,
     liczba_dni_roboczych INTEGER NOT NULL CHECK (liczba_dni_roboczych = 120),
     status VARCHAR(30) NOT NULL DEFAULT 'roboczy' CHECK (status IN ('roboczy', 'zatwierdzony', 'odrzucony')),
-    FOREIGN KEY (id_studenta) REFERENCES studenci(id_studenta),
-    FOREIGN KEY (id_firmy) REFERENCES firmy(id_firmy),
+    FOREIGN KEY (id_studenta) REFERENCES studenci(id_studenta) ON DELETE CASCADE,
+    FOREIGN KEY (id_firmy) REFERENCES firmy(id_firmy) ON DELETE CASCADE,
     CHECK (data_do >= data_od)
 );
 
@@ -42,7 +42,7 @@ CREATE TABLE formularz_opiekunowie (
 );
 
 CREATE TABLE efekty_ksztalcenia (
-    id_efektu INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_efektu SERIAL PRIMARY KEY,
     kod VARCHAR(2) NOT NULL UNIQUE,
     opis TEXT NOT NULL
 );
@@ -57,7 +57,7 @@ CREATE TABLE efekty_formularza (
 );
 
 CREATE TABLE harmonogram_praktyki (
-    id_harmonogramu INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_harmonogramu SERIAL PRIMARY KEY,
     id_formularza INTEGER NOT NULL,
     lp INTEGER NOT NULL,
     dzial_komorka VARCHAR(255) NOT NULL,
@@ -67,7 +67,7 @@ CREATE TABLE harmonogram_praktyki (
 );
 
 CREATE TABLE karty_praktyki (
-    id_karty INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_karty SERIAL PRIMARY KEY,
     id_formularza INTEGER NOT NULL UNIQUE,
     data_szkolenia_bhp DATE,
     ocena_zakladowa INTEGER CHECK (ocena_zakladowa BETWEEN 2 AND 5),
@@ -77,24 +77,24 @@ CREATE TABLE karty_praktyki (
 );
 
 CREATE TABLE potwierdzenia_efektow (
-    id_potwierdzenia INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_potwierdzenia SERIAL PRIMARY KEY,
     id_formularza INTEGER NOT NULL,
     id_efektu INTEGER NOT NULL,
-    czy_uzyskany INTEGER CHECK (czy_uzyskany IN (0, 1)),
+    czy_uzyskany SMALLINT CHECK (czy_uzyskany IN (0, 1)),
     FOREIGN KEY (id_formularza) REFERENCES formularze_praktyk(id_formularza) ON DELETE CASCADE,
     FOREIGN KEY (id_efektu) REFERENCES efekty_ksztalcenia(id_efektu) ON DELETE CASCADE,
     UNIQUE(id_formularza, id_efektu)
 );
 
 CREATE TABLE dzienniki_praktyk (
-    id_dziennika INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_dziennika SERIAL PRIMARY KEY,
     id_formularza INTEGER NOT NULL UNIQUE,
     status VARCHAR(50) DEFAULT 'Draft',
     FOREIGN KEY (id_formularza) REFERENCES formularze_praktyk(id_formularza) ON DELETE CASCADE
 );
 
 CREATE TABLE wpisy_dziennika (
-    id_wpisu INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_wpisu SERIAL PRIMARY KEY,
     id_dziennika INTEGER NOT NULL,
     nr_dnia INTEGER CHECK (nr_dnia BETWEEN 1 AND 120),
     data_wpisu DATE NOT NULL,
@@ -106,7 +106,7 @@ CREATE TABLE wpisy_dziennika (
 );
 
 CREATE TABLE sprawozdania (
-    id_sprawozdania INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_sprawozdania SERIAL PRIMARY KEY,
     id_formularza INTEGER NOT NULL UNIQUE,
     charakterystyka_miejsca TEXT NOT NULL,
     opis_i_analiza_prac TEXT NOT NULL,

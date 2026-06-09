@@ -1,4 +1,6 @@
 from flask import Blueprint, request, jsonify, abort
+from flask_login import login_required
+from app.auth.decorators import role_required
 from datetime import datetime
 from app import db
 from app.models.user import User
@@ -7,6 +9,7 @@ from app.models.internship import Internship
 internships_bp = Blueprint('internships', __name__, url_prefix='/api/internships')
 
 @internships_bp.route('', methods=['GET'])
+@login_required
 def get_internships():
     student_id = request.args.get('student_id')
     query = Internship.query
@@ -24,6 +27,7 @@ def get_internships():
     } for i in internships]), 200
 
 @internships_bp.route('', methods=['POST'])
+@login_required
 def create_internship():
     data = request.get_json()
     User.query.filter_by(id=data.get('student_id'), role='student').first_or_404(description="Student nie istnieje")
@@ -45,10 +49,15 @@ def create_internship():
     return jsonify({"message": "Praktyka utworzona", "id": new_internship.id}), 201
 
 @internships_bp.route('/<int:id>', methods=['PUT', 'DELETE'])
+@login_required
 def modify_internship(id):
+    from flask_login import current_user
     internship = Internship.query.get_or_404(id)
     
     if request.method == 'DELETE':
+        if current_user.role != 'administrator':
+            abort(403, description="Brak uprawnień do usuwania praktyk.")
+            
         db.session.delete(internship)
         db.session.commit()
         return jsonify({"message": "Praktyka usunięta"}), 200

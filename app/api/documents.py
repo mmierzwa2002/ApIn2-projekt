@@ -3,10 +3,13 @@ from datetime import datetime
 from app import db
 from app.models.internship import Internship
 from app.models.document import Document
+from flask_login import login_required
+from app.auth.decorators import role_required
 
 documents_bp = Blueprint('documents', __name__, url_prefix='/api/documents')
 
 @documents_bp.route('', methods=['GET'])
+@login_required
 def get_documents():
     internship_id = request.args.get('internship_id')
     query = Document.query
@@ -25,6 +28,7 @@ def get_documents():
     } for d in docs]), 200
 
 @documents_bp.route('', methods=['POST'])
+@login_required
 def create_document():
     data = request.get_json()
     Internship.query.get_or_404(data.get('identyfikator_praktyki'), description="Praktyka nie istnieje")
@@ -42,6 +46,8 @@ def create_document():
     return jsonify({"message": "Dokument przesłany", "id": new_doc.id}), 201
 
 @documents_bp.route('/<int:id>', methods=['DELETE'])
+@login_required
+@role_required('administrator', 'dyrektor')
 def delete_document(id):
     doc = Document.query.get_or_404(id)
     db.session.delete(doc)

@@ -9,3 +9,4 @@ class User(db.Model, UserMixin):
     external_id = db.Column(db.String(255), unique=True)
     role = db.Column(db.String(50), nullable=False)
     is_active = db.Column(db.Boolean, default=True)
+    password_hash = db.Column(db.String(255), nullable=True)

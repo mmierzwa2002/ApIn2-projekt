@@ -1,5 +1,4 @@
 from app import db
-from datetime import datetime
 
 class Internship(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -8,4 +7,5 @@ class Internship(db.Model):
     start_date = db.Column(db.Date, nullable=False)
     end_date = db.Column(db.Date, nullable=False)
     status = db.Column(db.String(50), default='Oczekująca')
+    stage = db.Column(db.String(50), default='dyrektor_wysyla_wstepne')
     student = db.relationship('User', backref=db.backref('internships', lazy=True))

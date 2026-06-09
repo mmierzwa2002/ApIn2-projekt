@@ -1,10 +1,14 @@
 from flask import Blueprint, request, jsonify, abort
+from flask_login import login_required, current_user
+from app.auth.decorators import role_required
 from app import db
 from app.models.user import User
 
 students_bp = Blueprint('students', __name__, url_prefix='/api/students')
 
 @students_bp.route('', methods=['GET'])
+@login_required
+@role_required('administrator', 'uopz', 'zopz', 'dyrektor')
 def get_students():
     students = User.query.filter_by(role='student').all()
     return jsonify([{
@@ -16,6 +20,8 @@ def get_students():
     } for s in students]), 200
 
 @students_bp.route('/<int:id>', methods=['GET'])
+@login_required
+@role_required('administrator', 'uopz', 'zopz', 'dyrektor')
 def get_student(id):
     student = User.query.filter_by(id=id, role='student').first_or_404()
     return jsonify({
@@ -27,6 +33,8 @@ def get_student(id):
     }), 200
 
 @students_bp.route('', methods=['POST'])
+@login_required
+@role_required('administrator', 'dyrektor')
 def create_student():
     data = request.get_json()
     if not data or not all(k in data for k in ("imie", "nazwisko", "numer_indeksu", "email")):
@@ -43,6 +51,8 @@ def create_student():
     return jsonify({"message": "Student utworzony", "id": new_student.id}), 201
 
 @students_bp.route('/<int:id>', methods=['PUT'])
+@login_required
+@role_required('administrator', 'dyrektor')
 def update_student(id):
     student = User.query.filter_by(id=id, role='student').first_or_404()
     data = request.get_json()
@@ -58,6 +68,8 @@ def update_student(id):
     return jsonify({"message": "Student zaktualizowany"}), 200
 
 @students_bp.route('/<int:id>', methods=['DELETE'])
+@login_required
+@role_required('administrator')
 def delete_student(id):
     student = User.query.filter_by(id=id, role='student').first_or_404()
     db.session.delete(student)
