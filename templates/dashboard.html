@@ -1,0 +1,512 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% for category, message in messages %}
+    <div class="alert alert-{{ category }}">{{ message }}</div>
+  {% endfor %}
+{% endwith %}
+
+{# ===================== WIDOK STUDENTA ===================== #}
+{% if current_user.role == 'student' %}
+
+<div class="workflow-timeline">
+  <div class="timeline-step {% if internships and internships[0].faza_procesu >= 1 %}active{% endif %}">
+    <div class="step-icon">1</div>
+    <div class="step-label">Inicjacja (Zał. 1, 2a)</div>
+  </div>
+  <div class="timeline-step {% if internships and internships[0].faza_procesu >= 2 %}active{% endif %}">
+    <div class="step-icon">2</div>
+    <div class="step-label">Realizacja (Dziennik)</div>
+  </div>
+  <div class="timeline-step {% if internships and internships[0].faza_procesu >= 3 %}active{% endif %}">
+    <div class="step-icon">3</div>
+    <div class="step-label">Podsumowanie (Zał. 4, 7)</div>
+  </div>
+  <div class="timeline-step {% if internships and internships[0].faza_procesu >= 4 %}active{% endif %}">
+    <div class="step-icon">4</div>
+    <div class="step-label">Zaliczenie (Protokół)</div>
+  </div>
+</div>
+
+{% if internships %}
+{% set p = internships[0] %}
+<div style="display: grid; grid-template-columns: 1fr 2fr; gap: 2rem; margin-top: 2rem">
+  <div class="academic-card">
+    <div class="card-title">Aktualne zadanie</div>
+    <p style="color: var(--text-muted); margin-bottom: 1.5rem">
+      {% if p.faza_procesu == 1 %}
+        Dokumenty wstępne są w trakcie podpisywania przez ZOPZ i Dyrektora.
+      {% elif p.faza_procesu == 2 %}
+        Praktyka w toku. Wpisuj dni pracy do Dziennika (Zał. 6).
+      {% elif p.faza_procesu == 3 %}
+        Napisz Sprawozdanie (Zał. 7) i złóż Samoocenę.
+      {% elif p.faza_procesu == 4 %}
+        Oczekuj na wyznaczenie terminu egzaminu zaliczeniowego.
+      {% else %}
+        Praktyka zakończona i zarchiwizowana.
+      {% endif %}
+    </p>
+
+    {# Dziennik – aktywny tylko w Fazie 2 #}
+    <form action="/api/journal/add" method="POST">
+      <input type="hidden" name="praktyka_id" value="{{ p.id_formularza }}" />
+      <div class="form-group">
+        <label>Miejsce praktyki</label>
+        <input type="text" class="custom-input" value="{{ p.firma.nazwa }}" disabled />
+      </div>
+      {% if p.faza_procesu == 2 %}
+      <div class="form-group">
+        <label>Data</label>
+        <input type="date" name="data" class="custom-input" required />
+      </div>
+      <div class="form-group">
+        <label>Godziny (1–8)</label>
+        <input type="number" name="godziny" class="custom-input" min="1" max="8" required />
+      </div>
+      <div class="form-group">
+        <label>Opis prac (min. 10 znaków)</label>
+        <textarea name="opis" class="custom-input" rows="3" minlength="10" required></textarea>
+      </div>
+      <button type="submit" class="btn-academic">Zapisz dzień do Dziennika</button>
+      {% else %}
+      <button type="button" class="btn-academic" disabled style="opacity:0.45">
+        Dziennik {% if p.faza_procesu < 2 %}zablokowany – Faza 1{% else %}zamknięty{% endif %}
+      </button>
+      {% endif %}
+    </form>
+  </div>
+
+  <div class="academic-card">
+    <div class="card-title">Stan załączników</div>
+    <div class="table-wrapper">
+      <table class="academic-table">
+        <thead>
+          <tr><th>Dokument</th><th>Status</th><th></th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Zał. 1</strong> – Porozumienie o praktyce</td>
+            <td>
+              <span class="badge {% if p.zal1_zopz and p.zal1_dyrektor %}badge-active{% else %}badge-pending{% endif %}">
+                Zakład: {{ '✓' if p.zal1_zopz else '…' }} &nbsp; Uczelnia: {{ '✓' if p.zal1_dyrektor else '…' }}
+              </span>
+            </td>
+            <td>
+              <a href="/auth/formularze/{{ p.id_formularza }}/zal1"
+                 style="font-size:0.82rem;color:var(--primary);text-decoration:none;font-weight:600">
+                Otwórz →
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td><strong>Zał. 2a</strong> – Harmonogram praktyki</td>
+            <td>
+              <span class="badge {% if p.zal2a_uopz %}badge-active{% else %}badge-pending{% endif %}">
+                ZOPZ: {{ '✓' if p.zal2a_zopz else '…' }} &nbsp;
+                Student: {{ '✓' if p.zal2a_student else '…' }} &nbsp;
+                UOPZ: {{ '✓' if p.zal2a_uopz else '…' }}
+              </span>
+            </td>
+            <td>
+              <a href="/auth/formularze/{{ p.id_formularza }}/zal2a"
+                 style="font-size:0.82rem;color:var(--primary);text-decoration:none;font-weight:600">
+                Otwórz →
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td><strong>Zał. 3.1</strong> – Skierowanie (Dyrektor)</td>
+            <td>
+              <span class="badge {% if p.zal31_dyrektor %}badge-active{% else %}badge-pending{% endif %}">
+                {{ '✓ Wystawione' if p.zal31_dyrektor else 'Oczekuje' }}
+              </span>
+            </td>
+            <td></td>
+          </tr>
+          <tr>
+            <td><strong>Zał. 6</strong> – Dziennik praktyki</td>
+            <td>
+              <span class="badge {% if p.faza_procesu == 2 %}badge-active{% elif p.faza_procesu > 2 %}badge-closed{% else %}badge-pending{% endif %}">
+                {% if p.faza_procesu < 2 %}Zablokowany{% elif p.faza_procesu == 2 %}Otwarty{% else %}Zamknięty{% endif %}
+              </span>
+            </td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    {# Podpisanie Zał. 2a przez studenta #}
+    {% if p.faza_procesu == 1 and p.zal2a_zopz and not p.zal2a_student %}
+    <div style="margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border)">
+      <p style="font-size:0.9rem;margin-bottom:0.75rem;color:var(--text-muted)">
+        ZOPZ podpisał harmonogram — teraz Twoja kolej:
+      </p>
+      <form action="/api/internships/{{ p.id_formularza }}/sign" method="POST">
+        <input type="hidden" name="dokument" value="ZAL2A">
+        <input type="hidden" name="redirect_to" value="/auth/dashboard">
+        <button type="submit" class="btn-academic" style="width:auto;padding:0.5rem 1.25rem">
+          Podpisz Zał. 2a (Harmonogram)
+        </button>
+      </form>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+{% else %}
+<div class="academic-card" style="margin-top: 2rem; text-align: center">
+  <div class="card-title">Brak zgłoszonej praktyki</div>
+  <p style="color: var(--text-muted)">Skontaktuj się z UOPZ w celu rejestracji miejsca praktyki w systemie.</p>
+</div>
+{% endif %}
+
+{# ===================== WIDOK ADMINISTRATORA ===================== #}
+{% elif current_user.role == 'administrator' %}
+
+<div style="margin-bottom: 2rem">
+  <h2>Panel Administratora</h2>
+</div>
+
+{% if internships %}
+<div class="table-wrapper">
+  <table class="academic-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Student</th>
+        <th>Firma</th>
+        <th>Daty</th>
+        <th>Faza</th>
+        <th>Dokumenty</th>
+        <th>Akcje</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in internships %}
+      <tr>
+        <td>{{ p.id_formularza }}</td>
+        <td>
+          <strong>{{ p.student_record.full_name }}</strong><br>
+          <small>{{ p.student_record.nr_albumu }}</small>
+        </td>
+        <td>{{ p.firma.nazwa }}</td>
+        <td style="font-size:0.82rem;color:var(--text-muted)">
+          {{ p.data_od }} –<br>{{ p.data_do }}
+        </td>
+        <td><span class="badge badge-pending">Faza {{ p.faza_procesu }}</span></td>
+        <td>
+          <div style="display:flex;flex-direction:column;gap:0.3rem">
+            <a href="/auth/formularze/{{ p.id_formularza }}/zal1"
+               style="font-size:0.82rem;color:var(--primary);text-decoration:none;font-weight:600">
+              Zał. 1 →
+            </a>
+            <a href="/auth/formularze/{{ p.id_formularza }}/zal2a"
+               style="font-size:0.82rem;color:var(--primary);text-decoration:none;font-weight:600">
+              Zał. 2a →
+            </a>
+          </div>
+        </td>
+        <td>
+          <form action="/auth/admin/internship/{{ p.id_formularza }}/delete" method="POST"
+                onsubmit="return confirm('Na pewno usunąć praktykę #{{ p.id_formularza }}?')">
+            <button type="submit" class="btn-academic"
+                    style="padding:0.35rem 0.75rem;font-size:0.82rem;background:#dc2626;width:auto">
+              Usuń
+            </button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="academic-card" style="text-align:center;padding:3rem">
+  <p style="color:var(--text-muted)">Brak zarejestrowanych praktyk w systemie.</p>
+</div>
+{% endif %}
+
+{# ===================== WIDOK UOPZ / ZOPZ / DYREKTOR ===================== #}
+{% else %}
+
+<div style="margin-bottom: 2rem">
+  <h2>Konsola: {{ current_user.role | upper }}</h2>
+  <p style="color: var(--text-muted)">Lista wniosków wymagających akcji.</p>
+</div>
+
+{# ── Panel UOPZ: rejestracja praktyk i firm ── #}
+{% if current_user.role == 'uopz' %}
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-bottom:2rem">
+
+  <div class="academic-card">
+    <div class="card-title">Nowa praktyka</div>
+    <form action="/api/internships" method="POST">
+      <div class="form-group">
+        <label>Student</label>
+        <select name="id_studenta" class="custom-input" required>
+          <option value="">-- wybierz studenta --</option>
+          {% for s in students %}
+          <option value="{{ s.id_studenta }}">{{ s.full_name }} ({{ s.nr_albumu }})</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Firma / miejsce praktyki</label>
+        <select name="id_firmy" class="custom-input" required>
+          <option value="">-- wybierz firmę --</option>
+          {% for f in firms %}
+          <option value="{{ f.id_firmy }}">{{ f.nazwa }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group" style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem">
+        <div>
+          <label>Data od</label>
+          <input type="date" name="data_od" class="custom-input" required>
+        </div>
+        <div>
+          <label>Data do</label>
+          <input type="date" name="data_do" class="custom-input" required>
+        </div>
+      </div>
+      <button type="submit" class="btn-academic" style="width:auto;padding:0.45rem 1.25rem">
+        Zarejestruj praktykę
+      </button>
+    </form>
+  </div>
+
+  <div class="academic-card">
+    <div class="card-title">Miejsca praktyk</div>
+    <form action="/api/firms" method="POST" style="margin-bottom:1.5rem">
+      <input type="hidden" name="redirect_to" value="/auth/dashboard">
+      <div class="form-group">
+        <label>Nazwa firmy</label>
+        <input type="text" name="nazwa" class="custom-input" placeholder="np. ABC Software Sp. z o.o." required>
+      </div>
+      <div class="form-group" style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem">
+        <div>
+          <label>Adres</label>
+          <input type="text" name="adres" class="custom-input" placeholder="ul. Przykładowa 1, Elbląg">
+        </div>
+        <div>
+          <label>Przedstawiciel</label>
+          <input type="text" name="przedstawiciel" class="custom-input" placeholder="Jan Nowak">
+        </div>
+      </div>
+      <button type="submit" class="btn-academic" style="width:auto;padding:0.4rem 1rem;font-size:0.9rem">
+        + Dodaj firmę
+      </button>
+    </form>
+    {% if firms %}
+    <div class="table-wrapper">
+      <table class="academic-table">
+        <thead><tr><th>Nazwa</th><th>Adres</th><th>Przedstawiciel</th></tr></thead>
+        <tbody>
+          {% for f in firms %}
+          <tr>
+            <td>{{ f.nazwa }}</td>
+            <td>{{ f.adres or '—' }}</td>
+            <td>{{ f.przedstawiciel or '—' }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <p style="color:var(--text-muted);font-size:0.9rem">Brak zarejestrowanych firm.</p>
+    {% endif %}
+  </div>
+
+</div>
+{% endif %}
+
+<div class="table-wrapper">
+  <table class="academic-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Student</th>
+        <th>Firma</th>
+        <th>Faza</th>
+        <th>Dokumenty</th>
+        <th>Akcje</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in internships %}
+      <tr>
+        <td>{{ p.id_formularza }}</td>
+        <td>
+          <strong>{{ p.student_record.full_name }}</strong><br>
+          <small>{{ p.student_record.nr_albumu }}</small>
+        </td>
+        <td>{{ p.firma.nazwa }}</td>
+        <td><span class="badge badge-pending">Faza {{ p.faza_procesu }}</span></td>
+        <td>
+          <div style="display:flex;flex-direction:column;gap:0.3rem">
+            <a href="/auth/formularze/{{ p.id_formularza }}/zal1"
+               style="font-size:0.82rem;color:var(--primary);text-decoration:none;font-weight:600">
+              Zał. 1 →
+            </a>
+            <a href="/auth/formularze/{{ p.id_formularza }}/zal2a"
+               style="font-size:0.82rem;color:var(--primary);text-decoration:none;font-weight:600">
+              Zał. 2a →
+            </a>
+          </div>
+        </td>
+        <td>
+          <div style="display:flex;flex-direction:column;gap:0.4rem;min-width:160px">
+
+            {# ── Faza 1 ── #}
+            {% if p.faza_procesu == 1 %}
+
+              {% if current_user.role == 'zopz' %}
+                {% if not p.zal1_zopz %}
+                <form action="/api/internships/{{ p.id_formularza }}/sign" method="POST">
+                  <input type="hidden" name="dokument" value="ZAL1">
+                  <input type="hidden" name="redirect_to" value="/auth/dashboard">
+                  <button type="submit" class="btn-academic"
+                          style="padding:0.35rem 0.7rem;font-size:0.82rem;background:#0369a1">
+                    Podpisz Zał. 1 (Zakład)
+                  </button>
+                </form>
+                {% endif %}
+                {% if p.zal1_zopz and p.zal1_dyrektor and not p.zal2a_zopz %}
+                <form action="/api/internships/{{ p.id_formularza }}/sign" method="POST">
+                  <input type="hidden" name="dokument" value="ZAL2A">
+                  <input type="hidden" name="redirect_to" value="/auth/dashboard">
+                  <button type="submit" class="btn-academic"
+                          style="padding:0.35rem 0.7rem;font-size:0.82rem">
+                    Podpisz Zał. 2a (Harmonogram)
+                  </button>
+                </form>
+                {% endif %}
+              {% endif %}
+
+              {% if current_user.role == 'dyrektor' %}
+                {% if not p.zal1_dyrektor %}
+                <form action="/api/internships/{{ p.id_formularza }}/sign" method="POST">
+                  <input type="hidden" name="dokument" value="ZAL1">
+                  <input type="hidden" name="redirect_to" value="/auth/dashboard">
+                  <button type="submit" class="btn-academic"
+                          style="padding:0.35rem 0.7rem;font-size:0.82rem;background:#7c3aed">
+                    Podpisz Zał. 1 (Uczelnia)
+                  </button>
+                </form>
+                {% endif %}
+                {% if p.zal1_zopz and p.zal1_dyrektor and p.zal2a_uopz and not p.zal31_dyrektor %}
+                <form action="/api/internships/{{ p.id_formularza }}/sign" method="POST">
+                  <input type="hidden" name="dokument" value="ZAL3_1">
+                  <input type="hidden" name="redirect_to" value="/auth/dashboard">
+                  <button type="submit" class="btn-academic"
+                          style="padding:0.35rem 0.7rem;font-size:0.82rem;background:#9333ea">
+                    Wystaw Skierowanie (Zał. 3.1)
+                  </button>
+                </form>
+                {% endif %}
+              {% endif %}
+
+              {% if current_user.role == 'uopz' %}
+                {% if p.zal2a_student and not p.zal2a_uopz %}
+                <form action="/api/internships/{{ p.id_formularza }}/sign" method="POST">
+                  <input type="hidden" name="dokument" value="ZAL2A">
+                  <input type="hidden" name="redirect_to" value="/auth/dashboard">
+                  <button type="submit" class="btn-academic"
+                          style="padding:0.35rem 0.7rem;font-size:0.82rem">
+                    Zatwierdź Zał. 2a (UOPZ)
+                  </button>
+                </form>
+                {% elif not p.zal1_zopz or not p.zal1_dyrektor %}
+                <span style="font-size:0.8rem;color:var(--text-muted)">
+                  Oczekuje na podpisy Zał. 1
+                </span>
+                {% elif not p.zal2a_zopz %}
+                <span style="font-size:0.8rem;color:var(--text-muted)">
+                  Oczekuje na Harmonogram (ZOPZ)
+                </span>
+                {% elif not p.zal2a_student %}
+                <span style="font-size:0.8rem;color:var(--text-muted)">
+                  Oczekuje na podpis studenta
+                </span>
+                {% endif %}
+              {% endif %}
+
+            {# ── Faza 2 ── #}
+            {% elif p.faza_procesu == 2 %}
+              {% if current_user.role == 'zopz' %}
+                {% if not p.zal32_zopz %}
+                <form action="/api/internships/{{ p.id_formularza }}/sign" method="POST">
+                  <input type="hidden" name="dokument" value="ZAL3_2">
+                  <input type="hidden" name="redirect_to" value="/auth/dashboard">
+                  <button type="submit" class="btn-academic"
+                          style="padding:0.35rem 0.7rem;font-size:0.82rem">
+                    Potwierdź szkolenie BHP (Zał. 3.2)
+                  </button>
+                </form>
+                {% endif %}
+                {% if not p.dziennik_zatwierdzony %}
+                <form action="/api/internships/{{ p.id_formularza }}/sign" method="POST">
+                  <input type="hidden" name="dokument" value="DZIENNIK_GOTOWY">
+                  <input type="hidden" name="redirect_to" value="/auth/dashboard">
+                  <button type="submit" class="btn-academic"
+                          style="padding:0.35rem 0.7rem;font-size:0.82rem;background:#059669">
+                    Zamknij Dziennik (120 dni)
+                  </button>
+                </form>
+                {% else %}
+                <span style="font-size:0.8rem;color:#065f46;font-weight:600">✓ Dziennik zamknięty</span>
+                {% endif %}
+              {% endif %}
+
+            {# ── Faza 3 ── #}
+            {% elif p.faza_procesu == 3 %}
+              {% if current_user.role == 'zopz' and not p.zal4_zopz %}
+              <form action="/api/internships/{{ p.id_formularza }}/sign" method="POST">
+                <input type="hidden" name="dokument" value="ZAL4">
+                <input type="hidden" name="redirect_to" value="/auth/dashboard">
+                <button type="submit" class="btn-academic"
+                        style="padding:0.35rem 0.7rem;font-size:0.82rem">
+                  Potwierdź efekty (Zał. 4 – Zakład)
+                </button>
+              </form>
+              {% endif %}
+              {% if current_user.role == 'uopz' and not p.zal4_uopz %}
+              <form action="/api/internships/{{ p.id_formularza }}/sign" method="POST">
+                <input type="hidden" name="dokument" value="ZAL4">
+                <input type="hidden" name="redirect_to" value="/auth/dashboard">
+                <button type="submit" class="btn-academic"
+                        style="padding:0.35rem 0.7rem;font-size:0.82rem">
+                  Potwierdź efekty (Zał. 4 – UOPZ)
+                </button>
+              </form>
+              {% endif %}
+
+            {# ── Faza 4 ── #}
+            {% elif p.faza_procesu == 4 %}
+              {% if current_user.role == 'dyrektor' and not p.zal8_dyrektor %}
+              <form action="/api/internships/{{ p.id_formularza }}/sign" method="POST">
+                <input type="hidden" name="dokument" value="ZAL8">
+                <input type="hidden" name="redirect_to" value="/auth/dashboard">
+                <button type="submit" class="btn-academic"
+                        style="padding:0.35rem 0.7rem;font-size:0.82rem;background:#7c3aed">
+                  Wystaw Protokół (Zał. 8)
+                </button>
+              </form>
+              {% endif %}
+
+            {% else %}
+              <span style="font-size:0.8rem;color:var(--text-muted)">Zamknięta</span>
+            {% endif %}
+
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endif %}
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Konto oczekuje na zatwierdzenie{% endblock %}
+{% block content %}
+<div style="max-width: 500px; margin: 5rem auto; text-align: center">
+  <div class="academic-card">
+    <div class="card-title">Konto oczekuje na zatwierdzenie</div>
+    <p style="color: var(--text-muted); margin: 1.5rem 0">
+      Twoje konto organizacyjne zostało zarejestrowane w systemie.<br />
+      Administrator musi nadać Ci odpowiednią rolę (UOPZ, ZOPZ lub Dyrektor)
+      przed pierwszym zalogowaniem.
+    </p>
+    <p style="color: var(--text-muted); font-size: 0.9rem">
+      Skontaktuj się z administratorem systemu i podaj swój adres e-mail.
+    </p>
+    <a href="/auth/login" class="btn-academic" style="display: inline-block; margin-top: 1rem; text-decoration: none">
+      Powrót do logowania
+    </a>
+  </div>
+</div>
+{% endblock %}

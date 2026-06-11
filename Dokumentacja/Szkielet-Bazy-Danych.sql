@@ -1,10 +1,23 @@
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    email VARCHAR(150) NOT NULL UNIQUE,
+    full_name VARCHAR(150) NOT NULL,
+    password_hash VARCHAR(256),
+    auth_provider VARCHAR(50) DEFAULT 'local',
+    external_id VARCHAR(250),
+    role VARCHAR(50) NOT NULL CHECK (role IN ('student', 'zopz', 'uopz', 'dyrektor', 'administrator', 'konto_do_zatwierdzenia')),
+    is_active BOOLEAN DEFAULT TRUE
+);
+
 CREATE TABLE studenci (
     id_studenta SERIAL PRIMARY KEY,
+    user_id INTEGER UNIQUE, -- Powiązanie z kontem logowania
     imie VARCHAR(50) NOT NULL,
     nazwisko VARCHAR(50) NOT NULL,
     nr_albumu VARCHAR(20) NOT NULL UNIQUE,
     kierunek VARCHAR(100) NOT NULL,
-    specjalnosc VARCHAR(100)
+    specjalnosc VARCHAR(100),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE firmy (
@@ -15,11 +28,12 @@ CREATE TABLE firmy (
 
 CREATE TABLE opiekunowie (
     id_opiekuna SERIAL PRIMARY KEY,
+    user_id INTEGER UNIQUE, -- Powiązanie z kontem logowania
     imie VARCHAR(50) NOT NULL,
     nazwisko VARCHAR(50) NOT NULL,
-    typ_opiekuna VARCHAR(30) NOT NULL CHECK (typ_opiekuna IN ('uczelniany', 'zakladowy'))
+    typ_opiekuna VARCHAR(30) NOT NULL CHECK (typ_opiekuna IN ('uczelniany', 'zakladowy')),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
-
 CREATE TABLE formularze_praktyk (
     id_formularza SERIAL PRIMARY KEY,
     id_studenta INTEGER NOT NULL,
@@ -27,7 +41,26 @@ CREATE TABLE formularze_praktyk (
     data_od DATE NOT NULL,
     data_do DATE NOT NULL,
     liczba_dni_roboczych INTEGER NOT NULL CHECK (liczba_dni_roboczych = 120),
+    
+    -- Status ogólny z Laboratorium 07
     status VARCHAR(30) NOT NULL DEFAULT 'roboczy' CHECK (status IN ('roboczy', 'zatwierdzony', 'odrzucony')),
+    
+    -- KONTROLA FAZ (Silnik Workflow)
+    faza_procesu INTEGER DEFAULT 1 CHECK (faza_procesu BETWEEN 1 AND 5),
+    
+    -- CYFROWE PODPISY (Zatwierdzenia Załączników)
+    zal1_zopz BOOLEAN DEFAULT FALSE,
+    zal1_dyrektor BOOLEAN DEFAULT FALSE,
+    zal2a_zopz BOOLEAN DEFAULT FALSE,
+    zal2a_student BOOLEAN DEFAULT FALSE,
+    zal2a_uopz BOOLEAN DEFAULT FALSE,
+    zal31_dyrektor BOOLEAN DEFAULT FALSE,
+    dziennik_zatwierdzony BOOLEAN DEFAULT FALSE,
+    zal4_zopz BOOLEAN DEFAULT FALSE,
+    zal4_uopz BOOLEAN DEFAULT FALSE,
+    zal7_student BOOLEAN DEFAULT FALSE,
+    zal8_dyrektor BOOLEAN DEFAULT FALSE,
+
     FOREIGN KEY (id_studenta) REFERENCES studenci(id_studenta) ON DELETE CASCADE,
     FOREIGN KEY (id_firmy) REFERENCES firmy(id_firmy) ON DELETE CASCADE,
     CHECK (data_do >= data_od)
@@ -40,6 +73,7 @@ CREATE TABLE formularz_opiekunowie (
     FOREIGN KEY (id_formularza) REFERENCES formularze_praktyk(id_formularza) ON DELETE CASCADE,
     FOREIGN KEY (id_opiekuna) REFERENCES opiekunowie(id_opiekuna) ON DELETE CASCADE
 );
+
 
 CREATE TABLE efekty_ksztalcenia (
     id_efektu SERIAL PRIMARY KEY,
@@ -66,6 +100,7 @@ CREATE TABLE harmonogram_praktyki (
     UNIQUE (id_formularza, lp)
 );
 
+-- 5. KARTY ZALICZEŃ I DZIENNIKI
 CREATE TABLE karty_praktyki (
     id_karty SERIAL PRIMARY KEY,
     id_formularza INTEGER NOT NULL UNIQUE,

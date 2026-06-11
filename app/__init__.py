@@ -11,67 +11,68 @@ login_manager = LoginManager()
 
 def create_app():
     load_dotenv()
-    
-    app = Flask(__name__, static_folder='../frontend', static_url_path='')
-    
-    # Konfiguracja bezpiecznego klucza sesji (naprawia RuntimeError)
+
+    app = Flask(__name__, static_folder='../static', static_url_path='', template_folder='../templates')
+
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'pancerne-haslo-sesji-praktyk-999!')
-    
-    # Dynamiczna migracja bazy: priorytet ma PostgreSQL z .env, spadek do lokalnego SQLite
+
     database_url = os.getenv('DATABASE_URL', 'sqlite:///praktyki.db')
     if database_url.startswith("postgres://"):
         database_url = database_url.replace("postgres://", "postgresql://", 1)
-        
     app.config['SQLALCHEMY_DATABASE_URI'] = database_url
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     db.init_app(app)
-    
-    # Zaawansowana konfiguracja CORS umożliwiająca autoryzację sesyjną między różnymi portami
-    CORS(app, supports_credentials=True, origins=["http://127.0.0.1:5500", "http://localhost:5500"])
-    
-    app.config['SWAGGER'] = {
-        'title': 'API Systemu Praktyk',
-        'uiversion': 3,
-        'openapi': '3.0.0'
-    }
+    CORS(app, supports_credentials=True)
+
+    app.config['SWAGGER'] = {'title': 'API Systemu Praktyk', 'uiversion': 3, 'openapi': '3.0.0'}
     Swagger(app, template_file='../swagger.yaml')
-    
+
     login_manager.init_app(app)
     login_manager.login_view = 'auth.login'
-    
-    # Obsługa nieautoryzowanych żądań API dla interfejsu SPA (zwraca czysty JSON 401 zamiast przekierowania)
+
     @login_manager.unauthorized_handler
     def unauthorized():
         return jsonify({"error": "Brak dostępu. Zaloguj się do systemu."}), 401
-    
+
     from app.auth.oauth import oauth
     oauth.init_app(app)
-    
+
+    # Importy modeli — kolejność ma znaczenie (zależności FK)
     from app.models.user import User
+    from app.models.company import Firma
+    from app.models.student import Student
+    from app.models.supervisor import Opiekun
     from app.models.internship import Internship
+    from app.models.outcome import EfektKsztalcenia, EfektFormularza, PotwierdzenieEfektu
+    from app.models.schedule import HarmonogramPraktyki
+    from app.models.card import KartaPraktyki
+    from app.models.diary import DziennikPraktyki, WpisDziennika
+    from app.models.report import Sprawozdanie
     from app.models.document import Document
-    from app.models.journal_entry import JournalEntry
-    from app.models.learning_outcome import LearningOutcome
-    
+
     @login_manager.user_loader
     def load_user(user_id):
         return User.query.get(int(user_id))
 
-    # Rejestracja modułów uwierzytelniania i generowania PDF
+    @app.context_processor
+    def inject_globals():
+        from flask_login import current_user
+        pending_count = 0
+        if current_user.is_authenticated and current_user.role == 'administrator':
+            pending_count = User.query.filter_by(role='konto_do_zatwierdzenia').count()
+        return {'pending_count': pending_count}
+
     from app.auth.routes import auth_bp
     app.register_blueprint(auth_bp, url_prefix='/auth')
-    
-    #from app.pdf_generator import pdf_bp
-    #app.register_blueprint(pdf_bp)
 
-    # Rejestracja modułów REST API
     from app.api.errors import errors_bp
     from app.api.students import students_bp
     from app.api.internships import internships_bp
     from app.api.documents import documents_bp
     from app.api.journal import journal_bp
     from app.api.outcomes import outcomes_bp
+    from app.api.firms import firms_bp
 
     app.register_blueprint(errors_bp)
     app.register_blueprint(students_bp)
@@ -79,5 +80,6 @@ def create_app():
     app.register_blueprint(documents_bp)
     app.register_blueprint(journal_bp)
     app.register_blueprint(outcomes_bp)
+    app.register_blueprint(firms_bp)
 
     return app

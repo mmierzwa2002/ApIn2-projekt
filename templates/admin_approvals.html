@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Zatwierdzenia kont{% endblock %}
+{% block content %}
+
+<div style="margin-bottom:2rem">
+  <h2>Zatwierdzenia kont</h2>
+  <p style="color:var(--text-muted)">Konta zarejestrowane przez Microsoft wymagające przypisania roli.</p>
+</div>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% for category, message in messages %}
+    <div class="alert alert-{{ category }}">{{ message }}</div>
+  {% endfor %}
+{% endwith %}
+
+{% if pending_users %}
+<div class="academic-card">
+  <div class="table-wrapper">
+    <table class="academic-table">
+      <thead>
+        <tr>
+          <th>Imię i nazwisko</th>
+          <th>E-mail</th>
+          <th>Dostawca</th>
+          <th style="width:22rem">Nadaj rolę i zatwierdź</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in pending_users %}
+        <tr>
+          <td><strong>{{ u.full_name }}</strong></td>
+          <td>{{ u.email }}</td>
+          <td>
+            <span class="badge badge-pending">{{ u.auth_provider }}</span>
+          </td>
+          <td>
+            <form action="/auth/admin/approve/{{ u.id }}" method="POST"
+                  style="display:flex;gap:0.5rem;align-items:center">
+              <select name="role" class="custom-input"
+                      style="padding:0.35rem 0.5rem;font-size:0.85rem">
+                <option value="uopz">UOPZ</option>
+                <option value="zopz">ZOPZ</option>
+                <option value="dyrektor">Dyrektor</option>
+              </select>
+              <button type="submit" class="btn-academic"
+                      style="padding:0.4rem 0.9rem;font-size:0.85rem;white-space:nowrap">
+                Zatwierdź
+              </button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% else %}
+<div class="academic-card" style="text-align:center;padding:3rem">
+  <p style="color:var(--text-muted);font-size:1rem">Brak kont oczekujących na zatwierdzenie.</p>
+</div>
+{% endif %}
+
+{% endblock %}

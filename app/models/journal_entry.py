@@ -3,7 +3,7 @@ from datetime import date
 
 class JournalEntry(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    internship_id = db.Column(db.Integer, db.ForeignKey('internship.id'), nullable=False)
+    internship_id = db.Column(db.Integer, db.ForeignKey('formularze_praktyk.id_formularza'), nullable=False)
     date = db.Column(db.Date, nullable=False)
     hours = db.Column(db.Integer, nullable=False)
     description = db.Column(db.Text, nullable=False)

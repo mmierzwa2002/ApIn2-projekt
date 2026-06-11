@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}System Praktyk IIS{% endblock %}</title>
+    <script>
+      (function () {
+        var t = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', t);
+      })();
+    </script>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+  </head>
+  <body>
+    <nav class="nav-container">
+      <div class="brand">System Rozliczania Praktyk</div>
+      <div style="display:flex;align-items:center;gap:1rem">
+        <button class="theme-toggle" id="theme-toggle" title="Przełącz motyw">Jasny</button>
+        {% if current_user.is_authenticated %}
+          {% if current_user.role == 'administrator' %}
+          <a href="/auth/admin/approvals"
+             class="approvals-btn{% if pending_count > 0 %} approvals-btn--alert{% endif %}">
+            Zatwierdzenia{% if pending_count > 0 %} ({{ pending_count }}){% endif %}
+          </a>
+          {% endif %}
+        <span style="font-weight: 600">
+          {{ current_user.full_name }}
+          ({{ current_user.role }})
+        </span>
+        <a href="{{ url_for('auth.logout') }}"
+           style="color: var(--warning); font-weight: bold; text-decoration: none;">Wyloguj się</a>
+        {% endif %}
+      </div>
+    </nav>
+
+    <div style="max-width: 1400px; margin: 2rem auto; padding: 0 1.5rem">
+      {% block content %}{% endblock %}
+    </div>
+
+    <script>
+      (function () {
+        var btn = document.getElementById('theme-toggle');
+        function applyTheme(t) {
+          document.documentElement.setAttribute('data-theme', t);
+          btn.textContent = t === 'dark' ? 'Jasny' : 'Ciemny';
+        }
+        applyTheme(localStorage.getItem('theme') || 'light');
+        btn.addEventListener('click', function () {
+          var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+          localStorage.setItem('theme', next);
+          applyTheme(next);
+        });
+      })();
+    </script>
+  </body>
+</html>

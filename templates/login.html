@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Logowanie — System Obsługi Praktyk</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+  </head>
+  <body class="auth-body">
+    <div class="auth-page">
+      <!-- ========== PANEL LEWY: branding ========== -->
+      <div class="auth-brand">
+        <div>
+          <div class="auth-brand-logo">🎓 SOP</div>
+          <div class="auth-brand-name">System Obsługi Praktyk Zawodowych</div>
+          <div class="auth-brand-subtitle">
+            Akademia Nauk Stosowanych w Elblągu<br />
+            Informatyka i Inżynieria Systemów
+          </div>
+        </div>
+
+        <ul class="auth-brand-features">
+          <li>Elektroniczne wnioski i zatwierdzanie praktyk</li>
+          <li>Dziennik praktyk online z kontrolą postępu</li>
+          <li>Podpisy cyfrowe wg 4-fazowego procesu</li>
+          <li>Raportowanie efektów kształcenia</li>
+        </ul>
+
+        <div class="auth-brand-footer">
+          Aplikacje Internetowe 2 · Michał Mierzwa 21273 © 2026
+        </div>
+      </div>
+
+      <!-- ========== PANEL PRAWY: formularze ========== -->
+      <div class="auth-forms">
+        <div class="auth-forms-inner">
+          {% with messages = get_flashed_messages(with_categories=true) %} {% if
+          messages %} {% for category, message in messages %}
+          <div class="auth-alert auth-alert-{{ category }}">{{ message }}</div>
+          {% endfor %} {% endif %} {% endwith %}
+
+          <!-- Logowanie -->
+          <div class="academic-card">
+            <div class="card-title">Zaloguj się</div>
+
+            <form action="{{ url_for('auth.login_local') }}" method="POST">
+              <div class="form-group">
+                <label>Adres e-mail</label>
+                <input
+                  type="email"
+                  name="email"
+                  class="custom-input"
+                  placeholder="login@example.com"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label>Hasło</label>
+                <input
+                  type="password"
+                  name="password"
+                  class="custom-input"
+                  required
+                />
+              </div>
+              <button type="submit" class="btn-academic">Zaloguj się</button>
+            </form>
+
+            <div class="auth-divider">lub</div>
+
+            <a
+              href="{{ url_for('auth.login_microsoft') }}"
+              class="btn-academic btn-microsoft"
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 18 18"
+                style="margin-right: 9px; flex-shrink: 0"
+              >
+                <rect x="0" y="0" width="8" height="8" fill="#f25022" />
+                <rect x="10" y="0" width="8" height="8" fill="#7fba00" />
+                <rect x="0" y="10" width="8" height="8" fill="#00a4ef" />
+                <rect x="10" y="10" width="8" height="8" fill="#ffb900" />
+              </svg>
+              Kontynuuj z Microsoft (Entra ID)
+            </a>
+
+            <p class="auth-hint">
+              Studenci ANS Elbląg logują się kontem @student.ans-elblag.pl
+            </p>
+          </div>
+
+          <!-- Rejestracja -->
+          <div class="academic-card">
+            <div class="card-title">Utwórz konto lokalne</div>
+            <p
+              class="auth-hint"
+              style="margin-bottom: 1.25rem; text-align: left"
+            >
+              Dla pracowników i opiekunów nieposiadających konta Microsoft.
+              Konto wymaga zatwierdzenia przez administratora.
+            </p>
+
+            <form action="{{ url_for('auth.register') }}" method="POST">
+              <div class="form-group">
+                <label>Pełne imię i nazwisko</label>
+                <input
+                  type="text"
+                  name="full_name"
+                  class="custom-input"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label>Adres e-mail</label>
+                <input
+                  type="email"
+                  name="email"
+                  class="custom-input"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label>Hasło (min. 6 znaków)</label>
+                <input
+                  type="password"
+                  name="password"
+                  class="custom-input"
+                  minlength="6"
+                  required
+                />
+              </div>
+              <button type="submit" class="btn-academic btn-register">
+                Utwórz konto
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,356 @@
+{% extends "base.html" %}
+{% block title %}Zał. 2a – Program i Harmonogram Praktyki{% endblock %}
+{% block content %}
+
+<div class="no-print" style="display:flex;gap:1rem;align-items:center;margin-bottom:1.5rem">
+  <a href="/auth/dashboard" style="color:var(--primary);font-weight:600;text-decoration:none">← Powrót</a>
+  <button onclick="window.print()" class="btn-academic"
+          style="width:auto;padding:0.4rem 1rem;font-size:0.9rem">Drukuj / PDF</button>
+</div>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% for category, message in messages %}
+    <div class="alert alert-{{ category }}">{{ message }}</div>
+  {% endfor %}
+{% endwith %}
+
+<div class="dokument">
+
+  {# ── Nagłówek ── #}
+  <div style="text-align:right;font-size:0.85rem;font-weight:600;margin-bottom:1rem">
+    Załącznik nr 2a
+  </div>
+
+  <p style="font-weight:700">Akademia Nauk Stosowanych w Elblągu</p>
+  <p style="font-weight:700;margin-bottom:1.2rem">Instytut Informatyki Stosowanej im. Krzysztofa Brzeskiego</p>
+
+  <p>Kierunek studiów: <strong>Informatyka</strong></p>
+  <p style="margin-top:0.6rem">
+    Student / ka:
+    <span class="dok-blank">{{ p.student_record.full_name }}</span>
+  </p>
+  <p>
+    Nr albumu:
+    <span class="dok-blank">{{ p.student_record.nr_albumu }}</span>
+  </p>
+  <p>Kierunek studiów: <strong>Informatyka</strong></p>
+  <p>
+    Specjalność:
+    <span class="dok-blank">{{ p.student_record.specjalnosc or '' }}</span>
+  </p>
+  <p style="margin-top:0.6rem">
+    Miejsce praktyki (instytucja):
+    <span class="dok-blank">{{ p.firma.nazwa }}{% if p.firma.adres %}, {{ p.firma.adres }}{% endif %}</span>
+  </p>
+  <p style="margin-top:0.6rem">
+    Termin realizacji praktyki: od
+    <span class="dok-blank">{{ p.data_od.strftime('%d.%m.%Y') }}</span>
+    do
+    <span class="dok-blank">{{ p.data_do.strftime('%d.%m.%Y') }}</span>
+    &nbsp;&nbsp;&nbsp; Liczba dni roboczych: <strong>120</strong>
+  </p>
+
+  <h3 style="text-align:center;margin:2rem 0 1rem;font-size:1rem;text-transform:uppercase;letter-spacing:0.05em">
+    Program Praktyki Zawodowej
+  </h3>
+
+  {# ════════════════════════════════════════════════════════
+     TRYB EDYCJI — ZOPZ wypełnia formularz
+     ════════════════════════════════════════════════════════ #}
+  {% if not p.zal2a_zopz and current_user.role in ('zopz', 'administrator') %}
+  {% if not p.zal1_zopz or not p.zal1_dyrektor %}
+  <div class="alert alert-warning" style="text-align:center">
+    Zał. 2a można wypełnić dopiero po podpisaniu Załącznika nr 1 przez obie strony
+    (ZOPZ i Dyrektora Instytutu).
+  </div>
+  {% else %}
+
+  <form action="/api/internships/{{ p.id_formularza }}/zal2a" method="POST">
+
+    <table class="zal-table" style="margin-bottom:2rem">
+      <thead>
+        <tr>
+          <th style="width:3rem">Nr</th>
+          <th>Efekty kształcenia</th>
+          <th style="width:35%">Dział (komórka) / przykładowe prace wykonywane przez praktykanta</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for efekt in all_efekty %}
+        <tr>
+          <td style="text-align:center;font-weight:700">{{ efekt.kod }}</td>
+          <td style="font-size:0.88rem">{{ efekt.opis }}</td>
+          <td>
+            <textarea name="efekt_{{ efekt.kod }}" rows="3"
+                      style="width:100%;border:1px solid var(--border);border-radius:4px;
+                             padding:0.4rem;font-size:0.85rem;background:var(--bg-main);
+                             color:var(--text-main);resize:vertical"
+                      required>{{ efekty_map.get(efekt.id_efektu, '') }}</textarea>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <h3 style="text-align:center;margin:2rem 0 1rem;font-size:1rem;text-transform:uppercase;letter-spacing:0.05em">
+      Harmonogram Praktyki Zawodowej
+    </h3>
+
+    <table class="zal-table" style="margin-bottom:2rem">
+      <thead>
+        <tr>
+          <th style="width:3rem">L.p.</th>
+          <th>Dział / komórka (miejsce odbywania praktyki)</th>
+          <th style="width:10rem;text-align:center">Planowana liczba dni roboczych</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for i in range(1, 14) %}
+        {% set row = harmonogram[loop.index0] if loop.index0 < harmonogram|length else none %}
+        <tr>
+          <td style="text-align:center">{{ i }}</td>
+          <td>
+            <input type="text" name="dzial_{{ '%02d' % i }}"
+                   value="{{ row.dzial_komorka if row else '' }}"
+                   style="width:100%;border:none;border-bottom:1px solid var(--border);
+                          background:transparent;padding:0.3rem;color:var(--text-main);font-size:0.9rem">
+          </td>
+          <td>
+            <input type="number" name="dni_{{ '%02d' % i }}" min="1" max="120"
+                   value="{{ row.planowana_liczba_dni if row else '' }}"
+                   style="width:100%;border:none;border-bottom:1px solid var(--border);
+                          background:transparent;padding:0.3rem;text-align:center;
+                          color:var(--text-main);font-size:0.9rem">
+          </td>
+        </tr>
+        {% endfor %}
+        <tr style="font-weight:700">
+          <td colspan="2" style="text-align:right;padding-right:1rem">Łącznie</td>
+          <td style="text-align:center">—</td>
+        </tr>
+        <tr style="font-weight:700">
+          <td colspan="2" style="text-align:right;padding-right:1rem">Wymagana</td>
+          <td style="text-align:center">120</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div style="text-align:center;margin-top:2rem">
+      <button type="submit" class="btn-academic"
+              style="width:auto;padding:0.6rem 2rem;font-size:1rem">
+        Zapisz i podpisz Zał. 2a
+      </button>
+    </div>
+  </form>
+  {% endif %}{# koniec bloku: zal1 podpisany #}
+
+  {# ════════════════════════════════════════════════════════
+     TRYB PODGLĄDU — formularz wypełniony (lub użytkownik nie jest ZOPZ)
+     ════════════════════════════════════════════════════════ #}
+  {% else %}
+
+  {% if all_efekty and efekty_map %}
+  <table class="zal-table" style="margin-bottom:2rem">
+    <thead>
+      <tr>
+        <th style="width:3rem">Nr</th>
+        <th>Efekty kształcenia</th>
+        <th style="width:35%">Dział (komórka) / przykładowe prace wykonywane przez praktykanta</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for efekt in all_efekty %}
+      <tr>
+        <td style="text-align:center;font-weight:700">{{ efekt.kod }}</td>
+        <td style="font-size:0.88rem">{{ efekt.opis }}</td>
+        <td style="font-size:0.88rem">{{ efekty_map.get(efekt.id_efektu, '') }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <h3 style="text-align:center;margin:2rem 0 1rem;font-size:1rem;text-transform:uppercase;letter-spacing:0.05em">
+    Harmonogram Praktyki Zawodowej
+  </h3>
+
+  <table class="zal-table" style="margin-bottom:2rem">
+    <thead>
+      <tr>
+        <th style="width:3rem">L.p.</th>
+        <th>Dział / komórka (miejsce odbywania praktyki)</th>
+        <th style="width:10rem;text-align:center">Planowana liczba dni roboczych</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in harmonogram %}
+      <tr>
+        <td style="text-align:center">{{ row.lp }}</td>
+        <td>{{ row.dzial_komorka }}</td>
+        <td style="text-align:center">{{ row.planowana_liczba_dni }}</td>
+      </tr>
+      {% endfor %}
+      <tr style="font-weight:700">
+        <td colspan="2" style="text-align:right;padding-right:1rem">Łącznie</td>
+        <td style="text-align:center">{{ harmonogram | sum(attribute='planowana_liczba_dni') }}</td>
+      </tr>
+      <tr style="font-weight:700">
+        <td colspan="2" style="text-align:right;padding-right:1rem">Wymagana</td>
+        <td style="text-align:center">120</td>
+      </tr>
+    </tbody>
+  </table>
+
+  {% else %}
+  <div style="text-align:center;padding:2rem;color:var(--text-muted)">
+    Formularz nie został jeszcze wypełniony przez ZOPZ.
+  </div>
+  {% endif %}
+
+  {% endif %}
+
+  {# ── Sekcja podpisów ── #}
+  <hr style="margin:2.5rem 0 1.5rem;border:none;border-top:1px solid var(--border)">
+
+  <p style="margin-bottom:1.5rem;font-size:0.9rem">
+    Uzgodniono w dniu:
+    <span class="dok-blank" style="min-width:10rem">
+      {% if p.zal2a_uopz %}{{ p.data_od.strftime('%d.%m.%Y') }}{% endif %}
+    </span>
+  </p>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;margin-top:1rem">
+
+    {# UOPZ (uczelniany opiekun) #}
+    <div style="text-align:center">
+      <div style="min-height:3rem;border-bottom:1px solid var(--border);margin-bottom:0.5rem">
+        {% if p.zal2a_uopz %}
+        <span class="badge badge-active">Podpisano (UOPZ)</span>
+        {% else %}
+        <span class="badge badge-pending">Oczekuje na podpis</span>
+        {% endif %}
+      </div>
+      <small style="color:var(--text-muted)">(podpis uczelnianego opiekuna praktyki)</small>
+    </div>
+
+    {# ZOPZ (zakładowy opiekun) #}
+    <div style="text-align:center">
+      <div style="min-height:3rem;border-bottom:1px solid var(--border);margin-bottom:0.5rem">
+        {% if p.zal2a_zopz %}
+        <span class="badge badge-active">Podpisano (ZOPZ)</span>
+        {% else %}
+        <span class="badge badge-pending">Oczekuje na podpis</span>
+        {% endif %}
+      </div>
+      <small style="color:var(--text-muted)">(podpis zakładowego opiekuna praktyki)</small>
+    </div>
+
+    {# Student #}
+    <div style="text-align:center">
+      <div style="min-height:3rem;border-bottom:1px solid var(--border);margin-bottom:0.5rem">
+        {% if p.zal2a_student %}
+        <span class="badge badge-active">Podpisano (Student)</span>
+        {% else %}
+        <span class="badge badge-pending">Oczekuje na podpis</span>
+        {% endif %}
+      </div>
+      <small style="color:var(--text-muted)">(podpis studenta)</small>
+    </div>
+  </div>
+
+  {# ── Przyciski akcji ── #}
+  <div class="no-print" style="margin-top:2rem;display:flex;flex-wrap:wrap;gap:1rem;justify-content:center">
+
+    {# Student podpisuje #}
+    {% if p.zal2a_zopz and not p.zal2a_student and current_user.role == 'student' %}
+    <form action="/api/internships/{{ p.id_formularza }}/sign" method="POST">
+      <input type="hidden" name="dokument" value="ZAL2A">
+      <input type="hidden" name="redirect_to" value="/auth/formularze/{{ p.id_formularza }}/zal2a">
+      <button type="submit" class="btn-academic"
+              style="width:auto;padding:0.5rem 1.5rem;background:#059669">
+        Podpisz Harmonogram (Student)
+      </button>
+    </form>
+    {% endif %}
+
+    {# UOPZ zatwierdza lub odrzuca #}
+    {% if p.zal2a_student and not p.zal2a_uopz and current_user.role in ('uopz', 'administrator') %}
+    <form action="/api/internships/{{ p.id_formularza }}/sign" method="POST">
+      <input type="hidden" name="dokument" value="ZAL2A">
+      <input type="hidden" name="redirect_to" value="/auth/formularze/{{ p.id_formularza }}/zal2a">
+      <button type="submit" class="btn-academic"
+              style="width:auto;padding:0.5rem 1.5rem">
+        Zatwierdź (UOPZ)
+      </button>
+    </form>
+    <form action="/api/internships/{{ p.id_formularza }}/zal2a/reject" method="POST">
+      <button type="submit" class="btn-academic"
+              style="width:auto;padding:0.5rem 1.5rem;background:#b91c1c"
+              onclick="return confirm('Odrzucić Zał. 2a? ZOPZ będzie musiał ponownie podpisać.')">
+        Odrzuć do ZOPZ
+      </button>
+    </form>
+    {% endif %}
+
+    {# UOPZ czeka na podpis studenta #}
+    {% if p.zal2a_zopz and not p.zal2a_student and current_user.role in ('uopz', 'administrator') %}
+    <div style="text-align:center;padding:0.75rem 1.5rem;background:var(--surface-alt);
+                border-radius:8px;border:1px solid var(--border)">
+      <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:0.75rem">
+        ZOPZ podpisał harmonogram — oczekuje na podpis studenta.<br>
+        Po podpisaniu przez studenta będzie możliwe zatwierdzenie przez UOPZ.
+      </p>
+      <form action="/api/internships/{{ p.id_formularza }}/zal2a/reject" method="POST">
+        <button type="submit" class="btn-academic"
+                style="width:auto;padding:0.4rem 1rem;background:#b91c1c;font-size:0.85rem"
+                onclick="return confirm('Odrzucić Zał. 2a? ZOPZ będzie musiał ponownie podpisać.')">
+          Odrzuć do ZOPZ
+        </button>
+      </form>
+    </div>
+    {% endif %}
+
+  </div>
+
+</div>
+
+<style>
+.zal-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+.zal-table th, .zal-table td {
+  border: 1px solid var(--border);
+  padding: 0.6rem 0.75rem;
+  vertical-align: top;
+}
+.zal-table th {
+  background: var(--surface-alt);
+  font-weight: 700;
+  font-size: 0.82rem;
+  text-align: center;
+}
+.dok-blank {
+  border-bottom: 1px solid var(--text-muted);
+  display: inline-block;
+  min-width: 8rem;
+  padding-bottom: 1px;
+}
+.dokument {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 2.5rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+@media print {
+  .no-print { display: none !important; }
+  .dokument { border: none; box-shadow: none; padding: 0; }
+  nav, .alert { display: none !important; }
+  body { background: white; color: black; }
+  .zal-table th, .zal-table td { border-color: #000; }
+}
+</style>
+
+{% endblock %}
