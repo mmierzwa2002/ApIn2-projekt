@@ -22,20 +22,25 @@ def ensure_schema():
     migrations = {
         'formularze_praktyk': {
             'zal32_zgloszenie_zopz': 'BOOLEAN DEFAULT FALSE',
-            'zal32_bhp_zopz': 'BOOLEAN DEFAULT FALSE',
-            'zal7_zopz': 'BOOLEAN DEFAULT FALSE',
-            'zal3_strona2_zopz': 'BOOLEAN DEFAULT FALSE',
-            'zal3_strona2_uopz': 'BOOLEAN DEFAULT FALSE',
+            'zal32_bhp_zopz':        'BOOLEAN DEFAULT FALSE',
+            'zal7_zopz':             'BOOLEAN DEFAULT FALSE',
+            'zal3_strona2_zopz':     'BOOLEAN DEFAULT FALSE',
+            'zal3_strona2_uopz':     'BOOLEAN DEFAULT FALSE',
+            'zal4_opinia_uopz':      'TEXT',
+            'zal5_student':          'BOOLEAN DEFAULT FALSE',
+            'zal8_dyrektor':         'BOOLEAN DEFAULT FALSE',
+            'zal8_uopz':             'BOOLEAN DEFAULT FALSE',
+            'usos_wpisany':          'BOOLEAN DEFAULT FALSE',
         },
         'wpisy_dziennika': {
             'nr_efektow': 'VARCHAR(50)',
         },
         'karty_praktyki': {
-            'uwagi_odbycie': 'TEXT',
+            'uwagi_odbycie':    'TEXT',
             'ocena_zopz_param': 'VARCHAR(4)',
-            'ocena_zopz_opis': 'TEXT',
+            'ocena_zopz_opis':  'TEXT',
             'ocena_uopz_param': 'VARCHAR(4)',
-            'ocena_uopz_opis': 'TEXT',
+            'ocena_uopz_opis':  'TEXT',
             'ocena_sprawozdania': 'VARCHAR(4)',
         },
     }

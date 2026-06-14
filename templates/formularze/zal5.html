@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+{% block title %}Zał. 5 – Kwestionariusz ankiety | {{ p.firma.nazwa }}{% endblock %}
+
+{% block content %}
+<style>
+.dokument {
+  max-width: 900px; margin: 0 auto 2rem; background: #fff;
+  border: 1px solid var(--border); border-radius: var(--radius);
+  box-shadow: var(--shadow-card); padding: 3rem 3.5rem;
+  font-size: 0.9rem; line-height: 1.7; color: #1e293b;
+}
+.dok-naglowek { text-align: right; font-size: 0.85rem; font-weight: 600; margin-bottom: 1.5rem; color: var(--text-muted); }
+.dok-tytul { text-align: center; margin-bottom: 1.5rem; }
+.dok-tytul h2 { font-size: 1rem; font-weight: 700; }
+.ankieta-tabela { width: 100%; border-collapse: collapse; margin: 1.25rem 0; }
+.ankieta-tabela th, .ankieta-tabela td { border: 1px solid #334155; padding: 0.5rem 0.6rem; vertical-align: middle; }
+.ankieta-tabela thead th { background: #1e293b; color: #fff; font-size: 0.78rem; font-weight: 600; text-align: center; }
+.ankieta-tabela td:first-child { width: 2rem; text-align: center; font-weight: 700; }
+.ankieta-tabela .col-odp { width: 6rem; text-align: center; }
+.odp-icon { font-size: 1.1rem; }
+.odp-tak   { color: #059669; }
+.odp-nie   { color: #dc2626; }
+.odp-trudno { color: #92400e; }
+.odp-brak  { color: #9ca3af; }
+.metryczka { width: 100%; border-collapse: collapse; margin-top: 1.5rem; }
+.metryczka th, .metryczka td { border: 1px solid #334155; padding: 0.5rem 0.75rem; }
+.metryczka th { background: #f8fafc; font-weight: 600; width: 40%; }
+.dok-pieczatka { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.3rem 0.8rem; border-radius: 50px; font-size: 0.8rem; font-weight: 600; }
+.pieczatka-ok    { background: #d1fae5; color: #065f46; }
+.pieczatka-czeka { background: #fef3c7; color: #92400e; }
+
+.panel {
+  max-width: 900px; margin: 0 auto 1.5rem; background: var(--surface);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 1.5rem 2rem; box-shadow: var(--shadow-card);
+}
+.panel .card-title { font-size: 1.05rem; font-weight: 600; margin-bottom: 1rem; border-left: 4px solid var(--primary); padding-left: 0.5rem; }
+.pyt-row { display: grid; grid-template-columns: 1.5rem 1fr auto; align-items: start; gap: 0.75rem; padding: 0.75rem 0; border-bottom: 1px solid var(--border); }
+.pyt-row:last-of-type { border-bottom: none; }
+.pyt-nr { font-weight: 700; font-size: 0.88rem; padding-top: 0.1rem; }
+.pyt-tekst { font-size: 0.88rem; line-height: 1.5; }
+.pyt-opcje { display: flex; gap: 0.5rem; flex-wrap: nowrap; }
+.pyt-opcja { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; }
+.pyt-opcja label { font-size: 0.7rem; color: var(--text-muted); text-align: center; max-width: 5rem; line-height: 1.2; cursor: pointer; }
+.pyt-opcja input[type=radio] { cursor: pointer; }
+.dok-toolbar { display: flex; align-items: center; gap: 1rem; max-width: 900px; margin: 0 auto 1.25rem; flex-wrap: wrap; }
+.dok-blokada { max-width: 900px; margin: 0 auto 1.25rem; background: #fef3c7; color: #92400e; border-radius: 8px; padding: 0.85rem 1.1rem; font-size: 0.9rem; font-weight: 500; }
+.btn-sm { display: inline-flex; align-items: center; padding: 0.45rem 1rem; border-radius: 8px; font-size: 0.88rem; font-weight: 600; text-decoration: none; cursor: pointer; border: none; }
+.btn-back  { background: #e2e8f0; color: #334155; }
+.btn-print { background: var(--primary); color: #fff; }
+@media print {
+  .nav-container, .dok-toolbar, .panel, .alert, .dok-blokada { display: none !important; }
+  body { background: #fff; }
+  .dokument { border: none; box-shadow: none; margin: 0; padding: 1cm 1.5cm; font-size: 9.5pt; }
+  .ankieta-tabela thead th { background: #000 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+
+{% set ETYKIETY = {
+  'zd_tak': 'zdecydowanie tak',
+  'rk_tak': 'raczej tak',
+  'trudno': 'trudno powiedzieć',
+  'rk_nie': 'raczej nie',
+  'zd_nie': 'zdecydowanie nie'
+} %}
+</style>
+
+<div class="dok-toolbar">
+  <a href="/auth/dashboard" class="btn-sm btn-back">← Powrót</a>
+  <button onclick="window.print()" class="btn-sm btn-print">🖨 Drukuj / PDF</button>
+  <span style="margin-left:auto;font-size:0.82rem;color:var(--text-muted)">
+    Formularz: #{{ p.id_formularza }} &nbsp;·&nbsp; Faza {{ p.faza_procesu }}
+  </span>
+</div>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}{% for cat, msg in messages %}
+    <div class="alert alert-{{ cat }}" style="max-width:900px;margin:0 auto 1rem">{{ msg }}</div>
+  {% endfor %}{% endif %}
+{% endwith %}
+
+{% if p.faza_procesu < 3 %}
+<div class="dok-blokada">⚠ Kwestionariusz ankiety dostępny dopiero w Fazie 3 (Podsumowanie).</div>
+{% endif %}
+
+{# ══════════ DOKUMENT ══════════ #}
+<div class="dokument">
+  <div class="dok-naglowek">Załącznik nr 5</div>
+  <div class="dok-tytul">
+    <h2>Kwestionariusz ankiety oceniający przebieg praktyk zawodowych<br>
+    realizowanych w ramach programów studiów<br>
+    w Instytucie Informatyki Stosowanej im. K. Brzeskiego w Elblągu</h2>
+  </div>
+
+  <p style="text-align:justify">
+    W trosce o stałe podnoszenie jakości przebiegu praktyk zawodowych zwracamy się do
+    Pani/Pana z prośbą o wypełnienie anonimowej ankiety dotyczącej praktyk zawodowych,
+    w której należy określić w jakim stopniu zgadza się Pan/Pani z poniższymi stwierdzeniami.
+  </p>
+  <p><em>Prosimy zaznaczyć przy każdym pytaniu X w wybranym polu odpowiedzi.</em></p>
+
+  {% macro ikona_odp(val) %}
+    {% if val == 'zd_tak' %}<span class="odp-icon odp-tak">✓✓</span>
+    {% elif val == 'rk_tak' %}<span class="odp-icon odp-tak">✓</span>
+    {% elif val == 'trudno' %}<span class="odp-icon odp-trudno">?</span>
+    {% elif val == 'rk_nie' %}<span class="odp-icon odp-nie">✗</span>
+    {% elif val == 'zd_nie' %}<span class="odp-icon odp-nie">✗✗</span>
+    {% else %}<span class="odp-icon odp-brak">—</span>
+    {% endif %}
+  {% endmacro %}
+
+  <table class="ankieta-tabela">
+    <thead>
+      <tr>
+        <th></th>
+        <th></th>
+        <th class="col-odp">zdecydowanie<br>tak</th>
+        <th class="col-odp">raczej<br>tak</th>
+        <th class="col-odp">trudno<br>powiedzieć</th>
+        <th class="col-odp">raczej<br>nie</th>
+        <th class="col-odp">zdecydowanie<br>nie</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for nr, tekst in pytania %}
+      {% set qval = a['q' ~ nr] if a else none %}
+      <tr>
+        <td>{{ nr }}.</td>
+        <td>{{ tekst }}</td>
+        {% for kod in odpowiedzi %}
+        <td class="col-odp">
+          {% if qval == kod %}{{ ikona_odp(kod) }}{% endif %}
+        </td>
+        {% endfor %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <p style="margin-top:1rem"><strong>Dodatkowe uwagi dotyczące przebiegu praktyki zawodowej:</strong></p>
+  <div style="border-bottom:1px solid #334155;min-height:1.8rem;margin-bottom:0.5rem">
+    {{ a.uwagi if a and a.uwagi else '' }}
+  </div>
+  <div style="border-bottom:1px solid #334155;min-height:1.8rem;margin-bottom:0.5rem"></div>
+
+  <table class="metryczka" style="margin-top:1.5rem">
+    <caption style="font-weight:700;text-align:center;padding:0.5rem;border:1px solid #334155;border-bottom:none;background:#f8fafc">Metryczka</caption>
+    <tr><th>Rok akademicki</th><td>{{ rok_ak }}</td></tr>
+    <tr><th>Kierunek studiów</th><td>Informatyka</td></tr>
+    <tr><th>Forma studiów</th><td>stacjonarne</td></tr>
+    <tr><th>Semestr studiów</th><td>7</td></tr>
+    <tr><th>Liczba godzin zrealizowanej praktyki zawodowej</th><td>960</td></tr>
+  </table>
+
+  <p style="text-align:right;font-style:italic;font-weight:700;margin-top:2rem">Dziękujemy za udział w badaniu</p>
+
+  <div style="margin-top:1.5rem;text-align:center">
+    {% if p.zal5_student %}
+    <span class="dok-pieczatka pieczatka-ok">✓ Ankieta wypełniona</span>
+    {% else %}
+    <span class="dok-pieczatka pieczatka-czeka">Ankieta nie wypełniona</span>
+    {% endif %}
+  </div>
+</div>
+
+{# ══════════ PANEL STUDENTA ══════════ #}
+{% if current_user.role == 'student' and p.faza_procesu == 3 %}
+<div class="panel">
+  <div class="card-title">Wypełnij kwestionariusz</div>
+  {% if p.zal5_student %}
+  <p style="color:#065f46;font-weight:600">✓ Ankieta została już wypełniona i zapisana.</p>
+  {% else %}
+  <form action="/api/internships/{{ p.id_formularza }}/zal5" method="POST"
+        onsubmit="return confirm('Wysłać ankietę? Po wysłaniu nie będzie można jej edytować.')">
+
+    {% for nr, tekst in pytania %}
+    <div class="pyt-row">
+      <span class="pyt-nr">{{ nr }}.</span>
+      <span class="pyt-tekst">{{ tekst }}</span>
+      <div class="pyt-opcje">
+        {% for kod in odpowiedzi %}
+        <div class="pyt-opcja">
+          <input type="radio" name="q{{ nr }}" value="{{ kod }}" id="q{{ nr }}_{{ kod }}" required>
+          <label for="q{{ nr }}_{{ kod }}">{{ odpowiedzi_labels[kod] }}</label>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
+
+    <div class="form-group" style="margin-top:1.25rem">
+      <label>Dodatkowe uwagi (opcjonalnie)</label>
+      <textarea name="uwagi" class="custom-input" rows="2" style="resize:vertical"
+                placeholder="Ewentualne uwagi dotyczące przebiegu praktyki…"></textarea>
+    </div>
+
+    <button type="submit" class="btn-academic" style="width:auto;padding:0.55rem 1.5rem;margin-top:1rem">
+      Wyślij ankietę (Zał. 5)
+    </button>
+  </form>
+  {% endif %}
+</div>
+{% endif %}
+
+{% endblock %}

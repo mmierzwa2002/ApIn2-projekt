@@ -13,7 +13,7 @@
 <div class="workflow-timeline">
   <div class="timeline-step {% if internships and internships[0].faza_procesu >= 1 %}active{% endif %}">
     <div class="step-icon">1</div>
-    <div class="step-label">Inicjacja (Zał. 1, 2a, 3.1, 3.2)</div>
+    <div class="step-label">Inicjacja (Zał. 1, 2a, 3.1)</div>
   </div>
   <div class="timeline-step {% if internships and internships[0].faza_procesu >= 2 %}active{% endif %}">
     <div class="step-icon">2</div>
@@ -21,7 +21,7 @@
   </div>
   <div class="timeline-step {% if internships and internships[0].faza_procesu >= 3 %}active{% endif %}">
     <div class="step-icon">3</div>
-    <div class="step-label">Podsumowanie (Zał. 7, 3.2, 4)</div>
+    <div class="step-label">Podsumowanie (Zał. 7, 3.2, 4, 5)</div>
   </div>
   <div class="timeline-step {% if internships and internships[0].faza_procesu >= 4 %}active{% endif %}">
     <div class="step-icon">4</div>
@@ -40,15 +40,30 @@
       {% elif p.faza_procesu == 2 %}
         Praktyka w toku. Wpisuj dni pracy do Dziennika (Zał. 6).
       {% elif p.faza_procesu == 3 %}
-        Napisz Sprawozdanie (Zał. 7) i złóż Samoocenę.
-      {% elif p.faza_procesu == 4 %}
-        Oczekuj na wyznaczenie terminu egzaminu zaliczeniowego.
-      {% else %}
-        Praktyka zakończona i zarchiwizowana.
+        {% if not p.zal7_student %}Napisz i złóż Sprawozdanie (Zał. 7).
+        {% elif not p.zal7_zopz %}Sprawozdanie złożone — oczekuje na potwierdzenie ZOPZ.
+        {% elif not p.zal5_student %}Wypełnij Kwestionariusz ankiety (Zał. 5).
+        {% else %}Dokumenty złożone — oczekuj na oceny opiekunów.{% endif %}
+      {% elif p.faza_procesu == 4 and not p.usos_wpisany %}
+        Oczekuj na wyznaczenie terminu egzaminu i wystawienie Protokołu (Zał. 8).
+      {% elif p.faza_procesu == 4 and p.usos_wpisany %}
+        Praktyka została zakończona i zaliczona.
       {% endif %}
     </p>
 
-    {# Dziennik (Zał. 6) – aktywny tylko w Fazie 2 #}
+    {# Zakończona: faza 4 + usos_wpisany #}
+    {% if p.faza_procesu == 4 and p.usos_wpisany %}
+    <div style="text-align:center;padding:1.5rem 0">
+      <div style="font-size:4rem;line-height:1;color:#059669">✓</div>
+      <p style="font-size:1.05rem;font-weight:700;color:#065f46;margin:0.75rem 0 0.25rem">
+        Gratulacje!
+      </p>
+      <p style="font-size:0.88rem;color:var(--text-muted)">
+        Praktyka zawodowa zaliczona pomyślnie.<br>
+        Wszystkie dokumenty są dostępne poniżej.
+      </p>
+    </div>
+    {% else %}
     <div class="form-group">
       <label>Miejsce praktyki</label>
       <input type="text" class="custom-input" value="{{ p.firma.nazwa }}" disabled />
@@ -64,29 +79,93 @@
       Otwórz Dziennik (Zał. 6) →
     </a>
     {% elif p.faza_procesu == 3 %}
-    <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:1rem">
-      {% if not p.zal7_student %}Napisz i złóż Sprawozdanie z praktyki.
-      {% elif not p.zal7_zopz %}Sprawozdanie złożone — oczekuje na potwierdzenie przez ZOPZ.
-      {% else %}Sprawozdanie potwierdzone.{% endif %}
-    </p>
+    {% if not p.zal7_student %}
     <a href="/auth/formularze/{{ p.id_formularza }}/zal7" class="btn-academic"
        style="text-decoration:none;text-align:center">
       Otwórz Sprawozdanie (Zał. 7) →
     </a>
+    {% elif not p.zal5_student %}
+    <a href="/auth/formularze/{{ p.id_formularza }}/zal5" class="btn-academic"
+       style="text-decoration:none;text-align:center;background:#0369a1">
+      Wypełnij Ankietę (Zał. 5) →
+    </a>
+    {% endif %}
     {% elif p.faza_procesu < 2 %}
     <button type="button" class="btn-academic" disabled style="opacity:0.45">
       Dziennik zablokowany – Faza 1
     </button>
-    {% else %}
-    <a href="/auth/formularze/{{ p.id_formularza }}/zal6" class="btn-academic"
-       style="text-decoration:none;text-align:center">
-      Otwórz Dziennik (Zał. 6) →
+    {% elif p.faza_procesu == 4 %}
+    <a href="/auth/formularze/{{ p.id_formularza }}/zal8" class="btn-academic"
+       style="text-decoration:none;text-align:center;background:#7c3aed;opacity:0.7">
+      Podgląd Protokołu (Zał. 8) →
     </a>
+    {% endif %}
     {% endif %}
   </div>
 
   <div class="academic-card">
-    <div class="card-title">Stan załączników</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+      <div class="card-title" style="margin:0">Stan załączników</div>
+      {% if p.faza_procesu >= 1 %}
+      <button onclick="document.getElementById('zip-panel-{{ p.id_formularza }}').classList.toggle('hidden')"
+              style="background:var(--primary);color:#fff;border:none;border-radius:8px;
+                     padding:0.35rem 0.85rem;font-size:0.82rem;font-weight:600;cursor:pointer">
+        ⬇ Pobierz PDF/ZIP
+      </button>
+      {% endif %}
+    </div>
+
+    <div id="zip-panel-{{ p.id_formularza }}" class="hidden"
+         style="background:var(--surface-alt,#1e293b);border:1px solid var(--border);
+                border-radius:8px;padding:1rem 1.25rem;margin-bottom:1.25rem">
+      <form action="/api/pdf/{{ p.id_formularza }}/zip" method="POST" target="_blank">
+        <p style="font-size:0.82rem;font-weight:600;margin-bottom:0.6rem;color:var(--text-muted)">
+          Zaznacz załączniki do pobrania:
+        </p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.3rem 1.5rem;margin-bottom:0.85rem;font-size:0.83rem">
+          <label style="display:flex;align-items:center;gap:0.4rem;cursor:pointer">
+            <input type="checkbox" name="zalaczniki" value="zal1" checked> Zał. 1 – Porozumienie
+          </label>
+          <label style="display:flex;align-items:center;gap:0.4rem;cursor:pointer">
+            <input type="checkbox" name="zalaczniki" value="zal2a" checked> Zał. 2a – Harmonogram
+          </label>
+          <label style="display:flex;align-items:center;gap:0.4rem;cursor:pointer">
+            <input type="checkbox" name="zalaczniki" value="zal31" checked> Zał. 3.1 – Karta str. 1
+          </label>
+          {% if p.faza_procesu >= 3 %}
+          <label style="display:flex;align-items:center;gap:0.4rem;cursor:pointer">
+            <input type="checkbox" name="zalaczniki" value="zal32" checked> Zał. 3.2 – Karta str. 2
+          </label>
+          {% endif %}
+          {% if p.faza_procesu >= 2 %}
+          <label style="display:flex;align-items:center;gap:0.4rem;cursor:pointer">
+            <input type="checkbox" name="zalaczniki" value="zal6"> Zał. 6 – Dziennik
+          </label>
+          {% endif %}
+          {% if p.faza_procesu >= 3 %}
+          <label style="display:flex;align-items:center;gap:0.4rem;cursor:pointer">
+            <input type="checkbox" name="zalaczniki" value="zal7" checked> Zał. 7 – Sprawozdanie
+          </label>
+          <label style="display:flex;align-items:center;gap:0.4rem;cursor:pointer">
+            <input type="checkbox" name="zalaczniki" value="zal4" checked> Zał. 4 – Potwierdzenie efektów
+          </label>
+          <label style="display:flex;align-items:center;gap:0.4rem;cursor:pointer">
+            <input type="checkbox" name="zalaczniki" value="zal5" checked> Zał. 5 – Ankieta
+          </label>
+          {% endif %}
+          {% if p.faza_procesu >= 4 %}
+          <label style="display:flex;align-items:center;gap:0.4rem;cursor:pointer">
+            <input type="checkbox" name="zalaczniki" value="zal8" checked> Zał. 8 – Protokół
+          </label>
+          {% endif %}
+        </div>
+        <button type="submit" style="background:#059669;color:#fff;border:none;border-radius:8px;
+                padding:0.4rem 1rem;font-size:0.83rem;font-weight:600;cursor:pointer">
+          ⬇ Pobierz zaznaczone jako ZIP
+        </button>
+      </form>
+    </div>
+
     <div class="table-wrapper">
       <table class="academic-table">
         <thead>
@@ -97,7 +176,7 @@
             <td><strong>Zał. 1</strong> – Porozumienie o praktyce</td>
             <td>
               <span class="badge {% if p.zal1_zopz and p.zal1_dyrektor %}badge-active{% else %}badge-pending{% endif %}">
-                Zakład: {{ '✓' if p.zal1_zopz else '…' }} &nbsp; Uczelnia: {{ '✓' if p.zal1_dyrektor else '…' }}
+                ZOPZ: {{ '✓' if p.zal1_zopz else '…' }} &nbsp; Dyrektor: {{ '✓' if p.zal1_dyrektor else '…' }}
               </span>
             </td>
             <td>
@@ -127,9 +206,7 @@
             <td><strong>Zał. 3.1</strong> – Karta, str. 1 (skierowanie + potwierdzenia)</td>
             <td>
               <span class="badge {% if p.zal31_dyrektor and p.zal32_zgloszenie_zopz and p.zal32_bhp_zopz %}badge-active{% else %}badge-pending{% endif %}">
-                Skier.: {{ '✓' if p.zal31_dyrektor else '…' }} &nbsp;
-                Zgłosz.: {{ '✓' if p.zal32_zgloszenie_zopz else '…' }} &nbsp;
-                BHP: {{ '✓' if p.zal32_bhp_zopz else '…' }}
+                Dyrektor: {{ '✓' if p.zal31_dyrektor else '…' }} &nbsp; ZOPZ: {{ '✓' if p.zal32_zgloszenie_zopz and p.zal32_bhp_zopz else '…' }}
               </span>
             </td>
             <td>
@@ -158,8 +235,9 @@
           <tr>
             <td><strong>Zał. 6</strong> – Dziennik praktyki</td>
             <td>
-              <span class="badge {% if p.faza_procesu == 2 %}badge-active{% elif p.faza_procesu > 2 %}badge-closed{% else %}badge-pending{% endif %}">
-                {% if p.faza_procesu < 2 %}Zablokowany{% elif p.faza_procesu == 2 %}Otwarty{% else %}Zamknięty{% endif %}
+              <span class="badge {% if p.dziennik_zatwierdzony %}badge-active{% elif p.faza_procesu >= 2 %}badge-pending{% else %}badge-closed{% endif %}">
+                {% if p.faza_procesu < 2 %}Zablokowany
+                {% else %}ZOPZ: {{ '✓' if p.dziennik_zatwierdzony else '…' }}{% endif %}
               </span>
             </td>
             <td>
@@ -174,13 +252,65 @@
           <tr>
             <td><strong>Zał. 7</strong> – Sprawozdanie z praktyki</td>
             <td>
-              <span class="badge {% if p.zal7_zopz %}badge-active{% elif p.faza_procesu == 3 %}badge-pending{% else %}badge-closed{% endif %}">
-                {% if p.faza_procesu < 3 %}Zablokowany{% elif p.zal7_zopz %}Potwierdzony{% elif p.zal7_student %}Złożony{% else %}Do wypełnienia{% endif %}
+              <span class="badge {% if p.zal7_zopz %}badge-active{% elif p.faza_procesu >= 3 %}badge-pending{% else %}badge-closed{% endif %}">
+                {% if p.faza_procesu < 3 %}Zablokowany
+                {% else %}Student: {{ '✓' if p.zal7_student else '…' }} &nbsp; ZOPZ: {{ '✓' if p.zal7_zopz else '…' }}{% endif %}
               </span>
             </td>
             <td>
               {% if p.faza_procesu >= 3 %}
               <a href="/auth/formularze/{{ p.id_formularza }}/zal7"
+                 style="font-size:0.82rem;color:var(--primary);text-decoration:none;font-weight:600">
+                Otwórz →
+              </a>
+              {% endif %}
+            </td>
+          </tr>
+          <tr>
+            <td><strong>Zał. 4</strong> – Potwierdzenie efektów</td>
+            <td>
+              <span class="badge {% if p.zal4_uopz %}badge-active{% elif p.faza_procesu >= 3 %}badge-pending{% else %}badge-closed{% endif %}">
+                {% if p.faza_procesu < 3 %}Zablokowany
+                {% else %}ZOPZ: {{ '✓' if p.zal4_zopz else '…' }} &nbsp; UOPZ: {{ '✓' if p.zal4_uopz else '…' }}{% endif %}
+              </span>
+            </td>
+            <td>
+              {% if p.faza_procesu >= 3 %}
+              <a href="/auth/formularze/{{ p.id_formularza }}/zal4"
+                 style="font-size:0.82rem;color:var(--primary);text-decoration:none;font-weight:600">
+                Otwórz →
+              </a>
+              {% endif %}
+            </td>
+          </tr>
+          <tr>
+            <td><strong>Zał. 5</strong> – Kwestionariusz ankiety</td>
+            <td>
+              <span class="badge {% if p.zal5_student %}badge-active{% elif p.faza_procesu >= 3 %}badge-pending{% else %}badge-closed{% endif %}">
+                {% if p.faza_procesu < 3 %}Zablokowany
+                {% else %}Student: {{ '✓' if p.zal5_student else '…' }}{% endif %}
+              </span>
+            </td>
+            <td>
+              {% if p.faza_procesu >= 3 %}
+              <a href="/auth/formularze/{{ p.id_formularza }}/zal5"
+                 style="font-size:0.82rem;color:var(--primary);text-decoration:none;font-weight:600">
+                Otwórz →
+              </a>
+              {% endif %}
+            </td>
+          </tr>
+          <tr>
+            <td><strong>Zał. 8</strong> – Protokół zaliczenia</td>
+            <td>
+              <span class="badge {% if p.zal8_dyrektor and p.zal8_uopz %}badge-active{% elif p.faza_procesu >= 4 %}badge-pending{% else %}badge-closed{% endif %}">
+                {% if p.faza_procesu < 4 %}Zablokowany
+                {% else %}Dyrektor: {{ '✓' if p.zal8_dyrektor else '…' }} &nbsp; UOPZ: {{ '✓' if p.zal8_uopz else '…' }}{% endif %}
+              </span>
+            </td>
+            <td>
+              {% if p.faza_procesu >= 4 %}
+              <a href="/auth/formularze/{{ p.id_formularza }}/zal8"
                  style="font-size:0.82rem;color:var(--primary);text-decoration:none;font-weight:600">
                 Otwórz →
               </a>
@@ -249,7 +379,13 @@
         <td style="font-size:0.82rem;color:var(--text-muted)">
           {{ p.data_od }} –<br>{{ p.data_do }}
         </td>
-        <td><span class="badge badge-pending">Faza {{ p.faza_procesu }}</span></td>
+        <td>
+          {% if p.usos_wpisany %}
+          <span class="badge" style="background:#d1fae5;color:#065f46">Zakończone ✓</span>
+          {% else %}
+          <span class="badge badge-pending">Faza {{ p.faza_procesu }}</span>
+          {% endif %}
+        </td>
         <td>
           <div style="display:flex;flex-direction:column;gap:0.3rem">
             <a href="/auth/formularze/{{ p.id_formularza }}/zal1"
@@ -281,17 +417,42 @@
                class="doc-link {{ 'doc-link-done' if p.zal7_zopz else 'doc-link-wait' }}">
               Zał. 7 {{ '✓' if p.zal7_zopz else '⏳' }} →
             </a>
+            <a href="/auth/formularze/{{ p.id_formularza }}/zal4"
+               class="doc-link {{ 'doc-link-done' if p.zal4_uopz else 'doc-link-wait' }}">
+              Zał. 4 {{ '✓' if p.zal4_uopz else '⏳' }} →
+            </a>
+            <a href="/auth/formularze/{{ p.id_formularza }}/zal5"
+               class="doc-link {{ 'doc-link-done' if p.zal5_student else 'doc-link-wait' }}">
+              Zał. 5 {{ '✓' if p.zal5_student else '⏳' }} →
+            </a>
+            {% endif %}
+            {% if p.faza_procesu >= 4 %}
+            <a href="/auth/formularze/{{ p.id_formularza }}/zal8"
+               class="doc-link {{ 'doc-link-done' if p.zal8_dyrektor else 'doc-link-wait' }}">
+              Zał. 8 {{ '✓' if p.zal8_dyrektor else '⏳' }} →
+            </a>
             {% endif %}
           </div>
         </td>
         <td>
-          <form action="/auth/admin/internship/{{ p.id_formularza }}/delete" method="POST"
-                onsubmit="return confirm('Na pewno usunąć praktykę #{{ p.id_formularza }}?')">
-            <button type="submit" class="btn-academic"
-                    style="padding:0.35rem 0.75rem;font-size:0.82rem;background:#dc2626;width:auto">
-              Usuń
-            </button>
-          </form>
+          <div style="display:flex;flex-direction:column;gap:0.4rem">
+            <form action="/auth/admin/internship/{{ p.id_formularza }}/delete" method="POST"
+                  onsubmit="return confirm('Na pewno usunąć praktykę #{{ p.id_formularza }}?')">
+              <button type="submit" class="btn-academic"
+                      style="padding:0.35rem 0.75rem;font-size:0.82rem;background:#dc2626;width:auto">
+                Usuń
+              </button>
+            </form>
+            {% if p.zal4_zopz or p.zal4_uopz %}
+            <form action="/api/internships/{{ p.id_formularza }}/reset/zal4" method="POST"
+                  onsubmit="return confirm('Zresetować Zał. 4 dla tej praktyki?')">
+              <button type="submit" class="btn-academic"
+                      style="padding:0.35rem 0.75rem;font-size:0.82rem;background:#92400e;width:auto">
+                Cofnij Zał. 4
+              </button>
+            </form>
+            {% endif %}
+          </div>
         </td>
       </tr>
       {% endfor %}
@@ -422,7 +583,13 @@
           <small>{{ p.student_record.nr_albumu }}</small>
         </td>
         <td>{{ p.firma.nazwa }}</td>
-        <td><span class="badge badge-pending">Faza {{ p.faza_procesu }}</span></td>
+        <td>
+          {% if p.usos_wpisany %}
+          <span class="badge" style="background:#d1fae5;color:#065f46">Zakończone ✓</span>
+          {% else %}
+          <span class="badge badge-pending">Faza {{ p.faza_procesu }}</span>
+          {% endif %}
+        </td>
         <td>
           <div style="display:flex;flex-direction:column;gap:0.3rem">
             <a href="/auth/formularze/{{ p.id_formularza }}/zal1"
@@ -453,6 +620,20 @@
             <a href="/auth/formularze/{{ p.id_formularza }}/zal7"
                class="doc-link {{ 'doc-link-done' if p.zal7_zopz else 'doc-link-wait' }}">
               Zał. 7 {{ '✓' if p.zal7_zopz else '⏳' }} →
+            </a>
+            <a href="/auth/formularze/{{ p.id_formularza }}/zal4"
+               class="doc-link {{ 'doc-link-done' if p.zal4_uopz else 'doc-link-wait' }}">
+              Zał. 4 {{ '✓' if p.zal4_uopz else '⏳' }} →
+            </a>
+            <a href="/auth/formularze/{{ p.id_formularza }}/zal5"
+               class="doc-link {{ 'doc-link-done' if p.zal5_student else 'doc-link-wait' }}">
+              Zał. 5 {{ '✓' if p.zal5_student else '⏳' }} →
+            </a>
+            {% endif %}
+            {% if p.faza_procesu >= 4 %}
+            <a href="/auth/formularze/{{ p.id_formularza }}/zal8"
+               class="doc-link {{ 'doc-link-done' if p.zal8_dyrektor else 'doc-link-wait' }}">
+              Zał. 8 {{ '✓' if p.zal8_dyrektor else '⏳' }} →
             </a>
             {% endif %}
           </div>
@@ -593,7 +774,7 @@
                   Potwierdź Sprawozdanie (Zał. 7)
                 </a>
                 {% endif %}
-                {% if not p.zal3_strona2_zopz %}
+                {% if not p.zal3_strona2_zopz and p.zal7_zopz %}
                 <a href="/auth/formularze/{{ p.id_formularza }}/zal32" class="btn-academic"
                    style="padding:0.35rem 0.7rem;font-size:0.82rem;text-decoration:none;text-align:center;background:#0369a1">
                   Wypełnij Kartę str. 2 (Zał. 3.2)
@@ -601,8 +782,14 @@
                 {% endif %}
                 {% if not p.zal7_student %}
                 <span class="action-hint">⏳ Zał. 7 — oczekuje na studenta</span>
-                {% elif p.zal7_zopz and p.zal3_strona2_zopz %}
-                <span class="action-hint">✓ Część ZOPZ gotowa — oczekuje na UOPZ / Zał. 4</span>
+                {% elif p.zal4_zopz and p.zal3_strona2_zopz %}
+                <span class="action-hint">✓ Część ZOPZ gotowa — oczekuje na UOPZ</span>
+                {% endif %}
+                {% if p.zal7_zopz and p.zal3_strona2_zopz and not p.zal4_zopz %}
+                <a href="/auth/formularze/{{ p.id_formularza }}/zal4" class="btn-academic"
+                   style="padding:0.35rem 0.7rem;font-size:0.82rem;text-decoration:none;text-align:center;background:#7c3aed">
+                  Potwierdź efekty (Zał. 4)
+                </a>
                 {% endif %}
               {% elif current_user.role == 'uopz' %}
                 {% if p.zal3_strona2_zopz and p.zal7_student and not p.zal3_strona2_uopz %}
@@ -611,12 +798,18 @@
                   Oceń praktykę (Zał. 3.2)
                 </a>
                 {% endif %}
+                {% if p.zal4_zopz and not p.zal4_uopz %}
+                <a href="/auth/formularze/{{ p.id_formularza }}/zal4" class="btn-academic"
+                   style="padding:0.35rem 0.7rem;font-size:0.82rem;text-decoration:none;text-align:center;background:#7c3aed">
+                  Opinia do efektów (Zał. 4)
+                </a>
+                {% endif %}
                 {% if not p.zal7_student %}
                 <span class="action-hint">⏳ Zał. 7 — oczekuje na studenta</span>
                 {% elif not p.zal3_strona2_zopz %}
                 <span class="action-hint">⏳ Zał. 3.2 — oczekuje na część ZOPZ</span>
-                {% elif p.zal3_strona2_uopz %}
-                <span class="action-hint">✓ Twoja część gotowa — oczekuje na Zał. 4 (wkrótce)</span>
+                {% elif p.zal3_strona2_uopz and p.zal4_uopz %}
+                <span class="action-hint">✓ Twoja część gotowa — oczekuje na ankietę studenta</span>
                 {% endif %}
               {% elif current_user.role == 'dyrektor' %}
                 <span class="action-hint">⏳ Faza 3 — sprawozdanie i oceny w toku</span>
@@ -624,19 +817,27 @@
 
             {# ── Faza 4 ── #}
             {% elif p.faza_procesu == 4 %}
-              {% if current_user.role == 'dyrektor' and not p.zal8_dyrektor %}
-              <form action="/api/internships/{{ p.id_formularza }}/sign" method="POST">
-                <input type="hidden" name="dokument" value="ZAL8">
-                <input type="hidden" name="redirect_to" value="/auth/dashboard">
+              {% if p.usos_wpisany %}
+              <span style="font-size:0.8rem;color:#059669;font-weight:600">✓ Praktyka zakończona</span>
+              {% elif current_user.role == 'dyrektor' and not p.zal8_dyrektor %}
+              <a href="/auth/formularze/{{ p.id_formularza }}/zal8" class="btn-academic"
+                 style="padding:0.35rem 0.7rem;font-size:0.82rem;text-decoration:none;text-align:center;background:#7c3aed">
+                Wystaw Protokół (Zał. 8)
+              </a>
+              {% elif current_user.role == 'dyrektor' and p.zal8_dyrektor %}
+              <span class="action-hint">✓ Protokół wystawiony — oczekuje na UOPZ</span>
+              {% elif current_user.role == 'uopz' and p.zal8_dyrektor %}
+              <form action="/api/internships/{{ p.id_formularza }}/usos" method="POST"
+                    onsubmit="return confirm('Podpisać protokół i zakończyć praktykę?')">
                 <button type="submit" class="btn-academic"
-                        style="padding:0.35rem 0.7rem;font-size:0.82rem;background:#7c3aed">
-                  Wystaw Protokół (Zał. 8)
+                        style="padding:0.35rem 0.7rem;font-size:0.82rem;background:#059669">
+                  Podpisz i zakończ
                 </button>
               </form>
+              {% elif current_user.role == 'uopz' %}
+              <span class="action-hint">⏳ Oczekuje na Protokół Dyrektora</span>
               {% endif %}
 
-            {% else %}
-              <span style="font-size:0.8rem;color:var(--text-muted)">Zamknięta</span>
             {% endif %}
 
           </div>

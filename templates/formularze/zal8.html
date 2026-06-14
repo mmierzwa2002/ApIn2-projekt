@@ -1,0 +1,363 @@
+{% extends "base.html" %}
+{% block title %}Zał. 8 – Protokół zaliczenia | {{ p.firma.nazwa }}{% endblock %}
+
+{% block content %}
+<style>
+.dokument {
+  max-width: 900px; margin: 0 auto 2rem; background: #fff;
+  border: 1px solid var(--border); border-radius: var(--radius);
+  box-shadow: var(--shadow-card); padding: 3rem 3.5rem;
+  font-size: 0.9rem; line-height: 1.7; color: #1e293b;
+}
+.dok-naglowek { text-align: right; font-size: 0.85rem; font-weight: 600; margin-bottom: 1.5rem; color: var(--text-muted); }
+.dok-instytucja { font-size: 0.88rem; font-weight: 700; margin-bottom: 1.5rem; }
+.dok-tytul { text-align: center; margin-bottom: 2rem; }
+.dok-tytul h2 { font-size: 1.05rem; font-weight: 700; letter-spacing: 0.3px; }
+.proto-tabela { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+.proto-tabela th, .proto-tabela td { border: 1px solid #334155; padding: 0.5rem 0.75rem; vertical-align: middle; }
+.proto-tabela th { background: #f8fafc; font-weight: 600; white-space: nowrap; }
+.proto-tabela .col-ocena { width: 6rem; text-align: center; font-weight: 700; }
+.podpis-uopz-cell { text-align: center; vertical-align: middle; padding: 0.6rem 0.75rem !important; }
+.podpis-uopz-linia { width: 80%; margin: 1.2rem auto 0; border-top: 1px solid #334155; }
+.podpis-uopz-opis { font-size: 0.72rem; color: var(--text-muted); font-style: italic; margin-top: 0.3rem; }
+.komisja-tabela { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+.komisja-tabela td { border: 1px solid #334155; padding: 0.5rem 0.75rem; }
+.komisja-tabela .lp { width: 2rem; text-align: center; font-weight: 700; }
+.komisja-tabela .rola { width: 30%; font-style: italic; color: var(--text-muted); font-size: 0.82rem; }
+.dok-formula { font-size: 0.9rem; background: #f8fafc; border: 1px solid #e2e8f0;
+               border-radius: 8px; padding: 0.75rem 1.25rem; margin: 1.25rem 0; }
+.dok-wynik { font-size: 1.25rem; font-weight: 800; color: #1e293b; }
+.dok-pieczatka { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.3rem 0.8rem;
+                 border-radius: 50px; font-size: 0.8rem; font-weight: 600; }
+.pieczatka-ok    { background: #d1fae5; color: #065f46; }
+.pieczatka-czeka { background: #fef3c7; color: #92400e; }
+.dok-podpis-blok { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; margin-top: 2rem; }
+.dok-podpis-linia { width: 220px; border-top: 1px solid #334155; margin-top: 2.5rem; }
+.dok-podpis-opis { font-size: 0.78rem; color: var(--text-muted); text-align: center; width: 220px; }
+
+.panel {
+  max-width: 900px; margin: 0 auto 1.5rem; background: var(--surface);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 1.5rem 2rem; box-shadow: var(--shadow-card);
+}
+.panel .card-title { font-size: 1.05rem; font-weight: 600; margin-bottom: 1rem;
+                     border-left: 4px solid var(--primary); padding-left: 0.5rem; }
+.dok-toolbar { display: flex; align-items: center; gap: 1rem; max-width: 900px; margin: 0 auto 1.25rem; flex-wrap: wrap; }
+.dok-blokada { max-width: 900px; margin: 0 auto 1.25rem; background: #fef3c7; color: #92400e;
+               border-radius: 8px; padding: 0.85rem 1.1rem; font-size: 0.9rem; font-weight: 500; }
+.btn-sm { display: inline-flex; align-items: center; padding: 0.45rem 1rem; border-radius: 8px;
+          font-size: 0.88rem; font-weight: 600; text-decoration: none; cursor: pointer; border: none; }
+.btn-back  { background: #e2e8f0; color: #334155; }
+.btn-print { background: var(--primary); color: #fff; }
+.pytania-tabela { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+.pytania-tabela th, .pytania-tabela td { border: 1px solid #334155; padding: 0.5rem 0.75rem; }
+.pytania-tabela th { background: #1e293b; color: #fff; font-size: 0.82rem; }
+.pytania-tabela .col-nr   { width: 3rem; text-align: center; }
+.pytania-tabela .col-ocena { width: 7rem; text-align: center; }
+@media print {
+  .nav-container, .dok-toolbar, .panel, .alert, .dok-blokada { display: none !important; }
+  body { background: #fff; }
+  .dokument { border: none; box-shadow: none; margin: 0; padding: 1cm 1.5cm; font-size: 9.5pt; }
+  .proto-tabela th, .komisja-tabela, .pytania-tabela th { background: #f8fafc !important; }
+}
+</style>
+
+<div class="dok-toolbar">
+  <a href="/auth/dashboard" class="btn-sm btn-back">← Powrót</a>
+  <button onclick="window.print()" class="btn-sm btn-print">🖨 Drukuj / PDF</button>
+  <span style="margin-left:auto;font-size:0.82rem;color:var(--text-muted)">
+    Formularz: #{{ p.id_formularza }} &nbsp;·&nbsp; Faza {{ p.faza_procesu }}
+  </span>
+</div>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}{% for cat, msg in messages %}
+    <div class="alert alert-{{ cat }}" style="max-width:900px;margin:0 auto 1rem">{{ msg }}</div>
+  {% endfor %}{% endif %}
+{% endwith %}
+
+{% if p.faza_procesu < 4 %}
+<div class="dok-blokada">⚠ Protokół dostępny dopiero w Fazie 4 (Zaliczenie) — po ukończeniu wszystkich dokumentów Fazy 3.</div>
+{% endif %}
+
+{# ══════════ DOKUMENT ══════════ #}
+<div class="dokument">
+  <div class="dok-naglowek">Załącznik nr 8</div>
+  <div class="dok-instytucja">
+    Akademia Nauk Stosowanych w Elblągu<br>
+    <em>Instytut Informatyki Stosowanej im. Krzysztofa Brzeskiego</em>
+  </div>
+
+  <div class="dok-tytul">
+    <h2>PROTOKÓŁ ZALICZENIA PRAKTYKI ZAWODOWEJ (PZ)</h2>
+  </div>
+
+  <p><strong>Student:</strong> {{ p.student_record.full_name }} &nbsp;&nbsp;
+     <strong>Nr albumu:</strong> {{ p.student_record.nr_albumu }}</p>
+
+  <p style="font-weight:700;margin:1.25rem 0 0.3rem">Miejsce i okres realizacji PZ:</p>
+  <table class="proto-tabela">
+    <thead>
+      <tr>
+        <th></th>
+        <th>Nazwa instytucji (zakładu pracy), w której student odbył praktykę</th>
+        <th>Okres / liczba dni</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="text-align:center;font-weight:700">1</td>
+        <td>{{ p.firma.nazwa }}</td>
+        <td>{{ p.data_od.strftime('%d.%m.%Y') }} – {{ p.data_do.strftime('%d.%m.%Y') }}
+            / {{ p.liczba_dni_roboczych or 120 }} dni</td>
+      </tr>
+      <tr>
+        <td style="text-align:center;font-weight:700">2</td>
+        <td></td><td></td>
+      </tr>
+    </tbody>
+  </table>
+
+  {# Oceny S, U, Z #}
+  {% set ocena_u = k.ocena_uopz_param if k else '—' %}
+  {% set ocena_z = k.ocena_zopz_param if k else '—' %}
+  <table class="proto-tabela ocena-tabela" style="margin-top:1rem">
+    <tr>
+      <th style="width:38%">Ocena za sprawozdanie z praktyki S* =</th>
+      <td class="col-ocena">{{ pr.ocena_s if pr else '—' }}</td>
+      <td colspan="2" class="podpis-uopz-cell">
+        {% if p.zal8_uopz %}
+          <span class="dok-pieczatka pieczatka-ok">✓ Podpisano cyfrowo (UOPZ)</span>
+        {% else %}
+          <div class="podpis-uopz-linia"></div>
+        {% endif %}
+        <div class="podpis-uopz-opis">data i podpis uczelnianego opiekuna praktyki</div>
+      </td>
+    </tr>
+    <tr>
+      <th style="width:38%">Ocena U* =</th>
+      <td class="col-ocena">{{ ocena_u }}</td>
+      <th style="width:38%">Ocena Z* =</th>
+      <td class="col-ocena">{{ ocena_z }}</td>
+    </tr>
+  </table>
+
+  {# Skład komisji i data #}
+  <div style="display:grid;grid-template-columns:1fr auto;gap:2rem;margin-top:1.25rem;align-items:start">
+    <div>
+      <p style="font-weight:700;margin-bottom:0.4rem">Skład komisji:</p>
+      <table class="komisja-tabela">
+        <tr>
+          <td class="lp">1.</td>
+          <td>{{ pr.czlonek_1 if pr and pr.czlonek_1 else '……………………………………………………………' }}</td>
+          <td class="rola">— Przewodniczący Komisji</td>
+        </tr>
+        <tr>
+          <td class="lp">2.</td>
+          <td>{{ pr.czlonek_2 if pr and pr.czlonek_2 else '……………………………………………………………' }}</td>
+          <td class="rola">— Uczelniany opiekun praktyki zawodowej</td>
+        </tr>
+        <tr>
+          <td class="lp">3.</td>
+          <td>{{ pr.czlonek_3 if pr and pr.czlonek_3 else '……………………………………………………………' }}</td>
+          <td class="rola">{{ '—' if pr and pr.czlonek_3 else '' }}</td>
+        </tr>
+        <tr>
+          <td class="lp">4.</td>
+          <td>{{ pr.czlonek_4 if pr and pr.czlonek_4 else '……………………………………………………………' }}</td>
+          <td class="rola">{{ '—' if pr and pr.czlonek_4 else '' }}</td>
+        </tr>
+      </table>
+    </div>
+    <div>
+      <p style="font-weight:700;margin-bottom:0.4rem">Data zaliczenia:</p>
+      <p>{{ pr.data_zaliczenia.strftime('%d.%m.%Y') if pr and pr.data_zaliczenia else '…………………………' }}</p>
+    </div>
+  </div>
+
+  {# Pytania i oceny cząstkowe #}
+  <table class="pytania-tabela" style="margin-top:1.25rem">
+    <thead>
+      <tr>
+        <th class="col-nr">Lp.</th>
+        <th>Pytania / mini zadania zawodowe</th>
+        <th class="col-ocena">Oceny cząstkowe<br><small>(skala 2–5)</small></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for nr in range(1, 4) %}
+      <tr>
+        <td style="text-align:center;font-weight:700">{{ nr }}</td>
+        <td>{{ pr['pytanie_' ~ nr] if pr and pr['pytanie_' ~ nr] else '' }}</td>
+        <td style="text-align:center;font-weight:700">
+          {{ pr['ocena_p' ~ nr] if pr and pr['ocena_p' ~ nr] else '' }}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div class="dok-formula">
+    <strong>E</strong> (łączna ocena za mini zadania — średnia arytmetyczna) =
+    <strong>{{ pr.ocena_e if pr else '—' }}</strong>
+    &nbsp;&nbsp;|&nbsp;&nbsp;
+    <strong>K</strong> = 0,4·E + 0,1·S + 0,2·U + 0,3·Z =
+    <strong>{{ pr.ocena_k if pr else '—' }}</strong>
+  </div>
+
+  <p style="margin-top:1.5rem;font-size:1.05rem">
+    <strong>Zaliczam praktykę zawodową na ocenę (K):</strong>
+    {% if pr and pr.ocena_finalna %}
+    <span class="dok-wynik">&nbsp;{{ pr.ocena_finalna }}</span>
+    {% else %}
+    <span style="color:#9ca3af">…………</span>
+    {% endif %}
+  </p>
+
+  <div style="display:flex;justify-content:flex-end;margin-top:2rem">
+    <div class="dok-podpis-blok">
+      {% if p.zal8_dyrektor %}
+        <span class="dok-pieczatka pieczatka-ok">✓ Podpisane cyfrowo (Dyrektor)</span>
+      {% else %}
+        <span class="dok-pieczatka pieczatka-czeka">Oczekuje na podpis Dyrektora</span>
+      {% endif %}
+      <div class="dok-podpis-linia"></div>
+      <div class="dok-podpis-opis">Przewodniczący Komisji<br>(podpis)</div>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:4rem;margin-top:1.5rem">
+    <div class="dok-podpis-blok">
+      <div class="dok-podpis-linia"></div>
+      <div class="dok-podpis-opis">2) …………………………</div>
+    </div>
+    <div class="dok-podpis-blok">
+      <div class="dok-podpis-linia"></div>
+      <div class="dok-podpis-opis">3) …………………………</div>
+    </div>
+    <div class="dok-podpis-blok">
+      <div class="dok-podpis-linia"></div>
+      <div class="dok-podpis-opis">4) …………………………</div>
+    </div>
+  </div>
+
+  <p style="font-size:0.78rem;color:var(--text-muted);margin-top:1.5rem">
+    *) U i Z – oceny odpowiednio Opiekuna uczelnianego i Opiekuna zakładowego zapisane w Karcie praktyki zawodowej
+  </p>
+
+  <div style="margin-top:1rem;text-align:center">
+    {% if p.usos_wpisany %}
+    <span class="dok-pieczatka pieczatka-ok">✓ Praktyka zakończona</span>
+    {% elif p.zal8_dyrektor %}
+    <span class="dok-pieczatka pieczatka-czeka">Oczekuje na zamknięcie przez UOPZ</span>
+    {% endif %}
+  </div>
+</div>
+
+{# ══════════ PANEL DYREKTORA ══════════ #}
+{% if current_user.role in ('dyrektor', 'administrator') and p.faza_procesu == 4 %}
+<div class="panel">
+  <div class="card-title">Protokół zaliczenia (Dyrektor)</div>
+  {% if p.zal8_dyrektor %}
+  <p style="color:#065f46;font-weight:600">✓ Protokół został już wystawiony.</p>
+  {% else %}
+  <form action="/api/internships/{{ p.id_formularza }}/zal8" method="POST">
+    <p style="font-size:0.88rem;color:var(--text-muted);margin-bottom:1.25rem">
+      Oceny U={{ ocena_u }} i Z={{ ocena_z }} pobierane są automatycznie z Karty praktyki (Zał. 3.2).
+    </p>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:1rem">
+      <div class="form-group">
+        <label>Data zaliczenia</label>
+        <input type="date" name="data_zaliczenia" class="custom-input" required>
+      </div>
+      <div class="form-group">
+        <label>Ocena za sprawozdanie (S)</label>
+        <select name="ocena_s" class="custom-select" required>
+          <option value="">— wybierz —</option>
+          {% for o in oceny %}<option value="{{ o }}">{{ o }}</option>{% endfor %}
+        </select>
+      </div>
+    </div>
+
+    <p style="font-weight:600;margin-bottom:0.5rem">Skład komisji:</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:1rem">
+      <div class="form-group">
+        <label>1. Przewodniczący Komisji</label>
+        <input type="text" name="czlonek_1" class="custom-input" placeholder="Imię i nazwisko" required>
+      </div>
+      <div class="form-group">
+        <label>2. Uczelniany opiekun praktyki (UOPZ)</label>
+        {% if uopz_users | length > 1 %}
+        <select name="czlonek_2" class="custom-select">
+          <option value="">— wybierz —</option>
+          {% for u in uopz_users %}
+          <option value="{{ u.full_name }}">{{ u.full_name }}</option>
+          {% endfor %}
+        </select>
+        {% else %}
+        <input type="text" name="czlonek_2" class="custom-input"
+               value="{{ uopz_name }}" placeholder="Imię i nazwisko">
+        {% endif %}
+      </div>
+      <div class="form-group">
+        <label>3. Członek Komisji (opcjonalnie)</label>
+        <input type="text" name="czlonek_3" class="custom-input" placeholder="Imię i nazwisko">
+      </div>
+      <div class="form-group">
+        <label>4. Członek Komisji (opcjonalnie)</label>
+        <input type="text" name="czlonek_4" class="custom-input" placeholder="Imię i nazwisko">
+      </div>
+    </div>
+
+    <p style="font-weight:600;margin-bottom:0.5rem">Pytania / mini zadania zawodowe:</p>
+    {% for nr in range(1, 4) %}
+    <div style="display:grid;grid-template-columns:1fr 8rem;gap:0.75rem;margin-bottom:0.5rem;align-items:end">
+      <div class="form-group" style="margin:0">
+        <label>{{ nr }}. Pytanie / zadanie</label>
+        <input type="text" name="pytanie_{{ nr }}" class="custom-input" placeholder="Treść pytania…" required>
+      </div>
+      <div class="form-group" style="margin:0">
+        <label>Ocena</label>
+        <select name="ocena_p{{ nr }}" class="custom-select" required>
+          <option value="">—</option>
+          {% for o in oceny %}<option value="{{ o }}">{{ o }}</option>{% endfor %}
+        </select>
+      </div>
+    </div>
+    {% endfor %}
+
+    <button type="submit" class="btn-academic"
+            style="width:auto;padding:0.55rem 1.5rem;margin-top:1rem;background:#7c3aed"
+            onclick="return confirm('Wystawić protokół? Po zapisaniu nie można go edytować.')">
+      Wystaw i podpisz Protokół (Zał. 8)
+    </button>
+  </form>
+  {% endif %}
+</div>
+{% endif %}
+
+{# ══════════ PANEL UOPZ ══════════ #}
+{% if current_user.role in ('uopz', 'administrator') and p.faza_procesu == 4 %}
+<div class="panel">
+  <div class="card-title">Zakończenie procesu</div>
+  {% if p.usos_wpisany %}
+  <p style="color:#065f46;font-weight:600">✓ Praktyka została zakończona.</p>
+  {% elif not p.zal8_dyrektor %}
+  <p style="color:var(--warning)">Najpierw Dyrektor musi wystawić Protokół (Zał. 8).</p>
+  {% else %}
+  <p style="font-size:0.88rem;margin-bottom:1rem">
+    Protokół wystawiony przez Dyrektora. Podpisz protokół jako uczelniany opiekun
+    praktyki (UOPZ) i zakończ proces — to ostatni krok.
+  </p>
+  <form action="/api/internships/{{ p.id_formularza }}/usos" method="POST"
+        onsubmit="return confirm('Podpisać protokół i zakończyć praktykę? Tego nie można cofnąć.')">
+    <button type="submit" class="btn-academic" style="width:auto;padding:0.55rem 1.5rem">
+      Podpisz protokół i zakończ praktykę
+    </button>
+  </form>
+  {% endif %}
+</div>
+{% endif %}
+
+{% endblock %}

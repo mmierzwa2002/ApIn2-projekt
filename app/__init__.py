@@ -49,6 +49,8 @@ def create_app():
     from app.models.card import KartaPraktyki
     from app.models.diary import DziennikPraktyki, WpisDziennika
     from app.models.report import Sprawozdanie
+    from app.models.survey import Ankieta
+    from app.models.protocol import ProtokolZaliczenia
     from app.models.document import Document
 
     @login_manager.user_loader
@@ -73,6 +75,7 @@ def create_app():
     from app.api.journal import journal_bp
     from app.api.outcomes import outcomes_bp
     from app.api.firms import firms_bp
+    from app.api.pdf import pdf_bp
 
     app.register_blueprint(errors_bp)
     app.register_blueprint(students_bp)
@@ -81,5 +84,6 @@ def create_app():
     app.register_blueprint(journal_bp)
     app.register_blueprint(outcomes_bp)
     app.register_blueprint(firms_bp)
+    app.register_blueprint(pdf_bp)
 
     return app

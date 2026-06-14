@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+{% block title %}Zał. 4 – Potwierdzenie efektów | {{ p.firma.nazwa }}{% endblock %}
+
+{% block content %}
+<style>
+.dokument {
+  max-width: 860px; margin: 0 auto 2rem; background: #fff;
+  border: 1px solid var(--border); border-radius: var(--radius);
+  box-shadow: var(--shadow-card); padding: 3rem 3.5rem;
+  font-size: 0.93rem; line-height: 1.7; color: #1e293b;
+}
+.dok-naglowek { text-align: right; font-size: 0.85rem; font-weight: 600; margin-bottom: 1.5rem; color: var(--text-muted); }
+.dok-tytul { text-align: center; margin-bottom: 2rem; }
+.dok-tytul h2 { font-size: 1.1rem; font-weight: 700; letter-spacing: 0.3px; }
+.dok-fill { font-weight: 700; }
+.dok-blank { color: #9ca3af; font-style: italic; border-bottom: 1px solid #9ca3af; display: inline-block; min-width: 100px; }
+.efekty-tabela { width: 100%; border-collapse: collapse; margin: 1.5rem 0; }
+.efekty-tabela th, .efekty-tabela td { border: 1px solid #334155; padding: 0.5rem 0.75rem; vertical-align: middle; }
+.efekty-tabela th { background: #1e293b; color: #fff; font-weight: 600; font-size: 0.82rem; text-align: center; }
+.efekty-tabela td:first-child { width: 2.5rem; text-align: center; font-weight: 700; }
+.efekty-tabela td:last-child { width: 9rem; text-align: center; }
+.dok-wynik { font-size: 1rem; font-weight: 700; }
+.wynik-ok  { color: #065f46; }
+.wynik-nie { color: #991b1b; }
+.wynik-brak { color: #9ca3af; font-style: italic; font-weight: 400; }
+.dok-podpis-blok { margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border); display: flex; flex-direction: column; align-items: flex-end; gap: 0.35rem; }
+.dok-podpis-linia { width: 260px; border-top: 1px solid #334155; margin-top: 2rem; }
+.dok-podpis-opis { font-size: 0.78rem; color: var(--text-muted); text-align: center; width: 260px; }
+.dok-pieczatka { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.3rem 0.8rem; border-radius: 50px; font-size: 0.8rem; font-weight: 600; }
+.pieczatka-ok    { background: #d1fae5; color: #065f46; }
+.pieczatka-czeka { background: #fef3c7; color: #92400e; }
+.opinia-tresc { white-space: pre-wrap; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.6rem 0.9rem; min-height: 2.5rem; background: #fbfcfe; margin-top: 0.4rem; }
+.opinia-pusty { color: #9ca3af; font-style: italic; }
+
+.panel {
+  max-width: 860px; margin: 0 auto 1.5rem; background: var(--surface);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 1.5rem 2rem; box-shadow: var(--shadow-card);
+}
+.panel .card-title { font-size: 1.05rem; font-weight: 600; margin-bottom: 1rem; border-left: 4px solid var(--primary); padding-left: 0.5rem; }
+.ef-row { display: grid; grid-template-columns: 2.5rem 1fr auto; align-items: center; gap: 0.75rem; padding: 0.6rem 0; border-bottom: 1px solid var(--border); }
+.ef-row:last-child { border-bottom: none; }
+.ef-kod { font-weight: 700; font-size: 0.9rem; text-align: center; }
+.ef-radio { display: flex; gap: 1.5rem; white-space: nowrap; }
+.ef-radio label { display: flex; align-items: center; gap: 0.3rem; cursor: pointer; font-size: 0.88rem; }
+.dok-toolbar { display: flex; align-items: center; gap: 1rem; max-width: 860px; margin: 0 auto 1.25rem; flex-wrap: wrap; }
+.dok-blokada { max-width: 860px; margin: 0 auto 1.25rem; background: #fef3c7; color: #92400e; border-radius: 8px; padding: 0.85rem 1.1rem; font-size: 0.9rem; font-weight: 500; }
+.btn-sm { display: inline-flex; align-items: center; padding: 0.45rem 1rem; border-radius: 8px; font-size: 0.88rem; font-weight: 600; text-decoration: none; cursor: pointer; border: none; }
+.btn-back  { background: #e2e8f0; color: #334155; }
+.btn-print { background: var(--primary); color: #fff; }
+@media print {
+  .nav-container, .dok-toolbar, .panel, .alert, .dok-blokada { display: none !important; }
+  body { background: #fff; }
+  .dokument { border: none; box-shadow: none; margin: 0; padding: 1cm 1.5cm; font-size: 10pt; }
+  .efekty-tabela th { background: #000 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+</style>
+
+<div class="dok-toolbar">
+  <a href="/auth/dashboard" class="btn-sm btn-back">← Powrót</a>
+  <button onclick="window.print()" class="btn-sm btn-print">🖨 Drukuj / PDF</button>
+  <span style="margin-left:auto;font-size:0.82rem;color:var(--text-muted)">
+    Formularz: #{{ p.id_formularza }} &nbsp;·&nbsp; Faza {{ p.faza_procesu }}
+  </span>
+</div>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}{% for cat, msg in messages %}
+    <div class="alert alert-{{ cat }}" style="max-width:860px;margin:0 auto 1rem">{{ msg }}</div>
+  {% endfor %}{% endif %}
+{% endwith %}
+
+{% if p.faza_procesu < 3 %}
+<div class="dok-blokada">⚠ Potwierdzenie efektów dostępne dopiero w Fazie 3 (Podsumowanie).</div>
+{% endif %}
+
+{# ══════════ DOKUMENT ══════════ #}
+<div class="dokument">
+  <div class="dok-naglowek">Załącznik nr 4</div>
+  <div class="dok-tytul">
+    <h2>POTWIERDZENIE UZYSKANIA EFEKTÓW UCZENIA SIĘ<br>W RAMACH PRAKTYKI ZAWODOWEJ</h2>
+  </div>
+
+  <p>Student / ka: <span class="dok-fill">{{ p.student_record.full_name }}</span></p>
+  <p>Nr albumu: <span class="dok-fill">{{ p.student_record.nr_albumu }}</span></p>
+  <p>Kierunek studiów: <strong>Informatyka</strong></p>
+  <p>Specjalność: <span class="dok-fill">{{ p.student_record.specjalnosc or '—' }}</span></p>
+  <p style="margin-top:0.75rem">
+    W ramach praktyki zawodowej zrealizowanej w wymiarze
+    <span class="dok-fill">960</span> godzin uzyskał/a
+    {% if p.zal4_zopz %}
+      <strong>/ nie uzyskał/a *</strong>
+    {% else %}
+      <span class="dok-blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+    {% endif %}
+    zakładane efekty uczenia się:
+  </p>
+
+  <table class="efekty-tabela">
+    <thead>
+      <tr>
+        <th>Lp.</th>
+        <th>Efekty uczenia się</th>
+        <th>Potwierdzenie uzyskania efektów</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for ef in efekty %}
+      {% set pot = potwierdzenia.get(ef.id_efektu) %}
+      <tr>
+        <td>{{ ef.kod }}</td>
+        <td>{{ ef.opis }}</td>
+        <td>
+          {% if pot is not none %}
+            {% if pot.czy_uzyskany == 1 %}
+              <span class="dok-wynik wynik-ok">uzyskał/a ✓</span>
+            {% else %}
+              <span class="dok-wynik wynik-nie">nie uzyskał/a ✗</span>
+            {% endif %}
+          {% else %}
+            <span class="dok-wynik wynik-brak">—</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {# Podpis ZOPZ #}
+  <div class="dok-podpis-blok">
+    {% if p.zal4_zopz %}
+      <span class="dok-pieczatka pieczatka-ok">✓ Potwierdzone cyfrowo (ZOPZ)</span>
+    {% else %}
+      <span class="dok-pieczatka pieczatka-czeka">Oczekuje na potwierdzenie ZOPZ</span>
+    {% endif %}
+    <div class="dok-podpis-linia"></div>
+    <div class="dok-podpis-opis">Data, podpis i pieczęć zakładu pracy<br>(bezpośredni opiekun zakładowy)</div>
+  </div>
+
+  {# Opinia UOPZ #}
+  <div style="margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--border)">
+    <p style="font-weight:600;margin-bottom:0.5rem">Opinia opiekuna uczelnianego:</p>
+    <div class="opinia-tresc">
+      {% if p.zal4_opinia_uopz %}{{ p.zal4_opinia_uopz }}
+      {% else %}<span class="opinia-pusty">— nie wypełniono —</span>{% endif %}
+    </div>
+    <div class="dok-podpis-blok">
+      {% if p.zal4_uopz %}
+        <span class="dok-pieczatka pieczatka-ok">✓ Opinia UOPZ zapisana</span>
+      {% else %}
+        <span class="dok-pieczatka pieczatka-czeka">Oczekuje na opinię UOPZ</span>
+      {% endif %}
+      <div class="dok-podpis-linia"></div>
+      <div class="dok-podpis-opis">Data, podpis opiekuna uczelnianego</div>
+    </div>
+  </div>
+</div>
+
+{# ══════════ PANEL ZOPZ ══════════ #}
+{% if current_user.role == 'zopz' and p.faza_procesu == 3 %}
+<div class="panel">
+  <div class="card-title">Potwierdzenie efektów (ZOPZ)</div>
+  {% if p.zal4_zopz %}
+  <p style="color:#065f46;font-weight:600">✓ Efekty zostały już potwierdzone.</p>
+  {% elif not p.zal7_zopz %}
+  <p style="color:var(--warning)">Najpierw potwierdź Sprawozdanie (Zał. 7).</p>
+  {% else %}
+  <form action="/api/internships/{{ p.id_formularza }}/zal4/zopz" method="POST">
+    {% for ef in efekty %}
+    <div class="ef-row">
+      <span class="ef-kod">{{ ef.kod }}</span>
+      <span style="font-size:0.87rem">{{ ef.opis }}</span>
+      <div class="ef-radio">
+        <label><input type="radio" name="ef_{{ ef.kod }}" value="1" required> uzyskał/a</label>
+        <label><input type="radio" name="ef_{{ ef.kod }}" value="0"> nie uzyskał/a</label>
+      </div>
+    </div>
+    {% endfor %}
+    <button type="submit" class="btn-academic" style="width:auto;padding:0.55rem 1.5rem;background:#0369a1;margin-top:1rem">
+      Potwierdź efekty i podpisz (ZOPZ)
+    </button>
+  </form>
+  {% endif %}
+</div>
+{% endif %}
+
+{# ══════════ PANEL UOPZ ══════════ #}
+{% if current_user.role == 'uopz' and p.faza_procesu == 3 %}
+<div class="panel">
+  <div class="card-title">Opinia UOPZ</div>
+  {% if p.zal4_uopz %}
+  <p style="color:#065f46;font-weight:600">✓ Opinia została już zapisana.</p>
+  {% elif not p.zal4_zopz %}
+  <p style="color:var(--warning)">Najpierw ZOPZ musi potwierdzić efekty.</p>
+  {% else %}
+  <form action="/api/internships/{{ p.id_formularza }}/zal4/uopz" method="POST">
+    <div class="form-group">
+      <label>Opinia opiekuna uczelnianego (min. 10 znaków)</label>
+      <textarea name="opinia_uopz" class="custom-input" rows="4" minlength="10" required
+                style="resize:vertical" placeholder="Opinia na temat przebiegu praktyki i uzyskanych efektów…"></textarea>
+    </div>
+    <button type="submit" class="btn-academic" style="width:auto;padding:0.55rem 1.5rem">
+      Zapisz opinię (UOPZ)
+    </button>
+  </form>
+  {% endif %}
+</div>
+{% endif %}
+
+{% endblock %}

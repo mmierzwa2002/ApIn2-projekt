@@ -200,11 +200,36 @@ def delete_internship(id):
         flash('Brak uprawnień.', 'danger')
         return redirect('/auth/dashboard')
     from app.models.internship import Internship
-    from app.models.outcome import EfektFormularza
+    from app.models.outcome import EfektFormularza, PotwierdzenieEfektu
     from app.models.schedule import HarmonogramPraktyki
+    from app.models.card import KartaPraktyki
+    from app.models.diary import DziennikPraktyki, WpisDziennika
+    from app.models.document import Document
+    from app.models.protocol import ProtokolZaliczenia
+    from app.models.report import Sprawozdanie
+    from app.models.survey import Ankieta
+    from app.models.supervisor import formularz_opiekunowie
     internship = Internship.query.get_or_404(id)
+
+    # Usuń wpisy dziennika przed samym dziennikiem
+    dziennik = DziennikPraktyki.query.filter_by(id_formularza=id).first()
+    if dziennik:
+        WpisDziennika.query.filter_by(id_dziennika=dziennik.id_dziennika).delete()
+
     EfektFormularza.query.filter_by(id_formularza=id).delete()
+    PotwierdzenieEfektu.query.filter_by(id_formularza=id).delete()
     HarmonogramPraktyki.query.filter_by(id_formularza=id).delete()
+    KartaPraktyki.query.filter_by(id_formularza=id).delete()
+    DziennikPraktyki.query.filter_by(id_formularza=id).delete()
+    Document.query.filter_by(internship_id=id).delete()
+
+    ProtokolZaliczenia.query.filter_by(id_formularza=id).delete()
+    Sprawozdanie.query.filter_by(id_formularza=id).delete()
+    Ankieta.query.filter_by(id_formularza=id).delete()
+    db.session.execute(formularz_opiekunowie.delete().where(
+        formularz_opiekunowie.c.id_formularza == id
+    ))
+
     db.session.delete(internship)
     db.session.commit()
     flash(f'Praktyka #{id} została usunięta.', 'success')
@@ -321,6 +346,62 @@ def view_zal7(id):
             abort(403)
     sprawozdanie = Sprawozdanie.query.filter_by(id_formularza=id).first()
     return render_template('formularze/zal7.html', p=internship, s=sprawozdanie)
+
+
+@auth_bp.route('/formularze/<int:id>/zal4')
+@login_required
+def view_zal4(id):
+    from app.models.outcome import EfektKsztalcenia, PotwierdzenieEfektu
+    internship = Internship.query.get_or_404(id)
+    if current_user.role == 'student':
+        student = Student.query.filter_by(user_id=current_user.id).first()
+        if not student or internship.id_studenta != student.id_studenta:
+            abort(403)
+    all_efekty = EfektKsztalcenia.query.order_by(EfektKsztalcenia.kod).all()
+    potwierdzenia = {
+        p.id_efektu: p for p in
+        PotwierdzenieEfektu.query.filter_by(id_formularza=id).all()
+    }
+    return render_template('formularze/zal4.html', p=internship,
+                           efekty=all_efekty, potwierdzenia=potwierdzenia)
+
+
+@auth_bp.route('/formularze/<int:id>/zal5')
+@login_required
+def view_zal5(id):
+    from app.models.survey import Ankieta, PYTANIA_ZAL5, ODPOWIEDZI, ODPOWIEDZI_LABELS
+    internship = Internship.query.get_or_404(id)
+    if current_user.role == 'student':
+        student = Student.query.filter_by(user_id=current_user.id).first()
+        if not student or internship.id_studenta != student.id_studenta:
+            abort(403)
+    ankieta = Ankieta.query.filter_by(id_formularza=id).first()
+    d = internship.data_od
+    rok_ak = f'{d.year}/{d.year+1}' if d.month >= 9 else f'{d.year-1}/{d.year}'
+    return render_template('formularze/zal5.html', p=internship, a=ankieta,
+                           pytania=PYTANIA_ZAL5, odpowiedzi=ODPOWIEDZI,
+                           odpowiedzi_labels=ODPOWIEDZI_LABELS,
+                           rok_ak=rok_ak)
+
+
+@auth_bp.route('/formularze/<int:id>/zal8')
+@login_required
+def view_zal8(id):
+    from app.models.protocol import ProtokolZaliczenia, OCENY_PROTOKOL
+    from app.models.card import KartaPraktyki
+    from app.models.user import User
+    internship = Internship.query.get_or_404(id)
+    if current_user.role == 'student':
+        student = Student.query.filter_by(user_id=current_user.id).first()
+        if not student or internship.id_studenta != student.id_studenta:
+            abort(403)
+    protokol = ProtokolZaliczenia.query.filter_by(id_formularza=id).first()
+    karta = KartaPraktyki.query.filter_by(id_formularza=id).first()
+    uopz_users = User.query.filter_by(role='uopz').all()
+    uopz_name = uopz_users[0].full_name if len(uopz_users) == 1 else ''
+    return render_template('formularze/zal8.html', p=internship, pr=protokol,
+                           k=karta, oceny=OCENY_PROTOKOL, uopz_name=uopz_name,
+                           uopz_users=uopz_users)
 
 
 @auth_bp.route('/logout')

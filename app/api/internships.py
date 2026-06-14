@@ -10,6 +10,9 @@ from app.models.company import Firma
 from app.models.internship import Internship
 from app.models.report import Sprawozdanie
 from app.models.card import KartaPraktyki
+from app.models.outcome import PotwierdzenieEfektu
+from app.models.survey import Ankieta, ODPOWIEDZI, PYTANIA_ZAL5
+from app.models.protocol import ProtokolZaliczenia, OCENY_PROTOKOL, _round_grade
 
 internships_bp = Blueprint('internships', __name__, url_prefix='/api/internships')
 
@@ -138,6 +141,11 @@ def create_internship():
             f'wybrany zakres ma {dni_robocze}. Dla rozpoczęcia '
             f'{data_od.strftime("%d.%m.%Y")} data zakończenia powinna wynosić '
             f'{sugg.strftime("%d.%m.%Y")}.')
+        return r if r else j
+
+    existing = Internship.query.filter_by(id_studenta=student.id_studenta).first()
+    if existing:
+        r, j = _err(f'Student {student.full_name} ma już zarejestrowaną praktykę (ID: {existing.id_formularza}).')
         return r if r else j
 
     new_internship = Internship(
@@ -467,6 +475,9 @@ def submit_zal32_zopz(id):
     if internship.zal3_strona2_zopz:
         flash('Część zakładowa Karty (strona 2) została już wypełniona.', 'danger')
         return redirect(back)
+    if not internship.zal7_zopz:
+        flash('Najpierw ZOPZ musi potwierdzić Sprawozdanie (Zał. 7).', 'danger')
+        return redirect(back)
 
     data = request.form
     ocena = data.get('ocena_zopz_param', '').strip()
@@ -533,3 +544,244 @@ def submit_zal32_uopz(id):
     db.session.commit()
     flash('Ocena uczelniana i ocena sprawozdania (Zał. 3.2) zapisane.', 'success')
     return redirect(back)
+
+
+# ── Zał. 4: Potwierdzenie efektów uczenia się ────────────────────────────────
+
+@internships_bp.route('/<int:id>/zal4/zopz', methods=['POST'])
+@login_required
+@role_required('zopz', 'administrator')
+def submit_zal4_zopz(id):
+    """ZOPZ potwierdza uzyskanie każdego z 13 efektów uczenia się."""
+    internship = Internship.query.get_or_404(id)
+    back = f'/auth/formularze/{id}/zal4'
+
+    if internship.faza_procesu != 3:
+        flash('Potwierdzenie efektów dostępne tylko w Fazie 3.', 'danger')
+        return redirect(back)
+    if internship.zal4_zopz:
+        flash('Efekty uczenia się zostały już potwierdzone przez ZOPZ.', 'danger')
+        return redirect(back)
+    if not internship.zal7_zopz:
+        flash('Najpierw ZOPZ musi potwierdzić Sprawozdanie (Zał. 7).', 'danger')
+        return redirect(back)
+
+    all_efekty = EfektKsztalcenia.query.order_by(EfektKsztalcenia.kod).all()
+    for ef in all_efekty:
+        val = request.form.get(f'ef_{ef.kod}')
+        if val not in ('1', '0'):
+            flash(f'Brakuje odpowiedzi dla efektu {ef.kod}.', 'danger')
+            return redirect(back)
+        istniejace = PotwierdzenieEfektu.query.filter_by(
+            id_formularza=id, id_efektu=ef.id_efektu).first()
+        if istniejace:
+            istniejace.czy_uzyskany = int(val)
+        else:
+            db.session.add(PotwierdzenieEfektu(
+                id_formularza=id, id_efektu=ef.id_efektu, czy_uzyskany=int(val)))
+
+    internship.zal4_zopz = True
+    internship.check_and_advance_phase()
+    db.session.commit()
+    flash('Potwierdzenie efektów uczenia się (ZOPZ) zapisane.', 'success')
+    return redirect(back)
+
+
+@internships_bp.route('/<int:id>/zal4/uopz', methods=['POST'])
+@login_required
+@role_required('uopz', 'administrator')
+def submit_zal4_uopz(id):
+    """UOPZ dodaje opinię do Zał. 4 i zatwierdza."""
+    internship = Internship.query.get_or_404(id)
+    back = f'/auth/formularze/{id}/zal4'
+
+    if internship.faza_procesu != 3:
+        flash('Opinia UOPZ dostępna tylko w Fazie 3.', 'danger')
+        return redirect(back)
+    if not internship.zal4_zopz:
+        flash('Najpierw ZOPZ musi potwierdzić efekty uczenia się.', 'danger')
+        return redirect(back)
+    if internship.zal4_uopz:
+        flash('Opinia UOPZ do Zał. 4 została już zapisana.', 'danger')
+        return redirect(back)
+
+    opinia = request.form.get('opinia_uopz', '').strip()
+    if len(opinia) < 10:
+        flash('Opinia UOPZ jest wymagana (min. 10 znaków).', 'danger')
+        return redirect(back)
+
+    internship.zal4_opinia_uopz = opinia
+    internship.zal4_uopz = True
+    internship.check_and_advance_phase()
+    db.session.commit()
+    flash('Opinia UOPZ do Zał. 4 zapisana.', 'success')
+    return redirect(back)
+
+
+# ── Zał. 5: Kwestionariusz ankiety ───────────────────────────────────────────
+
+@internships_bp.route('/<int:id>/zal5', methods=['POST'])
+@login_required
+def submit_zal5(id):
+    """Student wypełnia kwestionariusz ankiety (Zał. 5)."""
+    internship = Internship.query.get_or_404(id)
+    back = f'/auth/formularze/{id}/zal5'
+
+    if current_user.role != 'student':
+        flash('Ankietę wypełnia student.', 'danger')
+        return redirect(back)
+
+    student = Student.query.filter_by(user_id=current_user.id).first()
+    if not student or internship.id_studenta != student.id_studenta:
+        flash('Brak autoryzacji.', 'danger')
+        return redirect('/auth/dashboard')
+
+    if internship.faza_procesu != 3:
+        flash('Ankieta dostępna dopiero w Fazie 3.', 'danger')
+        return redirect(back)
+    if internship.zal5_student:
+        flash('Ankieta została już wypełniona.', 'danger')
+        return redirect(back)
+
+    odpowiedzi = {}
+    for nr, _ in PYTANIA_ZAL5:
+        val = request.form.get(f'q{nr}', '').strip()
+        if val not in ODPOWIEDZI:
+            flash(f'Brakuje odpowiedzi na pytanie {nr}.', 'danger')
+            return redirect(back)
+        odpowiedzi[f'q{nr}'] = val
+
+    ankieta = Ankieta.query.filter_by(id_formularza=id).first()
+    if not ankieta:
+        ankieta = Ankieta(id_formularza=id)
+        db.session.add(ankieta)
+
+    for key, val in odpowiedzi.items():
+        setattr(ankieta, key, val)
+    ankieta.uwagi          = request.form.get('uwagi', '').strip()
+    d = internship.data_od
+    ankieta.rok_akademicki = f'{d.year}/{d.year+1}' if d.month >= 9 else f'{d.year-1}/{d.year}'
+    ankieta.forma_studiow  = 'stacjonarne'
+    ankieta.semestr        = '7'
+    ankieta.liczba_godzin  = 960
+
+    internship.zal5_student = True
+    internship.check_and_advance_phase()
+    db.session.commit()
+    flash('Kwestionariusz ankiety (Zał. 5) został zapisany.', 'success')
+    return redirect(back)
+
+
+# ── Admin: reset Zał. 4 ───────────────────────────────────────────────────────
+
+@internships_bp.route('/<int:id>/reset/zal4', methods=['POST'])
+@login_required
+@role_required('administrator')
+def reset_zal4(id):
+    """Administrator cofa potwierdzenie efektów uczenia się (Zał. 4)."""
+    internship = Internship.query.get_or_404(id)
+    PotwierdzenieEfektu.query.filter_by(id_formularza=id).delete()
+    internship.zal4_zopz = False
+    internship.zal4_uopz = False
+    internship.zal4_opinia_uopz = None
+    if internship.faza_procesu >= 4:
+        internship.faza_procesu = 3
+    db.session.commit()
+    flash(f'Zał. 4 dla praktyki #{id} został zresetowany.', 'success')
+    return redirect('/auth/dashboard')
+
+
+# ── Zał. 8: Protokół zaliczenia (Dyrektor) ───────────────────────────────────
+
+@internships_bp.route('/<int:id>/zal8', methods=['POST'])
+@login_required
+@role_required('dyrektor', 'administrator')
+def submit_zal8(id):
+    """Dyrektor wypełnia Protokół zaliczenia praktyki zawodowej (Zał. 8)."""
+    internship = Internship.query.get_or_404(id)
+    back = f'/auth/formularze/{id}/zal8'
+
+    if internship.faza_procesu != 4:
+        flash('Protokół dostępny dopiero w Fazie 4.', 'danger')
+        return redirect(back)
+    if internship.zal8_dyrektor:
+        flash('Protokół został już wystawiony.', 'danger')
+        return redirect(back)
+
+    karta = KartaPraktyki.query.filter_by(id_formularza=id).first()
+    if not karta or not karta.ocena_uopz_param or not karta.ocena_zopz_param:
+        flash('Brak ocen z Karty praktyki (Zał. 3.2) — uzupełnij najpierw.', 'danger')
+        return redirect(back)
+
+    # Walidacja ocen cząstkowych
+    p1 = request.form.get('ocena_p1', '').strip()
+    p2 = request.form.get('ocena_p2', '').strip()
+    p3 = request.form.get('ocena_p3', '').strip()
+    s  = request.form.get('ocena_s', '').strip()
+    for label, val in [('p1', p1), ('p2', p2), ('p3', p3), ('S', s)]:
+        if val not in OCENY_PROTOKOL:
+            flash(f'Nieprawidłowa ocena {label}: {val!r}.', 'danger')
+            return redirect(back)
+
+    data_str = request.form.get('data_zaliczenia', '').strip()
+    try:
+        from datetime import date
+        data_zaliczenia = date.fromisoformat(data_str) if data_str else None
+    except ValueError:
+        flash('Nieprawidłowy format daty.', 'danger')
+        return redirect(back)
+
+    # Obliczenia
+    E = (float(p1) + float(p2) + float(p3)) / 3
+    U = float(karta.ocena_uopz_param)
+    Z = float(karta.ocena_zopz_param)
+    S = float(s)
+    K = 0.4 * E + 0.1 * S + 0.2 * U + 0.3 * Z
+
+    pr = ProtokolZaliczenia.query.filter_by(id_formularza=id).first()
+    if not pr:
+        pr = ProtokolZaliczenia(id_formularza=id)
+        db.session.add(pr)
+
+    pr.data_zaliczenia = data_zaliczenia
+    pr.czlonek_1 = request.form.get('czlonek_1', '').strip()
+    pr.czlonek_2 = request.form.get('czlonek_2', '').strip()
+    pr.czlonek_3 = request.form.get('czlonek_3', '').strip()
+    pr.czlonek_4 = request.form.get('czlonek_4', '').strip()
+    pr.pytanie_1 = request.form.get('pytanie_1', '').strip()
+    pr.pytanie_2 = request.form.get('pytanie_2', '').strip()
+    pr.pytanie_3 = request.form.get('pytanie_3', '').strip()
+    pr.ocena_p1 = p1
+    pr.ocena_p2 = p2
+    pr.ocena_p3 = p3
+    pr.ocena_s  = s
+    pr.ocena_e  = f'{E:.2f}'
+    pr.ocena_k  = f'{K:.2f}'
+    pr.ocena_finalna = _round_grade(K)
+
+    internship.zal8_dyrektor = True
+    db.session.commit()
+    flash('Protokół zaliczenia (Zał. 8) został zapisany.', 'success')
+    return redirect(back)
+
+
+# ── USOS: wpis zaliczenia ─────────────────────────────────────────────────────
+
+@internships_bp.route('/<int:id>/usos', methods=['POST'])
+@login_required
+@role_required('uopz', 'administrator')
+def submit_usos(id):
+    """UOPZ potwierdza wpis zaliczenia do systemu USOS (§4.10 Regulaminu)."""
+    internship = Internship.query.get_or_404(id)
+    if not internship.zal8_dyrektor:
+        flash('Najpierw Dyrektor musi wystawić Protokół (Zał. 8).', 'danger')
+        return redirect('/auth/dashboard')
+    if internship.usos_wpisany:
+        flash('Zaliczenie zostało już wpisane do USOS.', 'warning')
+        return redirect('/auth/dashboard')
+    internship.zal8_uopz = True
+    internship.usos_wpisany = True
+    internship.check_and_advance_phase()
+    db.session.commit()
+    flash(f'Praktyka #{id} została zakończona.', 'success')
+    return redirect('/auth/dashboard')

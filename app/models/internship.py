@@ -11,7 +11,7 @@ class Internship(db.Model):
     liczba_dni_roboczych = db.Column(db.Integer)  # uzupełniane po zakończeniu Fazy 2
     status = db.Column(db.String(30), default='roboczy')
 
-    # KONTROLA FAZ (1=Inicjacja, 2=Realizacja, 3=Podsumowanie, 4=Zaliczenie, 5=Zamknięta)
+    # KONTROLA FAZ (1=Inicjacja, 2=Realizacja, 3=Podsumowanie, 4=Zaliczenie/Zakończone)
     faza_procesu = db.Column(db.Integer, default=1, nullable=False)
 
     # Metadane Porozumienia (Zał. 1)
@@ -36,13 +36,17 @@ class Internship(db.Model):
     # Zał. 3.2 = Karta praktyki STRONA 2 (po praktyce): zaświadczenie + oceny
     zal3_strona2_zopz = db.Column(db.Boolean, default=False)  # Zaświadczenie odbycia + ocena zakładowa (ZOPZ)
     zal3_strona2_uopz = db.Column(db.Boolean, default=False)  # Ocena uczelniana + ocena sprawozdania (UOPZ)
-    zal4_zopz = db.Column(db.Boolean, default=False)       # Efekty (Zakład)
-    zal4_uopz = db.Column(db.Boolean, default=False)       # Efekty (Uczelnia)
-    zal7_student = db.Column(db.Boolean, default=False)    # Sprawozdanie złożone (Student)
-    zal7_zopz = db.Column(db.Boolean, default=False)       # Sprawozdanie potwierdzone (Zakład)
+    zal4_zopz = db.Column(db.Boolean, default=False)           # Efekty (Zakład)
+    zal4_opinia_uopz = db.Column(db.Text, nullable=True)       # Opinia UOPZ do Zał. 4
+    zal4_uopz = db.Column(db.Boolean, default=False)           # Efekty (Uczelnia)
+    zal5_student = db.Column(db.Boolean, default=False)        # Kwestionariusz ankiety (Student)
+    zal7_student = db.Column(db.Boolean, default=False)        # Sprawozdanie złożone (Student)
+    zal7_zopz = db.Column(db.Boolean, default=False)           # Sprawozdanie potwierdzone (Zakład)
 
     # --- FAZA 4: ZALICZENIE ---
-    zal8_dyrektor = db.Column(db.Boolean, default=False)   # Protokół końcowy (Dyrektor)
+    zal8_dyrektor = db.Column(db.Boolean, default=False)   # Protokół końcowy — Przewodniczący Komisji (Dyrektor)
+    zal8_uopz     = db.Column(db.Boolean, default=False)   # Protokół — podpis uczelnianego opiekuna (UOPZ)
+    usos_wpisany  = db.Column(db.Boolean, default=False)   # Wpis zaliczenia do USOS (UOPZ)
 
     student_record = db.relationship('Student', backref=db.backref('formularze', lazy=True))
     firma = db.relationship('Firma', backref=db.backref('formularze', lazy=True))
@@ -59,8 +63,6 @@ class Internship(db.Model):
         elif self.faza_procesu == 3:
             if all([self.zal7_student, self.zal7_zopz,
                     self.zal3_strona2_zopz, self.zal3_strona2_uopz,
-                    self.zal4_zopz, self.zal4_uopz]):
+                    self.zal4_zopz, self.zal4_uopz,
+                    self.zal5_student]):
                 self.faza_procesu = 4
-        elif self.faza_procesu == 4:
-            if self.zal8_dyrektor:
-                self.faza_procesu = 5

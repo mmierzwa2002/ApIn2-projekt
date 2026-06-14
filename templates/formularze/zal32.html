@@ -44,7 +44,7 @@
 @media print {
   .nav-container, .dok-toolbar, .panel, .alert, .dok-blokada { display: none !important; }
   body { background: #fff; }
-  .dokument { border: none; box-shadow: none; margin: 0; padding: 0; font-size: 10pt; }
+  .dokument { border: none; box-shadow: none; margin: 0; padding: 1cm 1.5cm; font-size: 10pt; }
   .spr-tresc { border-color: #000; background: #fff; }
 }
 </style>
@@ -80,7 +80,6 @@
   </div>
   <div class="dok-tytul">
     <h2>KARTA PRAKTYKI ZAWODOWEJ</h2>
-    <div class="podtytul">Strona 2 — po praktyce</div>
   </div>
 
   {# ── Zaświadczenie odbycia ── #}
@@ -141,6 +140,8 @@
   <div class="card-title">Część zakładowa (ZOPZ) — zaświadczenie i ocena</div>
   {% if p.zal3_strona2_zopz %}
   <p style="color:#065f46;font-weight:600">✓ Część zakładowa została wypełniona.</p>
+  {% elif not p.zal7_zopz %}
+  <p style="color:var(--warning)">Wypełnienie możliwe dopiero po potwierdzeniu Sprawozdania (Zał. 7) przez ZOPZ.</p>
   {% else %}
   <form action="/api/internships/{{ p.id_formularza }}/zal32/zopz" method="POST">
     <div class="form-group">
