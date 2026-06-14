@@ -177,6 +177,22 @@ def approve_user(user_id):
     return redirect('/auth/admin/approvals')
 
 
+@auth_bp.route('/admin/reject/<int:user_id>', methods=['POST'])
+@login_required
+def reject_user(user_id):
+    if current_user.role != 'administrator':
+        flash('Brak uprawnień.', 'danger')
+        return redirect('/auth/dashboard')
+    user = User.query.get_or_404(user_id)
+    if user.role != 'konto_do_zatwierdzenia':
+        flash('To konto nie oczekuje na zatwierdzenie.', 'danger')
+        return redirect('/auth/admin/approvals')
+    db.session.delete(user)
+    db.session.commit()
+    flash(f'Konto {user.full_name} ({user.email}) zostało odrzucone i usunięte.', 'warning')
+    return redirect('/auth/admin/approvals')
+
+
 @auth_bp.route('/admin/internship/<int:id>/delete', methods=['POST'])
 @login_required
 def delete_internship(id):
@@ -210,9 +226,11 @@ def view_zal2a(id):
                   for ef in EfektFormularza.query.filter_by(id_formularza=id).all()}
     harmonogram = HarmonogramPraktyki.query.filter_by(
         id_formularza=id).order_by(HarmonogramPraktyki.lp).all()
+    suma_dni = sum(h.planowana_liczba_dni for h in harmonogram)
+    zal2a_filled = (len(efekty_map) == 13 and suma_dni == 120)
     return render_template('formularze/zal2a.html', p=internship,
                            all_efekty=all_efekty, efekty_map=efekty_map,
-                           harmonogram=harmonogram)
+                           harmonogram=harmonogram, zal2a_filled=zal2a_filled)
 
 
 @auth_bp.route('/formularze/<int:id>/zal1')
@@ -224,6 +242,85 @@ def view_zal1(id):
         if not student or internship.id_studenta != student.id_studenta:
             abort(403)
     return render_template('formularze/zal1.html', p=internship)
+
+
+@auth_bp.route('/formularze/<int:id>/zal31')
+@login_required
+def view_zal31(id):
+    internship = Internship.query.get_or_404(id)
+    if current_user.role == 'student':
+        student = Student.query.filter_by(user_id=current_user.id).first()
+        if not student or internship.id_studenta != student.id_studenta:
+            abort(403)
+    return render_template('formularze/zal31.html', p=internship)
+
+
+@auth_bp.route('/formularze/<int:id>/zal32')
+@login_required
+def view_zal32(id):
+    from app.models.card import KartaPraktyki
+    internship = Internship.query.get_or_404(id)
+    if current_user.role == 'student':
+        student = Student.query.filter_by(user_id=current_user.id).first()
+        if not student or internship.id_studenta != student.id_studenta:
+            abort(403)
+    karta = KartaPraktyki.query.filter_by(id_formularza=id).first()
+    oceny = ['2', '3', '3.5', '4', '4.5', '5']
+    return render_template('formularze/zal32.html', p=internship, k=karta, oceny=oceny)
+
+
+@auth_bp.route('/formularze/<int:id>/zal6')
+@login_required
+def view_zal6(id):
+    from datetime import timedelta
+    from app.models.diary import DziennikPraktyki
+    from app.models.outcome import EfektKsztalcenia
+    internship = Internship.query.get_or_404(id)
+    if current_user.role == 'student':
+        student = Student.query.filter_by(user_id=current_user.id).first()
+        if not student or internship.id_studenta != student.id_studenta:
+            abort(403)
+
+    dziennik = DziennikPraktyki.query.filter_by(id_formularza=id).first()
+    wpisy = sorted(dziennik.wpisy, key=lambda w: w.nr_dnia) if dziennik else []
+    all_efekty = EfektKsztalcenia.query.order_by(EfektKsztalcenia.kod).all()
+
+    # Pokrycie efektów uczenia się w całym dzienniku (wymóg: wszystkie 13)
+    efekty_pokryte = set()
+    for w in wpisy:
+        for kod in (w.nr_efektow or '').replace(';', ',').split(','):
+            kod = kod.strip()
+            if kod:
+                efekty_pokryte.add(kod)
+    brakujace_efekty = sorted({f'{i:02d}' for i in range(1, 14)} - efekty_pokryte)
+
+    # Następny oczekiwany dzień roboczy (do podpowiedzi w formularzu)
+    if wpisy:
+        d = wpisy[-1].data_wpisu + timedelta(days=1)
+    else:
+        d = internship.data_od
+    while d <= internship.data_do and d.weekday() >= 5:
+        d += timedelta(days=1)
+    next_date = d if d <= internship.data_do else None
+
+    return render_template('formularze/zal6.html', p=internship,
+                           wpisy=wpisy, all_efekty=all_efekty,
+                           wpisy_count=len(wpisy), next_date=next_date,
+                           efekty_pokryte=sorted(efekty_pokryte),
+                           brakujace_efekty=brakujace_efekty)
+
+
+@auth_bp.route('/formularze/<int:id>/zal7')
+@login_required
+def view_zal7(id):
+    from app.models.report import Sprawozdanie
+    internship = Internship.query.get_or_404(id)
+    if current_user.role == 'student':
+        student = Student.query.filter_by(user_id=current_user.id).first()
+        if not student or internship.id_studenta != student.id_studenta:
+            abort(403)
+    sprawozdanie = Sprawozdanie.query.filter_by(id_formularza=id).first()
+    return render_template('formularze/zal7.html', p=internship, s=sprawozdanie)
 
 
 @auth_bp.route('/logout')

@@ -4,7 +4,7 @@
 
 <div style="margin-bottom:2rem">
   <h2>Zatwierdzenia kont</h2>
-  <p style="color:var(--text-muted)">Konta zarejestrowane przez Microsoft wymagające przypisania roli.</p>
+  <p style="color:var(--text-muted)">Konta wymagające zatwierdzenia oraz przypisania roli.</p>
 </div>
 
 {% with messages = get_flashed_messages(with_categories=true) %}
@@ -34,19 +34,28 @@
             <span class="badge badge-pending">{{ u.auth_provider }}</span>
           </td>
           <td>
-            <form action="/auth/admin/approve/{{ u.id }}" method="POST"
-                  style="display:flex;gap:0.5rem;align-items:center">
-              <select name="role" class="custom-input"
-                      style="padding:0.35rem 0.5rem;font-size:0.85rem">
-                <option value="uopz">UOPZ</option>
-                <option value="zopz">ZOPZ</option>
-                <option value="dyrektor">Dyrektor</option>
-              </select>
-              <button type="submit" class="btn-academic"
-                      style="padding:0.4rem 0.9rem;font-size:0.85rem;white-space:nowrap">
-                Zatwierdź
-              </button>
-            </form>
+            <div style="display:flex;gap:0.5rem;align-items:center">
+              <form action="/auth/admin/approve/{{ u.id }}" method="POST"
+                    style="display:flex;gap:0.5rem;align-items:center">
+                <select name="role" class="custom-input"
+                        style="padding:0.35rem 0.5rem;font-size:0.85rem">
+                  <option value="uopz">UOPZ</option>
+                  <option value="zopz">ZOPZ</option>
+                  <option value="dyrektor">Dyrektor</option>
+                </select>
+                <button type="submit" class="btn-academic"
+                        style="padding:0.4rem 0.9rem;font-size:0.85rem;white-space:nowrap">
+                  Zatwierdź
+                </button>
+              </form>
+              <form action="/auth/admin/reject/{{ u.id }}" method="POST"
+                    onsubmit="return confirm('Odrzucić i usunąć konto {{ u.full_name }}?')">
+                <button type="submit" class="btn-academic"
+                        style="padding:0.4rem 0.9rem;font-size:0.85rem;white-space:nowrap;background:#dc2626">
+                  Odrzuć
+                </button>
+              </form>
+            </div>
           </td>
         </tr>
         {% endfor %}

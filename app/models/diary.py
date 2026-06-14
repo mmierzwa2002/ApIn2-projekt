@@ -14,6 +14,7 @@ class WpisDziennika(db.Model):
     nr_dnia = db.Column(db.Integer)
     data_wpisu = db.Column(db.Date, nullable=False)
     opis_wykonanych_prac = db.Column(db.Text, nullable=False)
+    nr_efektow = db.Column(db.String(50))  # kody efektów uczenia się, np. "01, 05, 09"
     id_efektu = db.Column(db.Integer, db.ForeignKey('efekty_ksztalcenia.id_efektu'))
     dziennik = db.relationship('DziennikPraktyki', backref=db.backref('wpisy', lazy=True))
     __table_args__ = (db.UniqueConstraint('id_dziennika', 'nr_dnia'),)

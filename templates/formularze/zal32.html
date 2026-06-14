@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+{% block title %}Zał. 3.2 – Karta praktyki (strona 2) | {{ p.firma.nazwa }}{% endblock %}
+
+{% block content %}
+<style>
+.dokument {
+  max-width: 860px; margin: 0 auto 2rem; background: #fff;
+  border: 1px solid var(--border); border-radius: var(--radius);
+  box-shadow: var(--shadow-card); padding: 3rem 3.5rem;
+  font-size: 0.93rem; line-height: 1.7; color: #1e293b;
+}
+.dok-naglowek { text-align: right; font-size: 0.85rem; font-weight: 600; margin-bottom: 1.5rem; color: var(--text-muted); }
+.dok-instytucja { font-size: 0.9rem; font-weight: 600; margin-bottom: 1.5rem; line-height: 1.5; }
+.dok-instytucja small { font-weight: 400; font-style: italic; color: var(--text-muted); }
+.dok-tytul { text-align: center; margin-bottom: 1.5rem; }
+.dok-tytul h2 { font-size: 1.15rem; font-weight: 700; letter-spacing: 0.5px; }
+.dok-tytul .podtytul { font-size: 0.8rem; color: var(--text-muted); font-style: italic; margin-top: 0.3rem; }
+.dok-fill { font-weight: 700; }
+.dok-blank { color: #9ca3af; font-style: italic; border-bottom: 1px solid #9ca3af; display: inline-block; min-width: 90px; }
+.dok-sekcja { margin-top: 2rem; padding-top: 1.25rem; border-top: 2px solid #334155; }
+.dok-sekcja h3 { font-size: 1rem; font-weight: 700; text-align: center; margin-bottom: 1rem; }
+.dok-ocena-blok { margin-top: 1.25rem; padding-top: 1rem; border-top: 1px dashed var(--border); }
+.dok-ocena-blok:first-of-type { border-top: none; padding-top: 0; }
+.ocena-param { font-size: 1.05rem; }
+.ocena-param strong { color: var(--primary); }
+.spr-tresc { white-space: pre-wrap; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.7rem 0.9rem; min-height: 2.5rem; background: #fbfcfe; margin-top: 0.4rem; }
+.spr-pusty { color: #9ca3af; font-style: italic; }
+.dok-pieczatka { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.35rem 0.85rem; border-radius: 50px; font-size: 0.8rem; font-weight: 600; }
+.pieczatka-ok    { background: #d1fae5; color: #065f46; }
+.pieczatka-czeka { background: #fef3c7; color: #92400e; }
+.podpis-opis { font-size: 0.78rem; color: var(--text-muted); }
+
+.panel {
+  max-width: 860px; margin: 0 auto 1.5rem; background: var(--surface);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 1.5rem 2rem; box-shadow: var(--shadow-card);
+}
+.panel .card-title { font-size: 1.05rem; font-weight: 600; margin-bottom: 1rem; border-left: 4px solid var(--primary); padding-left: 0.5rem; }
+.dok-toolbar { display: flex; align-items: center; gap: 1rem; max-width: 860px; margin: 0 auto 1.25rem; flex-wrap: wrap; }
+.dok-blokada { max-width: 860px; margin: 0 auto 1.25rem; background: #fef3c7; color: #92400e; border-radius: 8px; padding: 0.85rem 1.1rem; font-size: 0.9rem; font-weight: 500; }
+.btn-sm { display: inline-flex; align-items: center; padding: 0.45rem 1rem; border-radius: 8px; font-size: 0.88rem; font-weight: 600; text-decoration: none; cursor: pointer; border: none; }
+.btn-back  { background: #e2e8f0; color: #334155; }
+.btn-print { background: var(--primary); color: #fff; }
+@media print {
+  .nav-container, .dok-toolbar, .panel, .alert, .dok-blokada { display: none !important; }
+  body { background: #fff; }
+  .dokument { border: none; box-shadow: none; margin: 0; padding: 0; font-size: 10pt; }
+  .spr-tresc { border-color: #000; background: #fff; }
+}
+</style>
+
+{# ── toolbar ── #}
+<div class="dok-toolbar">
+  <a href="/auth/dashboard" class="btn-sm btn-back">← Powrót</a>
+  <button onclick="window.print()" class="btn-sm btn-print">🖨 Drukuj / PDF</button>
+  <span style="margin-left:auto;font-size:0.82rem;color:var(--text-muted)">
+    Formularz: #{{ p.id_formularza }} &nbsp;·&nbsp; Faza {{ p.faza_procesu }}
+  </span>
+</div>
+
+{# ── flash ── #}
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}{% for cat, msg in messages %}
+    <div class="alert alert-{{ cat }}" style="max-width:860px;margin:0 auto 1rem">{{ msg }}</div>
+  {% endfor %}{% endif %}
+{% endwith %}
+
+{% if p.faza_procesu < 3 %}
+<div class="dok-blokada">
+  ⚠ Strona 2 Karty (zaświadczenie i oceny) jest dostępna dopiero po zakończeniu praktyki — w Fazie 3.
+</div>
+{% endif %}
+
+{# ══════════════════ DOKUMENT — Zał. 3.2 (strona 2) ══════════════════ #}
+<div class="dokument">
+  <div class="dok-naglowek">Załącznik nr 3.2</div>
+  <div class="dok-instytucja">
+    Akademia Nauk Stosowanych w Elblągu<br>
+    Instytut Informatyki Stosowanej <small>im. Krzysztofa Brzeskiego</small>
+  </div>
+  <div class="dok-tytul">
+    <h2>KARTA PRAKTYKI ZAWODOWEJ</h2>
+    <div class="podtytul">Strona 2 — po praktyce</div>
+  </div>
+
+  {# ── Zaświadczenie odbycia ── #}
+  <div class="dok-sekcja" style="border-top:none;padding-top:0">
+    <h3>Zaświadczenie odbycia praktyki zawodowej</h3>
+    <p>
+      Zaświadcza się, że student <span class="dok-fill">{{ p.student_record.full_name }}</span>
+      (nr albumu <span class="dok-fill">{{ p.student_record.nr_albumu }}</span>) odbył praktykę zawodową
+      w <span class="dok-fill">{{ p.firma.nazwa }}</span>
+      w okresie od <span class="dok-fill">{{ p.data_od.strftime('%d.%m.%Y') }}</span>
+      do <span class="dok-fill">{{ p.data_do.strftime('%d.%m.%Y') }}</span> zgodnie z przyjętym programem.
+    </p>
+    <p style="margin-top:0.6rem"><strong>Uwagi:</strong></p>
+    <div class="spr-tresc">{% if k and k.uwagi_odbycie %}{{ k.uwagi_odbycie }}{% else %}<span class="spr-pusty">— brak uwag —</span>{% endif %}</div>
+    <p style="margin-top:0.75rem">
+      {% if p.zal3_strona2_zopz %}<span class="dok-pieczatka pieczatka-ok">✓ Potwierdzone cyfrowo (ZOPZ)</span>
+      {% else %}<span class="dok-pieczatka pieczatka-czeka">Oczekuje na potwierdzenie</span>{% endif %}
+      <br><span class="podpis-opis">(pieczęć i podpis kierownika zakładu / zakładowego opiekuna praktyki)</span>
+    </p>
+  </div>
+
+  {# ── Oceny ── #}
+  <div class="dok-sekcja">
+    <h3>Ocena przebiegu praktyki zawodowej</h3>
+
+    {# Ocena ZOPZ #}
+    <div class="dok-ocena-blok">
+      <p class="ocena-param">Ocena parametryczna (Zakładowy opiekun, skala 2–5):
+        {% if k and k.ocena_zopz_param %}<strong>{{ k.ocena_zopz_param }}</strong>{% else %}<span class="dok-blank"></span>{% endif %}
+      </p>
+      <p style="margin-top:0.4rem">Ocena opisowa:</p>
+      <div class="spr-tresc">{% if k and k.ocena_zopz_opis %}{{ k.ocena_zopz_opis }}{% else %}<span class="spr-pusty">— nie wypełniono —</span>{% endif %}</div>
+      <p class="podpis-opis" style="margin-top:0.4rem">Zakładowy opiekun praktyki zawodowej (data, pieczęć i podpis)</p>
+    </div>
+
+    {# Ocena UOPZ #}
+    <div class="dok-ocena-blok">
+      <p class="ocena-param">Ocena parametryczna (Uczelniany opiekun, skala 2–5):
+        {% if k and k.ocena_uopz_param %}<strong>{{ k.ocena_uopz_param }}</strong>{% else %}<span class="dok-blank"></span>{% endif %}
+      </p>
+      <p style="margin-top:0.4rem">Ocena opisowa:</p>
+      <div class="spr-tresc">{% if k and k.ocena_uopz_opis %}{{ k.ocena_uopz_opis }}{% else %}<span class="spr-pusty">— nie wypełniono —</span>{% endif %}</div>
+      <p class="podpis-opis" style="margin-top:0.4rem">Uczelniany opiekun praktyki zawodowej (data, pieczęć i podpis)</p>
+    </div>
+
+    {# Ocena sprawozdania #}
+    <div class="dok-ocena-blok">
+      <p class="ocena-param">Ocena sprawozdania z praktyki (Uczelniany opiekun, skala 2–5):
+        {% if k and k.ocena_sprawozdania %}<strong>{{ k.ocena_sprawozdania }}</strong>{% else %}<span class="dok-blank"></span>{% endif %}
+      </p>
+    </div>
+  </div>
+</div>
+
+{# ══════════════════ FORMULARZ ZOPZ (Faza 3, część zakładowa) ══════════════════ #}
+{% if current_user.role == 'zopz' and p.faza_procesu == 3 %}
+<div class="panel">
+  <div class="card-title">Część zakładowa (ZOPZ) — zaświadczenie i ocena</div>
+  {% if p.zal3_strona2_zopz %}
+  <p style="color:#065f46;font-weight:600">✓ Część zakładowa została wypełniona.</p>
+  {% else %}
+  <form action="/api/internships/{{ p.id_formularza }}/zal32/zopz" method="POST">
+    <div class="form-group">
+      <label>Uwagi do zaświadczenia (opcjonalnie)</label>
+      <textarea name="uwagi_odbycie" class="custom-input" rows="2" style="resize:vertical"
+                placeholder="Ewentualne uwagi do przebiegu praktyki…"></textarea>
+    </div>
+    <div class="form-group">
+      <label>Ocena parametryczna (2–5)</label>
+      <select name="ocena_zopz_param" class="custom-select" required>
+        <option value="">— wybierz —</option>
+        {% for o in oceny %}<option value="{{ o }}">{{ o }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Ocena opisowa (min. 10 znaków)</label>
+      <textarea name="ocena_zopz_opis" class="custom-input" rows="3" minlength="10" required
+                style="resize:vertical" placeholder="Opisowa ocena przebiegu praktyki…"></textarea>
+    </div>
+    <button type="submit" class="btn-academic" style="width:auto;padding:0.55rem 1.5rem;background:#0369a1">
+      Zapisz zaświadczenie i ocenę (ZOPZ)
+    </button>
+  </form>
+  {% endif %}
+</div>
+{% endif %}
+
+{# ══════════════════ FORMULARZ UOPZ (Faza 3, część uczelniana) ══════════════════ #}
+{% if current_user.role == 'uopz' and p.faza_procesu == 3 %}
+<div class="panel">
+  <div class="card-title">Część uczelniana (UOPZ) — ocena i ocena sprawozdania</div>
+  {% if p.zal3_strona2_uopz %}
+  <p style="color:#065f46;font-weight:600">✓ Część uczelniana została wypełniona.</p>
+  {% elif not p.zal3_strona2_zopz %}
+  <p style="color:var(--warning)">Najpierw część zakładową musi wypełnić ZOPZ.</p>
+  {% elif not p.zal7_student %}
+  <p style="color:var(--warning)">Ocena sprawozdania wymaga złożonego Sprawozdania (Zał. 7) przez studenta.</p>
+  {% else %}
+  <form action="/api/internships/{{ p.id_formularza }}/zal32/uopz" method="POST">
+    <div class="form-group">
+      <label>Ocena parametryczna (2–5)</label>
+      <select name="ocena_uopz_param" class="custom-select" required>
+        <option value="">— wybierz —</option>
+        {% for o in oceny %}<option value="{{ o }}">{{ o }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Ocena opisowa (min. 10 znaków)</label>
+      <textarea name="ocena_uopz_opis" class="custom-input" rows="3" minlength="10" required
+                style="resize:vertical" placeholder="Opisowa ocena przebiegu praktyki…"></textarea>
+    </div>
+    <div class="form-group">
+      <label>Ocena sprawozdania z praktyki (2–5)</label>
+      <select name="ocena_sprawozdania" class="custom-select" required>
+        <option value="">— wybierz —</option>
+        {% for o in oceny %}<option value="{{ o }}">{{ o }}</option>{% endfor %}
+      </select>
+    </div>
+    <button type="submit" class="btn-academic" style="width:auto;padding:0.55rem 1.5rem">
+      Zapisz ocenę uczelnianą (UOPZ)
+    </button>
+  </form>
+  {% endif %}
+</div>
+{% endif %}
+
+{% endblock %}

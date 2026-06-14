@@ -67,6 +67,16 @@
 
   <form action="/api/internships/{{ p.id_formularza }}/zal2a" method="POST">
 
+    <div class="no-print" style="margin-bottom:1.5rem">
+      <button type="button" onclick="fillZal2aTest()" class="btn-academic"
+              style="width:auto;padding:0.4rem 1rem;font-size:0.85rem;background:#7c3aed">
+        ⚡ Wypełnij danymi testowymi
+      </button>
+      <span style="font-size:0.8rem;color:var(--text-muted);margin-left:0.5rem">
+        (uzupełnia 13 efektów i harmonogram = 120 dni)
+      </span>
+    </div>
+
     <table class="zal-table" style="margin-bottom:2rem">
       <thead>
         <tr>
@@ -138,10 +148,27 @@
     <div style="text-align:center;margin-top:2rem">
       <button type="submit" class="btn-academic"
               style="width:auto;padding:0.6rem 2rem;font-size:1rem">
-        Zapisz i podpisz Zał. 2a
+        {% if zal2a_filled %}Zapisz zmiany{% else %}Zapisz harmonogram{% endif %}
       </button>
     </div>
   </form>
+
+  {# Podpis ZOPZ — dostępny dopiero po wypełnieniu i zapisaniu formularza #}
+  {% if zal2a_filled %}
+  <div class="no-print" style="text-align:center;margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--border)">
+    <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:0.75rem">
+      Formularz jest wypełniony. Po sprawdzeniu danych podpisz dokument:
+    </p>
+    <form action="/api/internships/{{ p.id_formularza }}/sign" method="POST">
+      <input type="hidden" name="dokument" value="ZAL2A">
+      <input type="hidden" name="redirect_to" value="/auth/formularze/{{ p.id_formularza }}/zal2a">
+      <button type="submit" class="btn-academic"
+              style="width:auto;padding:0.6rem 2rem;font-size:1rem;background:#059669">
+        Podpisz Zał. 2a (ZOPZ)
+      </button>
+    </form>
+  </div>
+  {% endif %}
   {% endif %}{# koniec bloku: zal1 podpisany #}
 
   {# ════════════════════════════════════════════════════════
@@ -352,5 +379,45 @@
   .zal-table th, .zal-table td { border-color: #000; }
 }
 </style>
+
+<script>
+function fillZal2aTest() {
+  var pad = function (n) { return (n < 10 ? '0' : '') + n; };
+
+  // 13 efektów kształcenia — przykładowe opisy prac
+  for (var i = 1; i <= 13; i++) {
+    var ta = document.querySelector('textarea[name="efekt_' + pad(i) + '"]');
+    if (ta) {
+      ta.value = 'Efekt ' + pad(i) + ': student realizował zadania z tego zakresu ' +
+                 'pod nadzorem opiekuna zakładowego, dokumentując postępy w dzienniku praktyki.';
+    }
+  }
+
+  // Harmonogram — pozycje sumujące się dokładnie do 120 dni
+  var rows = [
+    ['Dział IT', 30],
+    ['Serwis i konserwacja sprzętu', 25],
+    ['Administracja siecią komputerową', 25],
+    ['Programowanie i rozwój aplikacji', 20],
+    ['Wsparcie użytkowników (helpdesk)', 20]
+  ];
+
+  // wyczyść wszystkie 13 wierszy
+  for (var j = 1; j <= 13; j++) {
+    var d = document.querySelector('input[name="dzial_' + pad(j) + '"]');
+    var n = document.querySelector('input[name="dni_' + pad(j) + '"]');
+    if (d) d.value = '';
+    if (n) n.value = '';
+  }
+
+  // wstaw dane testowe
+  for (var r = 0; r < rows.length; r++) {
+    var dd = document.querySelector('input[name="dzial_' + pad(r + 1) + '"]');
+    var nn = document.querySelector('input[name="dni_' + pad(r + 1) + '"]');
+    if (dd) dd.value = rows[r][0];
+    if (nn) nn.value = rows[r][1];
+  }
+}
+</script>
 
 {% endblock %}

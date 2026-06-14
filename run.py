@@ -14,6 +14,45 @@ def index():
     return redirect('/auth/login')
 
 
+def ensure_schema():
+    """Dodaje brakujące kolumny do istniejącej bazy (prosta migracja)."""
+    from sqlalchemy import inspect, text
+    inspector = inspect(db.engine)
+    tables = inspector.get_table_names()
+    migrations = {
+        'formularze_praktyk': {
+            'zal32_zgloszenie_zopz': 'BOOLEAN DEFAULT FALSE',
+            'zal32_bhp_zopz': 'BOOLEAN DEFAULT FALSE',
+            'zal7_zopz': 'BOOLEAN DEFAULT FALSE',
+            'zal3_strona2_zopz': 'BOOLEAN DEFAULT FALSE',
+            'zal3_strona2_uopz': 'BOOLEAN DEFAULT FALSE',
+        },
+        'wpisy_dziennika': {
+            'nr_efektow': 'VARCHAR(50)',
+        },
+        'karty_praktyki': {
+            'uwagi_odbycie': 'TEXT',
+            'ocena_zopz_param': 'VARCHAR(4)',
+            'ocena_zopz_opis': 'TEXT',
+            'ocena_uopz_param': 'VARCHAR(4)',
+            'ocena_uopz_opis': 'TEXT',
+            'ocena_sprawozdania': 'VARCHAR(4)',
+        },
+    }
+    added = []
+    for table, cols in migrations.items():
+        if table not in tables:
+            continue
+        existing = {c['name'] for c in inspector.get_columns(table)}
+        for name, ddl in cols.items():
+            if name not in existing:
+                db.session.execute(text(f'ALTER TABLE {table} ADD COLUMN {name} {ddl}'))
+                added.append(f'{table}.{name}')
+    if added:
+        db.session.commit()
+        print(f"[SCHEMA] Dodano kolumny: {', '.join(added)}\n")
+
+
 def seed_test_accounts():
     from app.models.user import User
 
@@ -145,6 +184,7 @@ def seed_test_data():
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
+        ensure_schema()
         seed_test_accounts()
         seed_test_data()
         seed_efekty_ksztalcenia()

@@ -24,16 +24,22 @@ class Internship(db.Model):
     zal2a_zopz = db.Column(db.Boolean, default=False)      # Harmonogram (Zakład)
     zal2a_student = db.Column(db.Boolean, default=False)   # Harmonogram (Student)
     zal2a_uopz = db.Column(db.Boolean, default=False)      # Harmonogram (Uczelnia)
-    zal31_dyrektor = db.Column(db.Boolean, default=False)  # Skierowanie (Dyrektor)
+    # Zał. 3.1 = Karta praktyki STRONA 1 (przed praktyką): skierowanie + potwierdzenia zakładu
+    zal31_dyrektor = db.Column(db.Boolean, default=False)         # Skierowanie (Dyrektor)
+    zal32_zgloszenie_zopz = db.Column(db.Boolean, default=False)  # Potwierdzenie zgłoszenia studenta (Zakład) — strona 1
+    zal32_bhp_zopz = db.Column(db.Boolean, default=False)         # Potwierdzenie szkolenia BHP (Zakład) — strona 1
 
     # --- FAZA 2: REALIZACJA ---
-    zal32_zopz = db.Column(db.Boolean, default=False)          # Szkolenie BHP (Zakład)
     dziennik_zatwierdzony = db.Column(db.Boolean, default=False)  # 120 dni wpisane
 
     # --- FAZA 3: PODSUMOWANIE ---
+    # Zał. 3.2 = Karta praktyki STRONA 2 (po praktyce): zaświadczenie + oceny
+    zal3_strona2_zopz = db.Column(db.Boolean, default=False)  # Zaświadczenie odbycia + ocena zakładowa (ZOPZ)
+    zal3_strona2_uopz = db.Column(db.Boolean, default=False)  # Ocena uczelniana + ocena sprawozdania (UOPZ)
     zal4_zopz = db.Column(db.Boolean, default=False)       # Efekty (Zakład)
     zal4_uopz = db.Column(db.Boolean, default=False)       # Efekty (Uczelnia)
-    zal7_student = db.Column(db.Boolean, default=False)    # Sprawozdanie (Student)
+    zal7_student = db.Column(db.Boolean, default=False)    # Sprawozdanie złożone (Student)
+    zal7_zopz = db.Column(db.Boolean, default=False)       # Sprawozdanie potwierdzone (Zakład)
 
     # --- FAZA 4: ZALICZENIE ---
     zal8_dyrektor = db.Column(db.Boolean, default=False)   # Protokół końcowy (Dyrektor)
@@ -44,13 +50,16 @@ class Internship(db.Model):
     def check_and_advance_phase(self):
         if self.faza_procesu == 1:
             if all([self.zal1_zopz, self.zal1_dyrektor, self.zal2a_zopz,
-                    self.zal2a_student, self.zal2a_uopz, self.zal31_dyrektor]):
+                    self.zal2a_student, self.zal2a_uopz, self.zal31_dyrektor,
+                    self.zal32_zgloszenie_zopz, self.zal32_bhp_zopz]):
                 self.faza_procesu = 2
         elif self.faza_procesu == 2:
-            if self.zal32_zopz and self.dziennik_zatwierdzony:
+            if self.dziennik_zatwierdzony:
                 self.faza_procesu = 3
         elif self.faza_procesu == 3:
-            if all([self.zal7_student, self.zal4_zopz, self.zal4_uopz]):
+            if all([self.zal7_student, self.zal7_zopz,
+                    self.zal3_strona2_zopz, self.zal3_strona2_uopz,
+                    self.zal4_zopz, self.zal4_uopz]):
                 self.faza_procesu = 4
         elif self.faza_procesu == 4:
             if self.zal8_dyrektor:

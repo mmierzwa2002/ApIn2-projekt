@@ -1,0 +1,284 @@
+{% extends "base.html" %}
+{% block title %}Zał. 6 – Dziennik praktyki | {{ p.firma.nazwa }}{% endblock %}
+
+{% block content %}
+<style>
+.dokument {
+  max-width: 980px;
+  margin: 0 auto 2rem;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  padding: 3rem 3.5rem;
+  font-size: 0.93rem;
+  line-height: 1.6;
+  color: #1e293b;
+}
+.dok-naglowek { text-align: right; font-size: 0.85rem; font-weight: 600; margin-bottom: 1.5rem; color: var(--text-muted); }
+.dok-instytucja { font-size: 0.9rem; font-weight: 600; margin-bottom: 1.5rem; line-height: 1.5; }
+.dok-instytucja small { font-weight: 400; font-style: italic; color: var(--text-muted); }
+.dok-tytul { text-align: center; font-size: 1.15rem; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 2rem; }
+.dok-meta p { margin-bottom: 0.4rem; }
+.dok-fill { font-weight: 700; }
+.dok-blank { color: #9ca3af; font-style: italic; border-bottom: 1px solid #9ca3af; display: inline-block; min-width: 80px; }
+table.dziennik-tabela { width: 100%; border-collapse: collapse; margin: 1.5rem 0; }
+table.dziennik-tabela th, table.dziennik-tabela td {
+  border: 1px solid #334155; padding: 0.5rem 0.6rem; font-size: 0.86rem; vertical-align: top;
+}
+table.dziennik-tabela th { background: #f1f5f9; font-weight: 700; text-align: center; }
+table.dziennik-tabela td.c { text-align: center; white-space: nowrap; }
+.dz-pusty { text-align: center; color: var(--text-muted); padding: 2rem; }
+.dz-podpis-ok { color: #065f46; font-weight: 600; }
+.dok-potwierdzenie { margin-top: 2rem; padding-top: 1.25rem; border-top: 1px dashed #cbd5e1; font-size: 0.88rem; }
+.dok-podpis-linia { margin-top: 2rem; text-align: center; color: #475569; }
+.dok-podpis-linia small { color: var(--text-muted); font-size: 0.78rem; }
+
+.panel {
+  max-width: 980px; margin: 0 auto 1.5rem;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 1.5rem 2rem;
+  box-shadow: var(--shadow-card);
+}
+.panel .card-title { font-size: 1.05rem; font-weight: 600; margin-bottom: 1rem;
+  border-left: 4px solid var(--primary); padding-left: 0.5rem; }
+/* Lista efektów z pełną treścią + zaokrąglone checkboxy */
+.efekty-lista { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem 1.5rem; }
+@media (max-width: 760px) { .efekty-lista { grid-template-columns: 1fr; } }
+.efekt-chk {
+  display: flex; align-items: flex-start; gap: 0.6rem; cursor: pointer;
+  padding: 0.55rem 0.7rem; border: 1px solid var(--border); border-radius: 10px;
+  font-size: 0.84rem; line-height: 1.35; transition: all 0.15s; background: var(--bg-main);
+}
+.efekt-chk:hover { border-color: var(--primary); }
+.efekt-chk:has(input:checked) { border-color: var(--primary); background: rgba(15,118,110,0.07); }
+.efekt-chk input[type="checkbox"] {
+  appearance: none; -webkit-appearance: none; flex: 0 0 auto;
+  width: 1.15rem; height: 1.15rem; margin-top: 0.05rem;
+  border: 2px solid var(--border); border-radius: 6px; background: var(--surface);
+  cursor: pointer; position: relative; transition: all 0.15s;
+}
+.efekt-chk input[type="checkbox"]:checked { background: var(--primary); border-color: var(--primary); }
+.efekt-chk input[type="checkbox"]:checked::after {
+  content: ''; position: absolute; left: 0.32rem; top: 0.12rem;
+  width: 0.3rem; height: 0.6rem; border: solid #fff;
+  border-width: 0 2px 2px 0; transform: rotate(45deg);
+}
+.efekt-kod { font-weight: 700; color: var(--primary); }
+.efekt-opis { color: var(--text-main); }
+.dz-actions { display: flex; justify-content: center; align-items: center; gap: 1rem; flex-wrap: wrap; margin-top: 1.5rem; }
+.dz-actions form { margin: 0; }
+.efekty-status { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.ef-pill { display: inline-flex; align-items: center; padding: 0.25rem 0.6rem; border-radius: 999px;
+  font-size: 0.8rem; font-weight: 700; border: 1px solid var(--border); }
+.ef-ok { background: rgba(16,185,129,0.15); color: #047857; border-color: #6ee7b7; }
+.ef-miss { background: var(--bg-main); color: var(--text-muted); }
+.dok-toolbar { display: flex; align-items: center; gap: 1rem; max-width: 980px; margin: 0 auto 1.25rem; flex-wrap: wrap; }
+.btn-sm { display: inline-flex; align-items: center; padding: 0.45rem 1rem; border-radius: 8px;
+  font-size: 0.88rem; font-weight: 600; text-decoration: none; cursor: pointer; border: none; }
+.btn-back  { background: #e2e8f0; color: #334155; }
+.btn-print { background: var(--primary); color: #fff; }
+@media print {
+  .nav-container, .dok-toolbar, .panel, .alert { display: none !important; }
+  body { background: #fff; }
+  .dokument { border: none; box-shadow: none; margin: 0; padding: 0; font-size: 10pt; }
+  table.dziennik-tabela th, table.dziennik-tabela td { border-color: #000; }
+}
+</style>
+
+{# ── toolbar ── #}
+<div class="dok-toolbar">
+  <a href="/auth/dashboard" class="btn-sm btn-back">← Powrót</a>
+  <button onclick="window.print()" class="btn-sm btn-print">🖨 Drukuj / PDF</button>
+  <span style="margin-left:auto;font-size:0.82rem;color:var(--text-muted)">
+    Formularz: #{{ p.id_formularza }} &nbsp;·&nbsp; Faza {{ p.faza_procesu }} &nbsp;·&nbsp; {{ wpisy_count }}/120 dni
+  </span>
+</div>
+
+{# ── flash ── #}
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}{% for cat, msg in messages %}
+    <div class="alert alert-{{ cat }}" style="max-width:980px;margin:0 auto 1rem">{{ msg }}</div>
+  {% endfor %}{% endif %}
+{% endwith %}
+
+{# ══════════════════ DOKUMENT ══════════════════ #}
+<div class="dokument">
+  <div class="dok-naglowek">Załącznik nr 6</div>
+  <div class="dok-instytucja">
+    Akademia Nauk Stosowanych w Elblągu<br>
+    Instytut Informatyki Stosowanej <small>im. Krzysztofa Brzeskiego</small>
+  </div>
+  <div class="dok-tytul">DZIENNIK PRAKTYKI ZAWODOWEJ</div>
+
+  <div class="dok-meta">
+    <p>Student: <span class="dok-fill">{{ p.student_record.full_name }}</span>
+       &nbsp;&nbsp; Nr albumu: <span class="dok-fill">{{ p.student_record.nr_albumu }}</span></p>
+    <p>Kierunek: <strong>informatyka</strong>
+       &nbsp;&nbsp; W zakresie: <span class="dok-fill">{{ p.student_record.specjalnosc or '—' }}</span></p>
+    <p>Studia: <strong>inżynierskie, stacjonarne</strong>
+       &nbsp;&nbsp; Rok ak.: <span class="dok-fill">{{ p.data_od.year }}/{{ p.data_od.year + 1 }}</span></p>
+    <p>Miejsce odbywania praktyki:
+       <span class="dok-fill">{{ p.firma.nazwa }}{% if p.firma.adres %}, {{ p.firma.adres }}{% endif %}</span></p>
+    <p>Data rozpoczęcia: <span class="dok-fill">{{ p.data_od.strftime('%d.%m.%Y') }}</span>
+       &nbsp;&nbsp; Data zakończenia: <span class="dok-fill">{{ p.data_do.strftime('%d.%m.%Y') }}</span></p>
+  </div>
+
+  <table class="dziennik-tabela">
+    <thead>
+      <tr>
+        <th style="width:3rem">Dzień</th>
+        <th style="width:7rem">Data</th>
+        <th>Opis wykonanych prac</th>
+        <th style="width:6rem">Nr efektów</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for w in wpisy %}
+      <tr>
+        <td class="c">{{ w.nr_dnia }}</td>
+        <td class="c">{{ w.data_wpisu.strftime('%d.%m.%Y') }}</td>
+        <td>{{ w.opis_wykonanych_prac }}</td>
+        <td class="c">{{ w.nr_efektow or '—' }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="4" class="dz-pusty">Brak wpisów — dziennik jest pusty.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {# Potwierdzenie całości przez ZOPZ (regulamin: ZOPZ potwierdza dziennik, nie każdy dzień osobno) #}
+  <div class="dok-potwierdzenie">
+    {% if p.dziennik_zatwierdzony %}
+      <span class="dz-podpis-ok">✓ Potwierdzam zgodność powyższych wpisów ze stanem faktycznym</span><br>
+      <span style="font-size:0.82rem;color:var(--text-muted)">
+        Zakładowy opiekun praktyki (ZOPZ) — potwierdzenie elektroniczne
+      </span>
+    {% else %}
+      <span style="color:var(--text-muted)">
+        Dziennik oczekuje na potwierdzenie zakładowego opiekuna praktyki (ZOPZ).
+      </span>
+      <div class="dok-podpis-linia">
+        ......................................................<br>
+        <small>data i podpis zakładowego opiekuna praktyki (ZOPZ)</small>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+{# ══════════════════ POKRYCIE EFEKTÓW (student, Faza 2) ══════════════════ #}
+{% if current_user.role == 'student' and p.faza_procesu == 2 and not p.dziennik_zatwierdzony %}
+<div class="panel">
+  <div class="card-title">Pokrycie efektów uczenia się — {{ efekty_pokryte|length }}/13</div>
+  <p style="font-size:0.88rem;color:var(--text-muted);margin-bottom:0.75rem">
+    Aby zaliczyć praktykę, w całym dzienniku muszą wystąpić wszystkie efekty 01–13.
+  </p>
+  <div class="efekty-status">
+    {% for ef in all_efekty %}
+    <span class="ef-pill {{ 'ef-ok' if ef.kod in efekty_pokryte else 'ef-miss' }}"
+          title="{{ ef.opis }}">{{ ef.kod }} {{ '✓' if ef.kod in efekty_pokryte else '' }}</span>
+    {% endfor %}
+  </div>
+  {% if brakujace_efekty %}
+  <p style="font-size:0.85rem;color:var(--warning);margin-top:0.6rem">
+    Brakuje jeszcze: <strong>{{ brakujace_efekty|join(', ') }}</strong>
+  </p>
+  {% endif %}
+  {% if wpisy_count > 0 %}
+  <form action="/api/journal/undo_last" method="POST" style="margin-top:0.75rem"
+        onsubmit="return confirm('Cofnąć ostatni wpis (#{{ wpisy_count }})?')">
+    <input type="hidden" name="praktyka_id" value="{{ p.id_formularza }}">
+    <button type="submit" class="btn-sm" style="background:#e2e8f0;color:#334155">
+      ↩ Cofnij ostatni wpis (#{{ wpisy_count }})
+    </button>
+  </form>
+  {% endif %}
+</div>
+{% endif %}
+
+{# ══════════════════ FORMULARZ WPISU (student, Faza 2, < 120, niezatwierdzony) ══════════════════ #}
+{% if current_user.role == 'student' and p.faza_procesu == 2 and wpisy_count < 120 and not p.dziennik_zatwierdzony %}
+<div class="panel">
+  <div class="card-title">Dodaj wpis — dzień {{ wpisy_count + 1 }} z 120</div>
+  {% if next_date %}
+  <form id="journalAddForm" action="/api/journal/add" method="POST">
+    <input type="hidden" name="praktyka_id" value="{{ p.id_formularza }}">
+    <div style="display:grid;grid-template-columns:1fr 2fr;gap:1.25rem">
+      <div class="form-group">
+        <label>Data (dzień roboczy)</label>
+        <input type="date" name="data" class="custom-input" required
+               value="{{ next_date.strftime('%Y-%m-%d') }}"
+               min="{{ p.data_od.strftime('%Y-%m-%d') }}"
+               max="{{ p.data_do.strftime('%Y-%m-%d') }}">
+      </div>
+      <div class="form-group">
+        <label>Opis wykonanych prac (min. 10 znaków)</label>
+        <textarea name="opis" class="custom-input" rows="3" minlength="10" required
+                  style="resize:none"
+                  placeholder="Opisz konkretne prace i nabywane umiejętności…"></textarea>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Efekty uczenia się, których dotyczą prace (zaznacz co najmniej jeden)</label>
+      <div class="efekty-lista">
+        {% for ef in all_efekty %}
+        <label class="efekt-chk">
+          <input type="checkbox" name="efekty" value="{{ ef.kod }}">
+          <span><span class="efekt-kod">{{ ef.kod }}</span> &nbsp;<span class="efekt-opis">{{ ef.opis }}</span></span>
+        </label>
+        {% endfor %}
+      </div>
+    </div>
+  </form>
+
+  <div class="dz-actions">
+    <button type="submit" form="journalAddForm" class="btn-academic" style="width:auto;padding:0.55rem 1.5rem">
+      Zapisz dzień do Dziennika
+    </button>
+    <form action="/api/journal/fill_test" method="POST"
+          onsubmit="return confirm('Uzupełnić dziennik danymi testowymi do 120 dni?')">
+      <input type="hidden" name="praktyka_id" value="{{ p.id_formularza }}">
+      <button type="submit" class="btn-academic"
+              style="width:auto;padding:0.55rem 1.5rem;font-size:0.85rem;background:#7c3aed"
+              title="Pomocnik do testów">
+        ⚡ Wypełnij testowo do 120 dni
+      </button>
+    </form>
+  </div>
+  {% else %}
+  <p style="color:var(--warning)">Brak dostępnych dni roboczych w okresie praktyki do uzupełnienia.</p>
+  {% endif %}
+</div>
+{% endif %}
+
+{# ══════════════════ ZATWIERDZENIE PRZEZ ZOPZ ══════════════════ #}
+{% if current_user.role == 'zopz' and p.faza_procesu == 2 %}
+<div class="panel">
+  <div class="card-title">Zatwierdzenie dziennika</div>
+  {% if p.dziennik_zatwierdzony %}
+  <p class="dz-podpis-ok">✓ Dziennik zatwierdzony.</p>
+  {% elif wpisy_count >= 120 and not brakujace_efekty %}
+  <p style="color:var(--text-muted);margin-bottom:0.75rem">
+    Dziennik jest kompletny (120/120) i pokrywa wszystkie 13 efektów uczenia się. Potwierdź wykonanie zadań:
+  </p>
+  <form action="/api/internships/{{ p.id_formularza }}/sign" method="POST">
+    <input type="hidden" name="dokument" value="DZIENNIK_GOTOWY">
+    <input type="hidden" name="redirect_to" value="/auth/formularze/{{ p.id_formularza }}/zal6">
+    <button type="submit" class="btn-academic" style="width:auto;padding:0.55rem 1.5rem;background:#059669">
+      Zatwierdź Dziennik (120/120)
+    </button>
+  </form>
+  {% elif wpisy_count >= 120 and brakujace_efekty %}
+  <p style="color:var(--warning)">
+    Dziennik ma 120/120 wpisów, ale <strong>nie pokrywa wszystkich efektów uczenia się</strong>.
+    Brakuje efektów: <strong>{{ brakujace_efekty|join(', ') }}</strong>.
+    Zatwierdzenie będzie możliwe, gdy wszystkie 13 efektów (01–13) wystąpi we wpisach.
+  </p>
+  {% else %}
+  <p style="color:var(--text-muted)">Dziennik w toku — student wypełnił {{ wpisy_count }}/120 dni.
+     Zatwierdzenie będzie możliwe po uzupełnieniu wszystkich dni i pokryciu wszystkich 13 efektów.</p>
+  {% endif %}
+</div>
+{% endif %}
+
+{% endblock %}

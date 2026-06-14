@@ -1,14 +1,15 @@
 :root {
-  --bg-main: #f8fafc;
+  --bg-main: #e7ecf3;
   --surface: #ffffff;
-  --surface-alt: #f1f5f9;
+  --surface-alt: #eef2f8;
   --text-main: #0f172a;
   --text-muted: #64748b;
   --primary: #0f766e;
   --primary-hover: #115e59;
   --accent-blue: #1d4ed8;
   --warning: #b45309;
-  --border: #e2e8f0;
+  --border: #cbd5e1;
+  --shadow-card: 0 1px 3px rgba(15, 23, 42, 0.08), 0 4px 12px rgba(15, 23, 42, 0.06);
   --radius: 12px;
 }
 
@@ -23,6 +24,7 @@ html[data-theme="dark"] {
   --primary-hover: #14b8a6;
   --warning: #f59e0b;
   --border: #2a2a3e;
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 html[data-theme="dark"] .academic-table th {
@@ -89,7 +91,7 @@ body {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 2rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--shadow-card);
 }
 
 .card-title {
@@ -293,7 +295,7 @@ body {
 
 .auth-page {
   display: grid;
-  grid-template-columns: 5fr 7fr;
+  grid-template-columns: 35fr 65fr;
   height: 100vh;
 }
 
@@ -454,6 +456,20 @@ body {
 .approvals-btn--alert {
   background: #b45309;
   color: #fff;
+}
+
+.doc-link {
+  font-size: 0.82rem;
+  text-decoration: none;
+  font-weight: 600;
+}
+.doc-link-done { color: #10b981; }  /* zielony – komplet podpisów */
+.doc-link-wait { color: #f59e0b; }  /* pomarańczowy – oczekuje na podpis/wypełnienie */
+
+.action-hint {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-style: italic;
 }
 
 .theme-toggle {

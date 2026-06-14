@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+{% block title %}Zał. 7 – Sprawozdanie | {{ p.firma.nazwa }}{% endblock %}
+
+{% block content %}
+<style>
+.dokument {
+  max-width: 980px; margin: 0 auto 2rem; background: #fff;
+  border: 1px solid var(--border); border-radius: var(--radius);
+  box-shadow: var(--shadow-card); padding: 3rem 3.5rem;
+  font-size: 0.93rem; line-height: 1.6; color: #1e293b;
+}
+.dok-naglowek { text-align: right; font-size: 0.85rem; font-weight: 600; margin-bottom: 1.5rem; color: var(--text-muted); }
+.dok-instytucja { font-size: 0.9rem; font-weight: 600; margin-bottom: 1.5rem; line-height: 1.5; }
+.dok-instytucja small { font-weight: 400; font-style: italic; color: var(--text-muted); }
+.dok-tytul { text-align: center; font-size: 1.15rem; font-weight: 700; letter-spacing: 0.5px; margin: 2rem 0 1.5rem; }
+.dok-meta p { margin-bottom: 0.4rem; }
+.dok-fill { font-weight: 700; }
+.spr-sekcja { margin-top: 1.75rem; }
+.spr-sekcja h3 { font-size: 0.98rem; font-weight: 700; margin-bottom: 0.3rem; }
+.spr-sekcja .podpowiedz { font-size: 0.82rem; font-style: italic; color: var(--text-muted); margin-bottom: 0.5rem; }
+.spr-tresc { white-space: pre-wrap; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.85rem 1rem; min-height: 3rem; background: #fbfcfe; }
+.spr-pusty { color: #9ca3af; font-style: italic; }
+.dok-podpis-linia { margin-top: 2.5rem; text-align: right; color: #475569; }
+.dok-podpis-linia small { color: var(--text-muted); font-size: 0.78rem; }
+.dz-podpis-ok { color: #065f46; font-weight: 600; }
+
+.panel {
+  max-width: 980px; margin: 0 auto 1.5rem; background: var(--surface);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 1.5rem 2rem; box-shadow: var(--shadow-card);
+}
+.panel .card-title { font-size: 1.05rem; font-weight: 600; margin-bottom: 1rem;
+  border-left: 4px solid var(--primary); padding-left: 0.5rem; }
+.dok-toolbar { display: flex; align-items: center; gap: 1rem; max-width: 980px; margin: 0 auto 1.25rem; flex-wrap: wrap; }
+.btn-sm { display: inline-flex; align-items: center; padding: 0.45rem 1rem; border-radius: 8px;
+  font-size: 0.88rem; font-weight: 600; text-decoration: none; cursor: pointer; border: none; }
+.btn-back  { background: #e2e8f0; color: #334155; }
+.btn-print { background: var(--primary); color: #fff; }
+@media print {
+  .nav-container, .dok-toolbar, .panel, .alert { display: none !important; }
+  body { background: #fff; }
+  .dokument { border: none; box-shadow: none; margin: 0; padding: 0; font-size: 10pt; }
+  .spr-tresc { border-color: #000; background: #fff; }
+}
+</style>
+
+{# ── toolbar ── #}
+<div class="dok-toolbar">
+  <a href="/auth/dashboard" class="btn-sm btn-back">← Powrót</a>
+  <button onclick="window.print()" class="btn-sm btn-print">🖨 Drukuj / PDF</button>
+  <span style="margin-left:auto;font-size:0.82rem;color:var(--text-muted)">
+    Formularz: #{{ p.id_formularza }} &nbsp;·&nbsp; Faza {{ p.faza_procesu }}
+  </span>
+</div>
+
+{# ── flash ── #}
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}{% for cat, msg in messages %}
+    <div class="alert alert-{{ cat }}" style="max-width:980px;margin:0 auto 1rem">{{ msg }}</div>
+  {% endfor %}{% endif %}
+{% endwith %}
+
+{# ══════════════════ DOKUMENT ══════════════════ #}
+<div class="dokument">
+  <div class="dok-naglowek">Załącznik nr 7</div>
+  <div class="dok-instytucja">
+    Akademia Nauk Stosowanych w Elblągu<br>
+    Instytut Informatyki Stosowanej <small>im. Krzysztofa Brzeskiego</small>
+  </div>
+
+  <div class="dok-meta">
+    <p>Student: <span class="dok-fill">{{ p.student_record.full_name }}</span>
+       &nbsp;&nbsp; Nr albumu: <span class="dok-fill">{{ p.student_record.nr_albumu }}</span></p>
+    <p>Kierunek: <strong>informatyka</strong>
+       &nbsp;&nbsp; Specjalność: <span class="dok-fill">{{ p.student_record.specjalnosc or '—' }}</span></p>
+    <p>Studia: <strong>inżynierskie stacjonarne</strong>
+       &nbsp;&nbsp; Rok ak.: <span class="dok-fill">{{ p.data_od.year }}/{{ p.data_od.year + 1 }}</span></p>
+  </div>
+
+  <div class="dok-tytul">SPRAWOZDANIE STUDENTA<br>Z PRAKTYKI ZAWODOWEJ</div>
+  <p style="text-align:center">odbytej w
+     <span class="dok-fill">{{ p.firma.nazwa }}{% if p.firma.adres %}, {{ p.firma.adres }}{% endif %}</span></p>
+
+  <div class="spr-sekcja">
+    <h3>I. Charakterystyka miejsca odbywania praktyki</h3>
+    <div class="podpowiedz">(Krótki opis instytucji, w której odbywała się praktyka zawodowa)</div>
+    <div class="spr-tresc">{% if s %}{{ s.charakterystyka_miejsca }}{% else %}<span class="spr-pusty">— nie wypełniono —</span>{% endif %}</div>
+  </div>
+
+  <div class="spr-sekcja">
+    <h3>II. Opis i analiza wykonywanych prac</h3>
+    <div class="podpowiedz">(Syntetyczny opis najważniejszych zadań wykonanych w trakcie praktyki)</div>
+    <div class="spr-tresc">{% if s %}{{ s.opis_i_analiza_prac }}{% else %}<span class="spr-pusty">— nie wypełniono —</span>{% endif %}</div>
+  </div>
+
+  <div class="spr-sekcja">
+    <h3>III. Wiedza i umiejętności uzyskane w trakcie praktyki</h3>
+    <div class="podpowiedz">(Samoocena nabytych kompetencji oraz osiągniętych efektów uczenia się — odniesienie do efektów 01–13)</div>
+    <div class="spr-tresc">{% if s %}{{ s.samoocena_kompetencji }}{% else %}<span class="spr-pusty">— nie wypełniono —</span>{% endif %}</div>
+  </div>
+
+  <div class="dok-podpis-linia">
+    {% if p.zal7_student %}
+      <span class="dz-podpis-ok">✓ {{ p.student_record.full_name }} — podpisano elektronicznie</span><br>
+    {% else %}
+      ......................................................<br>
+    {% endif %}
+    <small>data i podpis studenta</small>
+  </div>
+
+  {# Potwierdzenie ZOPZ (regulamin: sprawozdanie podpisuje Zakładowy opiekun praktyk) #}
+  <div class="dok-podpis-linia">
+    {% if p.zal7_zopz %}
+      <span class="dz-podpis-ok">✓ Potwierdzam — Zakładowy opiekun praktyki (ZOPZ)</span><br>
+    {% else %}
+      ......................................................<br>
+    {% endif %}
+    <small>data i podpis zakładowego opiekuna praktyki (ZOPZ)</small>
+  </div>
+</div>
+
+{# ══════════════════ FORMULARZ (student, Faza 3, jeszcze nie złożone) ══════════════════ #}
+{% if current_user.role == 'student' and p.faza_procesu == 3 and not p.zal7_student %}
+<div class="panel">
+  <div class="card-title">Wypełnij i złóż Sprawozdanie</div>
+  <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:1rem">
+    Każda sekcja musi mieć co najmniej 30 znaków. Po złożeniu sprawozdanie zostaje podpisane
+    przez Ciebie i przekazane do potwierdzenia przez ZOPZ (nie można go już edytować).
+  </p>
+  <form action="/api/internships/{{ p.id_formularza }}/zal7" method="POST"
+        onsubmit="return confirm('Złożyć i podpisać sprawozdanie? Nie będzie można go już edytować.')">
+    <div class="form-group">
+      <label>I. Charakterystyka miejsca odbywania praktyki</label>
+      <textarea name="charakterystyka_miejsca" class="custom-input" rows="4" minlength="30" required
+                style="resize:vertical" placeholder="Krótki opis instytucji…">{% if s %}{{ s.charakterystyka_miejsca }}{% endif %}</textarea>
+    </div>
+    <div class="form-group">
+      <label>II. Opis i analiza wykonywanych prac</label>
+      <textarea name="opis_i_analiza_prac" class="custom-input" rows="6" minlength="30" required
+                style="resize:vertical" placeholder="Syntetyczny opis najważniejszych zadań…">{% if s %}{{ s.opis_i_analiza_prac }}{% endif %}</textarea>
+    </div>
+    <div class="form-group">
+      <label>III. Wiedza i umiejętności uzyskane w trakcie praktyki (samoocena)</label>
+      <textarea name="samoocena_kompetencji" class="custom-input" rows="6" minlength="30" required
+                style="resize:vertical" placeholder="Samoocena kompetencji i osiągniętych efektów uczenia się…">{% if s %}{{ s.samoocena_kompetencji }}{% endif %}</textarea>
+    </div>
+    <button type="submit" class="btn-academic" style="width:auto;padding:0.55rem 1.5rem">
+      Złóż i podpisz Sprawozdanie
+    </button>
+  </form>
+</div>
+{% endif %}
+
+{# ══════════════════ POTWIERDZENIE PRZEZ ZOPZ ══════════════════ #}
+{% if current_user.role == 'zopz' and p.faza_procesu == 3 %}
+<div class="panel">
+  <div class="card-title">Potwierdzenie sprawozdania</div>
+  {% if p.zal7_zopz %}
+  <p class="dz-podpis-ok">✓ Sprawozdanie potwierdzone.</p>
+  {% elif p.zal7_student %}
+  <p style="color:var(--text-muted);margin-bottom:0.75rem">
+    Student złożył sprawozdanie. Zapoznaj się z treścią powyżej i potwierdź:
+  </p>
+  <form action="/api/internships/{{ p.id_formularza }}/sign" method="POST">
+    <input type="hidden" name="dokument" value="ZAL7_ZOPZ">
+    <input type="hidden" name="redirect_to" value="/auth/formularze/{{ p.id_formularza }}/zal7">
+    <button type="submit" class="btn-academic" style="width:auto;padding:0.55rem 1.5rem;background:#059669">
+      Potwierdź Sprawozdanie (ZOPZ)
+    </button>
+  </form>
+  {% else %}
+  <p style="color:var(--text-muted)">Student nie złożył jeszcze sprawozdania.</p>
+  {% endif %}
+</div>
+{% endif %}
+
+{% endblock %}
