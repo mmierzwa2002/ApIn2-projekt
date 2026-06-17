@@ -1,5 +1,5 @@
 """
-Generowanie przykładowych dokumentów PDF (ETAP 11A — efekt końcowy).
+Generowanie przykładowych dokumentów PDF.
 
 Skrypt jest w pełni odtwarzalny: dla każdej praktyki w bazie generuje komplet
 dostępnych załączników (Zał. 1–8) przy użyciu produkcyjnej funkcji

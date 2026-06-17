@@ -1,5 +1,5 @@
 """
-Testy odporności modułu generowania PDF (ETAP 11A — Zadanie 6).
+Testy odporności modułu generowania PDF.
 
 Zestaw przypadków testowych sprawdzających reakcję modułu na dane brzegowe i
 błędne: puste dane, brakujące pola, bardzo długie teksty, niepoprawne dane,

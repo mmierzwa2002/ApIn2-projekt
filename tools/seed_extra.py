@@ -1,10 +1,10 @@
 """
 Seed uzupełniający — tworzy trzecią, w pełni wypełnioną praktykę dla studenta
-Michał Mierzwa (nr albumu 21273), aby moduł weryfikacji PDF (ETAP 11A) dysponował
+Michał Mierzwa (nr albumu 21273), aby moduł weryfikacji PDF dysponował
 minimum trzema różnymi użytkownikami z kompletem danych (Zadanie 1 i 2 z lab11).
 
 Dane tej praktyki różnią się od demonstracyjnej (inna firma, inne oceny, inne
-opisy) — dzięki temu porównanie PDF ↔ baza danych jest miarodajne.
+opisy) — dzięki temu porównanie PDF - baza danych jest miarodajne.
 
 Uruchomienie:
     .\\venv\\Scripts\\python.exe tools\\seed_extra.py
