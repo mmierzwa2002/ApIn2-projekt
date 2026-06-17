@@ -1,51 +1,80 @@
 openapi: 3.0.0
 info:
-  title: API Systemu Praktyk
-  description: Pełna dokumentacja REST API dla systemu obsługi praktyk studenckich (Etap 9).
-  version: 1.0.0
+  title: API Systemu Rozliczania Praktyk
+  description: >
+    Pełna dokumentacja REST API systemu obsługi praktyk zawodowych (ANS Elbląg).
+    Wszystkie endpointy wymagają zalogowanego użytkownika (sesja Flask-Login,
+    ciasteczko sesyjne). Dostęp do większości operacji jest dodatkowo ograniczony
+    rolą użytkownika (student, zopz, uopz, dyrektor, administrator).
+  version: 2.0.0
+
+servers:
+  - url: http://localhost:5000
+
+tags:
+  - name: Studenci
+  - name: Praktyki
+  - name: Praktyki - Workflow
+  - name: Dokumenty
+  - name: Dziennik
+  - name: Efekty uczenia się
+  - name: Firmy
+  - name: Generowanie PDF
+
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: session
+  schemas:
+    Error:
+      type: object
+      properties:
+        error: { type: string, example: "Resource not found" }
+
+security:
+  - cookieAuth: []
+
 paths:
+  # ───────────────────────── STUDENCI ─────────────────────────
   /api/students:
     get:
-      summary: Pobiera listę wszystkich studentów
+      tags: [Studenci]
+      summary: Lista studentów (role personelu)
       responses:
-        "200":
-          description: Lista studentów pobrana pomyślnie
+        "200": { description: Lista studentów }
     post:
-      summary: Dodaje nowego studenta
+      tags: [Studenci]
+      summary: Tworzy studenta (administrator, dyrektor)
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
+              required: [imie, nazwisko, numer_indeksu, email]
               properties:
                 imie: { type: string, example: "Jan" }
                 nazwisko: { type: string, example: "Kowalski" }
                 numer_indeksu: { type: string, example: "123456" }
-                email: { type: string, example: "jan@student.uczelnia.pl" }
+                email: { type: string, example: "jan@student.ans-elblag.pl" }
       responses:
-        "201":
-          description: Student utworzony pomyślnie
-        "400":
-          description: Błąd walidacji danych (braki w polach)
+        "201": { description: Student utworzony }
+        "400": { description: Brak wymaganych pól }
 
   /api/students/{id}:
     parameters:
-      - in: path
-        name: id
-        required: true
-        schema:
-          type: integer
-        description: ID studenta w bazie
+      - { in: path, name: id, required: true, schema: { type: integer } }
     get:
-      summary: Pobiera szczegóły konkretnego studenta
+      tags: [Studenci]
+      summary: Szczegóły studenta
       responses:
-        "200":
-          description: Dane studenta
-        "404":
-          description: Nie znaleziono studenta
+        "200": { description: Dane studenta }
+        "404": { description: Nie znaleziono }
     put:
-      summary: Aktualizuje dane studenta
+      tags: [Studenci]
+      summary: Aktualizacja studenta (administrator, dyrektor)
       requestBody:
         required: true
         content:
@@ -58,126 +87,508 @@ paths:
                 numer_indeksu: { type: string }
                 email: { type: string }
       responses:
-        "200":
-          description: Student zaktualizowany
-        "404":
-          description: Nie znaleziono studenta
+        "200": { description: Zaktualizowano }
+        "404": { description: Nie znaleziono }
     delete:
-      summary: Usuwa studenta z bazy
+      tags: [Studenci]
+      summary: Usuwa studenta (administrator)
       responses:
-        "200":
-          description: Student usunięty
-        "404":
-          description: Nie znaleziono studenta
+        "200": { description: Usunięto }
+        "404": { description: Nie znaleziono }
 
+  # ───────────────────────── PRAKTYKI ─────────────────────────
   /api/internships:
     get:
-      summary: Pobiera listę praktyk
-      parameters:
-        - in: query
-          name: student_id
-          schema:
-            type: integer
-          description: Opcjonalne filtrowanie po ID studenta
+      tags: [Praktyki]
+      summary: Lista praktyk
+      description: >
+        Student widzi wyłącznie własne praktyki; pozostałe role widzą wszystkie.
+        Każdy element zawiera komplet flag podpisów w obiekcie `podpisy`.
       responses:
-        "200":
-          description: Zwraca listę praktyk
+        "200": { description: Lista praktyk }
     post:
-      summary: Rejestruje nową praktykę
+      tags: [Praktyki]
+      summary: Rejestruje nową praktykę (administrator, uopz, dyrektor)
+      description: >
+        Wymaga istniejącego studenta i firmy (po ID). Zakres dat musi obejmować
+        dokładnie 120 dni roboczych (pon–pt). Student może mieć tylko jedną praktykę.
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
+              required: [id_studenta, id_firmy, data_od, data_do]
               properties:
-                student_id: { type: integer, example: 1 }
-                nazwa_firmy: { type: string, example: "Google Polska" }
-                data_rozpoczecia: { type: string, example: "2026-07-01" }
-                data_zakonczenia: { type: string, example: "2026-09-30" }
-                status: { type: string, example: "Oczekująca" }
+                id_studenta: { type: integer, example: 1 }
+                id_firmy: { type: integer, example: 1 }
+                data_od: { type: string, format: date, example: "2026-07-01" }
+                data_do: { type: string, format: date, example: "2026-12-15" }
       responses:
-        "201":
-          description: Praktyka dodana
-        "400":
-          description: Błędne daty
-        "404":
-          description: Student nie istnieje
+        "201": { description: Praktyka utworzona }
+        "400": { description: Błędne daty / inna niż 120 dni roboczych / student ma już praktykę }
+        "404": { description: Student lub firma nie istnieje }
 
   /api/internships/{id}:
     parameters:
-      - in: path
-        name: id
-        required: true
-        schema:
-          type: integer
-        description: ID praktyki
-    put:
-      summary: Aktualizuje status praktyki
+      - { in: path, name: id, required: true, schema: { type: integer } }
+    delete:
+      tags: [Praktyki]
+      summary: Usuwa praktykę wraz z dokumentami potomnymi (administrator)
+      responses:
+        "200": { description: Usunięto }
+        "404": { description: Nie znaleziono }
+
+  # ─────────────────── PRAKTYKI – WORKFLOW (podpisy/formularze) ───────────────────
+  /api/internships/{id}/sign:
+    parameters:
+      - { in: path, name: id, required: true, schema: { type: integer } }
+    post:
+      tags: [Praktyki - Workflow]
+      summary: Podpisuje / zatwierdza dokument w bieżącej fazie
+      description: >
+        Uniwersalny endpoint podpisu. Pole `dokument` decyduje, który załącznik jest
+        zatwierdzany; uprawnienie zależy od roli i fazy. Dozwolone wartości m.in.:
+        ZAL1, ZAL2A, ZAL3_1, ZAL3_2_ZGLOSZENIE, ZAL3_2_BHP, DZIENNIK_GOTOWY, ZAL4, ZAL8.
       requestBody:
         required: true
         content:
-          application/json:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required: [dokument]
+              properties:
+                dokument: { type: string, example: "ZAL1" }
+                redirect_to: { type: string, description: "Opcjonalny URL powrotu (tryb formularzowy)" }
+      responses:
+        "200": { description: Podpisano (zwraca też nową fazę) }
+        "403": { description: Brak uprawnień / niespełniony warunek poprzedzający }
+
+  /api/internships/{id}/meta:
+    parameters:
+      - { in: path, name: id, required: true, schema: { type: integer } }
+    post:
+      tags: [Praktyki - Workflow]
+      summary: Zapisuje metadane Porozumienia – Zał. 1 (administrator, uopz)
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
             schema:
               type: object
               properties:
-                status: { type: string, example: "Zatwierdzona" }
+                nr_porozumienia: { type: string }
+                data_porozumienia: { type: string, format: date }
+                przedstawiciel_firmy: { type: string }
+                redirect_to: { type: string }
       responses:
-        "200":
-          description: Status zaktualizowany
-        "404":
-          description: Nie znaleziono praktyki
-    delete:
-      summary: Usuwa praktykę
-      responses:
-        "200":
-          description: Praktyka usunięta
-        "404":
-          description: Nie znaleziono praktyki
+        "302": { description: Przekierowanie z komunikatem (tryb formularzowy) }
 
+  /api/internships/{id}/zal2a:
+    parameters:
+      - { in: path, name: id, required: true, schema: { type: integer } }
+    post:
+      tags: [Praktyki - Workflow]
+      summary: Zapisuje Program i harmonogram – Zał. 2a (zopz)
+      description: >
+        Pola `efekt_01`..`efekt_13` (opis prac dla każdego efektu) oraz pary
+        `dzial_01`/`dni_01` .. `dzial_13`/`dni_13`. Suma dni musi wynosić 120.
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                efekt_01: { type: string }
+                dzial_01: { type: string }
+                dni_01: { type: integer }
+      responses:
+        "302": { description: Zapisano / błąd walidacji (komunikat flash) }
+
+  /api/internships/{id}/zal2a/reject:
+    parameters:
+      - { in: path, name: id, required: true, schema: { type: integer } }
+    post:
+      tags: [Praktyki - Workflow]
+      summary: Odrzuca Zał. 2a do ponownego podpisu (uopz)
+      responses:
+        "302": { description: Odrzucono (komunikat flash) }
+
+  /api/internships/{id}/zal7:
+    parameters:
+      - { in: path, name: id, required: true, schema: { type: integer } }
+    post:
+      tags: [Praktyki - Workflow]
+      summary: Składa Sprawozdanie – Zał. 7 (student)
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required: [charakterystyka_miejsca, opis_i_analiza_prac, samoocena_kompetencji]
+              properties:
+                charakterystyka_miejsca: { type: string }
+                opis_i_analiza_prac: { type: string }
+                samoocena_kompetencji: { type: string }
+      responses:
+        "302": { description: Złożono / błąd walidacji }
+
+  /api/internships/{id}/zal32/zopz:
+    parameters:
+      - { in: path, name: id, required: true, schema: { type: integer } }
+    post:
+      tags: [Praktyki - Workflow]
+      summary: Karta str. 2 – zaświadczenie i ocena zakładowa (zopz)
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                ocena_zopz_param: { type: string, example: "4", description: "2,3,3.5,4,4.5,5" }
+                ocena_zopz_opis: { type: string }
+                uwagi_odbycie: { type: string }
+      responses:
+        "302": { description: Zapisano / błąd walidacji }
+
+  /api/internships/{id}/zal32/uopz:
+    parameters:
+      - { in: path, name: id, required: true, schema: { type: integer } }
+    post:
+      tags: [Praktyki - Workflow]
+      summary: Karta str. 2 – ocena uczelniana i ocena sprawozdania (uopz)
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                ocena_uopz_param: { type: string, example: "4" }
+                ocena_uopz_opis: { type: string }
+                ocena_sprawozdania: { type: string, example: "4" }
+      responses:
+        "302": { description: Zapisano / błąd walidacji }
+
+  /api/internships/{id}/zal4/zopz:
+    parameters:
+      - { in: path, name: id, required: true, schema: { type: integer } }
+    post:
+      tags: [Praktyki - Workflow]
+      summary: Potwierdzenie 13 efektów uczenia się (zopz)
+      description: "Pola ef_01..ef_13, każde o wartości '1' (uzyskany) lub '0'."
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                ef_01: { type: string, enum: ["0", "1"] }
+      responses:
+        "302": { description: Zapisano / błąd walidacji }
+
+  /api/internships/{id}/zal4/uopz:
+    parameters:
+      - { in: path, name: id, required: true, schema: { type: integer } }
+    post:
+      tags: [Praktyki - Workflow]
+      summary: Opinia UOPZ do Zał. 4 i zatwierdzenie (uopz)
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                opinia_uopz: { type: string }
+      responses:
+        "302": { description: Zapisano / błąd walidacji }
+
+  /api/internships/{id}/zal5:
+    parameters:
+      - { in: path, name: id, required: true, schema: { type: integer } }
+    post:
+      tags: [Praktyki - Workflow]
+      summary: Kwestionariusz ankiety – Zał. 5 (student)
+      description: "Pola q1..q14 (wartości: zd_tak, rk_tak, trudno, rk_nie, zd_nie) + uwagi."
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                q1: { type: string, example: "zd_tak" }
+                uwagi: { type: string }
+      responses:
+        "302": { description: Zapisano / błąd walidacji }
+
+  /api/internships/{id}/zal8:
+    parameters:
+      - { in: path, name: id, required: true, schema: { type: integer } }
+    post:
+      tags: [Praktyki - Workflow]
+      summary: Wystawia Protokół Zaliczenia – Zał. 8 (dyrektor)
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                data_zaliczenia: { type: string, format: date }
+                ocena_s: { type: string, example: "4" }
+                czlonek_1: { type: string }
+                czlonek_2: { type: string }
+                czlonek_3: { type: string }
+                czlonek_4: { type: string }
+                pytanie_1: { type: string }
+                pytanie_2: { type: string }
+                pytanie_3: { type: string }
+                ocena_p1: { type: string }
+                ocena_p2: { type: string }
+                ocena_p3: { type: string }
+      responses:
+        "302": { description: Zapisano / błąd walidacji }
+
+  /api/internships/{id}/usos:
+    parameters:
+      - { in: path, name: id, required: true, schema: { type: integer } }
+    post:
+      tags: [Praktyki - Workflow]
+      summary: Podpis UOPZ + wpis do USOS – zakończenie praktyki (uopz)
+      responses:
+        "302": { description: Praktyka zakończona / błąd }
+
+  /api/internships/{id}/reset/zal4:
+    parameters:
+      - { in: path, name: id, required: true, schema: { type: integer } }
+    post:
+      tags: [Praktyki - Workflow]
+      summary: Cofa potwierdzenie efektów – Zał. 4 (administrator)
+      responses:
+        "302": { description: Zresetowano }
+
+  # ───────────────────────── DOKUMENTY ─────────────────────────
   /api/documents:
     get:
-      summary: Pobiera listę dokumentów
+      tags: [Dokumenty]
+      summary: Lista dokumentów
       parameters:
-        - in: query
-          name: internship_id
-          schema:
-            type: integer
-          description: ID praktyki w celu przefiltrowania dokumentów
+        - { in: query, name: internship_id, schema: { type: integer }, description: Filtruj po praktyce }
       responses:
-        "200":
-          description: Lista dokumentów
+        "200": { description: Lista dokumentów }
     post:
-      summary: Przesyła nowy dokument
+      tags: [Dokumenty]
+      summary: Dodaje dokument (wymaga istniejącej praktyki)
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
+              required: [identyfikator_praktyki, nazwa_dokumentu, typ_dokumentu]
               properties:
                 identyfikator_praktyki: { type: integer, example: 1 }
                 nazwa_dokumentu: { type: string, example: "Skierowanie.pdf" }
                 typ_dokumentu: { type: string, example: "Skierowanie" }
                 komentarz_opiekuna: { type: string, example: "Brak uwag" }
       responses:
-        "201":
-          description: Dokument przesłany
-        "404":
-          description: Przypisana praktyka nie istnieje
+        "201": { description: Dokument dodany }
+        "404": { description: Praktyka nie istnieje }
 
   /api/documents/{id}:
     parameters:
-      - in: path
-        name: id
-        required: true
-        schema:
-          type: integer
-        description: ID dokumentu
+      - { in: path, name: id, required: true, schema: { type: integer } }
     delete:
-      summary: Usuwa dokument
+      tags: [Dokumenty]
+      summary: Usuwa dokument (administrator, dyrektor)
+      responses:
+        "200": { description: Usunięto }
+        "404": { description: Nie znaleziono }
+
+  # ───────────────────────── DZIENNIK ─────────────────────────
+  /api/journal:
+    get:
+      tags: [Dziennik]
+      summary: Lista wpisów dziennika
+      parameters:
+        - { in: query, name: internship_id, schema: { type: integer }, description: Filtruj po praktyce }
+      responses:
+        "200": { description: Lista wpisów }
+
+  /api/journal/add:
+    post:
+      tags: [Dziennik]
+      summary: Dodaje wpis dziennika (student)
+      description: >
+        Walidacja: data w okresie praktyki, dzień roboczy (pon–pt), data późniejsza
+        niż ostatni wpis, opis o min. długości, co najmniej jeden efekt. Maksymalnie 120 wpisów.
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required: [praktyka_id, data, opis, efekty]
+              properties:
+                praktyka_id: { type: integer }
+                data: { type: string, format: date }
+                opis: { type: string }
+                efekty: { type: array, items: { type: string }, example: ["01", "05"] }
+      responses:
+        "302": { description: Zapisano / błąd walidacji }
+
+  /api/journal/fill_test:
+    post:
+      tags: [Dziennik]
+      summary: Wypełnia dziennik danymi testowymi (narzędzie pomocnicze)
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                praktyka_id: { type: integer }
+      responses:
+        "302": { description: Wypełniono }
+
+  /api/journal/undo_last:
+    post:
+      tags: [Dziennik]
+      summary: Cofa ostatni wpis dziennika (student)
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                praktyka_id: { type: integer }
+      responses:
+        "302": { description: Cofnięto / brak wpisów }
+
+  /api/journal/{id}:
+    parameters:
+      - { in: path, name: id, required: true, schema: { type: integer } }
+    delete:
+      tags: [Dziennik]
+      summary: Usuwa pojedynczy wpis dziennika
+      responses:
+        "200": { description: Usunięto }
+        "404": { description: Nie znaleziono }
+
+  # ───────────────────────── EFEKTY ─────────────────────────
+  /api/outcomes:
+    get:
+      tags: [Efekty uczenia się]
+      summary: Lista potwierdzeń efektów
+      parameters:
+        - { in: query, name: internship_id, schema: { type: integer } }
+      responses:
+        "200": { description: Lista potwierdzeń }
+    post:
+      tags: [Efekty uczenia się]
+      summary: Zapisuje potwierdzenie efektu
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [id_formularza, id_efektu, czy_uzyskany]
+              properties:
+                id_formularza: { type: integer, example: 1 }
+                id_efektu: { type: integer, example: 1 }
+                czy_uzyskany: { type: integer, enum: [0, 1] }
+      responses:
+        "201": { description: Zapisano }
+        "400": { description: "Braki / czy_uzyskany spoza zbioru {0,1}" }
+        "404": { description: Formularz lub efekt nie istnieje }
+
+  /api/outcomes/{id}:
+    parameters:
+      - { in: path, name: id, required: true, schema: { type: integer } }
+    delete:
+      tags: [Efekty uczenia się]
+      summary: Usuwa potwierdzenie efektu
+      responses:
+        "200": { description: Usunięto }
+        "404": { description: Nie znaleziono }
+
+  # ───────────────────────── FIRMY ─────────────────────────
+  /api/firms:
+    get:
+      tags: [Firmy]
+      summary: Lista firm
+      responses:
+        "200": { description: Lista firm }
+    post:
+      tags: [Firmy]
+      summary: Dodaje firmę (administrator, uopz)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [nazwa]
+              properties:
+                nazwa: { type: string, example: "ABC Software Sp. z o.o." }
+                adres: { type: string, example: "Elbląg" }
+                przedstawiciel: { type: string }
+      responses:
+        "201": { description: Firma dodana }
+        "400": { description: Brak nazwy }
+
+  /api/firms/{id}:
+    parameters:
+      - { in: path, name: id, required: true, schema: { type: integer } }
+    delete:
+      tags: [Firmy]
+      summary: Usuwa firmę (administrator, uopz)
+      responses:
+        "200": { description: Usunięto }
+        "404": { description: Nie znaleziono }
+
+  # ───────────────────────── PDF ─────────────────────────
+  /api/pdf/{id}/{zal_key}:
+    parameters:
+      - { in: path, name: id, required: true, schema: { type: integer }, description: ID praktyki }
+      - in: path
+        name: zal_key
+        required: true
+        schema: { type: string }
+        description: "Klucz załącznika: zal1, zal2a, zal31, zal32, zal6, zal7, zal4, zal5, zal8"
+    get:
+      tags: [Generowanie PDF]
+      summary: Generuje pojedynczy załącznik jako PDF
       responses:
         "200":
-          description: Dokument usunięty
+          description: Plik PDF
+          content:
+            application/pdf: {}
         "404":
-          description: Nie znaleziono dokumentu
+          description: Nieznany klucz załącznika
+
+  /api/pdf/{id}/zip:
+    parameters:
+      - { in: path, name: id, required: true, schema: { type: integer } }
+    post:
+      tags: [Generowanie PDF]
+      summary: Pakuje wybrane załączniki do archiwum ZIP
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                zalaczniki:
+                  type: array
+                  items: { type: string }
+                  example: ["zal1", "zal2a", "zal8"]
+      responses:
+        "200": { description: Archiwum ZIP (application/zip) }
+        "302": { description: Brak zaznaczonych / nic nie wygenerowano (komunikat flash) }
+
+  /api/pdf/generate-pdf/{id}:
+    parameters:
+      - { in: path, name: id, required: true, schema: { type: integer } }
+    get:
+      tags: [Generowanie PDF]
+      summary: Pakuje wszystkie dostępne załączniki praktyki do ZIP
+      responses:
+        "200": { description: Archiwum ZIP ze wszystkimi załącznikami }

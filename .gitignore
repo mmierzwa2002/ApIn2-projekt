@@ -50,6 +50,8 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 cover/
+flask_err.txt
+flask_out.txt
 
 # Translations
 *.mo

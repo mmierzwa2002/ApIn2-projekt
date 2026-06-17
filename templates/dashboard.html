@@ -819,6 +819,49 @@
             {% elif p.faza_procesu == 4 %}
               {% if p.usos_wpisany %}
               <span style="font-size:0.8rem;color:#059669;font-weight:600">✓ Praktyka zakończona</span>
+              <a onclick="document.getElementById('zip-staff-{{ p.id_formularza }}').classList.toggle('hidden')"
+                 style="font-size:0.8rem;color:#059669;font-weight:600;cursor:pointer;text-decoration:underline">
+                ⬇ Pobierz dokumenty (ZIP)
+              </a>
+              <div id="zip-staff-{{ p.id_formularza }}" class="hidden"
+                   style="background:var(--surface-alt,#1e293b);border:1px solid var(--border);
+                          border-radius:8px;padding:0.6rem 0.75rem;margin-top:0.2rem">
+                <form action="/api/pdf/{{ p.id_formularza }}/zip" method="POST" target="_blank">
+                  <div style="display:flex;flex-direction:column;gap:0.25rem;margin-bottom:0.55rem;font-size:0.8rem">
+                    <label style="display:flex;align-items:center;gap:0.4rem;cursor:pointer">
+                      <input type="checkbox" name="zalaczniki" value="zal1" checked> Zał. 1 – Porozumienie
+                    </label>
+                    <label style="display:flex;align-items:center;gap:0.4rem;cursor:pointer">
+                      <input type="checkbox" name="zalaczniki" value="zal2a" checked> Zał. 2a – Harmonogram
+                    </label>
+                    <label style="display:flex;align-items:center;gap:0.4rem;cursor:pointer">
+                      <input type="checkbox" name="zalaczniki" value="zal31" checked> Zał. 3.1 – Karta str. 1
+                    </label>
+                    <label style="display:flex;align-items:center;gap:0.4rem;cursor:pointer">
+                      <input type="checkbox" name="zalaczniki" value="zal32" checked> Zał. 3.2 – Karta str. 2
+                    </label>
+                    <label style="display:flex;align-items:center;gap:0.4rem;cursor:pointer">
+                      <input type="checkbox" name="zalaczniki" value="zal6"> Zał. 6 – Dziennik
+                    </label>
+                    <label style="display:flex;align-items:center;gap:0.4rem;cursor:pointer">
+                      <input type="checkbox" name="zalaczniki" value="zal7" checked> Zał. 7 – Sprawozdanie
+                    </label>
+                    <label style="display:flex;align-items:center;gap:0.4rem;cursor:pointer">
+                      <input type="checkbox" name="zalaczniki" value="zal4" checked> Zał. 4 – Potwierdzenie efektów
+                    </label>
+                    <label style="display:flex;align-items:center;gap:0.4rem;cursor:pointer">
+                      <input type="checkbox" name="zalaczniki" value="zal5" checked> Zał. 5 – Ankieta
+                    </label>
+                    <label style="display:flex;align-items:center;gap:0.4rem;cursor:pointer">
+                      <input type="checkbox" name="zalaczniki" value="zal8" checked> Zał. 8 – Protokół
+                    </label>
+                  </div>
+                  <button type="submit" style="background:#059669;color:#fff;border:none;border-radius:8px;
+                          padding:0.35rem 0.9rem;font-size:0.8rem;font-weight:600;cursor:pointer">
+                    ⬇ Pobierz ZIP
+                  </button>
+                </form>
+              </div>
               {% elif current_user.role == 'dyrektor' and not p.zal8_dyrektor %}
               <a href="/auth/formularze/{{ p.id_formularza }}/zal8" class="btn-academic"
                  style="padding:0.35rem 0.7rem;font-size:0.82rem;text-decoration:none;text-align:center;background:#7c3aed">

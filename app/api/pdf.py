@@ -142,8 +142,19 @@ def _inline_css(html: str) -> str:
             css = f.read()
     except OSError:
         current_app.logger.warning('Nie udało się wczytać style.css do PDF')
+    page_number_css = """
+@page {
+  margin-bottom: 1.8cm;
+  @bottom-center {
+    content: "Strona " counter(page) " z " counter(pages);
+    font-size: 8pt;
+    color: #64748b;
+    font-family: Arial, sans-serif;
+  }
+}
+"""
     html = re.sub(r'<link\b[^>]*stylesheet[^>]*>', '', html, flags=re.IGNORECASE)
-    html = html.replace('</head>', f'<style>{css}</style></head>', 1)
+    html = html.replace('</head>', f'<style>{css}{page_number_css}</style></head>', 1)
     # Wymuś jasny motyw (brak localStorage w headless -> i tak 'light', ale pewniej)
     html = re.sub(r'<html\b', '<html data-theme="light"', html, count=1)
     return html

@@ -1,5 +1,5 @@
 """
-Seed demonstracyjny — tworzy studenta z całkowicie wypełnioną praktyką
+Seed demonstracyjny tworzy studenta z całkowicie wypełnioną praktyką
 (faza 4, usos_wpisany=True, wszystkie załączniki kompletne).
 
 Uruchomienie:
@@ -9,7 +9,7 @@ Dane logowania:
     email:  demo@ans.elblag.pl
     hasło:  Demo1234!
 
-Skrypt jest idempotentny — jeśli rekord już istnieje, nie tworzy duplikatu.
+Jeśli rekord już istnieje, nie tworzy duplikatu.
 """
 
 import sys
@@ -145,6 +145,7 @@ def seed():
             zal7_zopz=True,
             # Faza 4
             zal8_dyrektor=True,
+            zal8_uopz=True,
             usos_wpisany=True,
         )
         db.session.add(p)

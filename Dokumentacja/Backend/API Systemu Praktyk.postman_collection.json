@@ -1,1199 +1,429 @@
 {
   "info": {
-    "_postman_id": "0391ad12-accf-41ee-9a86-76883fe758d6",
     "name": "API Systemu Praktyk",
-    "description": "Pełna dokumentacja REST API dla systemu obsługi praktyk studenckich (Etap 9).",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "55253223",
-    "_collection_link": "https://go.postman.co/collection/55253223-0391ad12-accf-41ee-9a86-76883fe758d6?source=collection_link"
+    "description": "Pełna kolekcja REST API systemu rozliczania praktyk zawodowych (ANS Elbląg). Wszystkie endpointy wymagają zalogowanej sesji (ciasteczko Flask-Login). Ustaw zmienną baseUrl oraz, w razie potrzeby, id zasobów.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000" },
+    { "key": "internshipId", "value": "1" },
+    { "key": "studentId", "value": "1" }
+  ],
   "item": [
     {
-      "name": "api",
+      "name": "Studenci",
       "item": [
         {
-          "name": "students",
-          "item": [
-            {
-              "name": "{id}",
-              "item": [
-                {
-                  "name": "Pobiera szczegóły konkretnego studenta",
-                  "request": {
-                    "method": "GET",
-                    "header": [],
-                    "url": {
-                      "raw": "{{baseUrl}}/api/students/:id",
-                      "host": [
-                        "{{baseUrl}}"
-                      ],
-                      "path": [
-                        "api",
-                        "students",
-                        ":id"
-                      ],
-                      "variable": [
-                        {
-                          "key": "id",
-                          "value": "6072",
-                          "description": "ID studenta w bazie"
-                        }
-                      ]
-                    }
-                  },
-                  "response": [
-                    {
-                      "name": "Dane studenta",
-                      "originalRequest": {
-                        "method": "GET",
-                        "header": [],
-                        "url": {
-                          "raw": "{{baseUrl}}/api/students/:id",
-                          "host": [
-                            "{{baseUrl}}"
-                          ],
-                          "path": [
-                            "api",
-                            "students",
-                            ":id"
-                          ],
-                          "variable": [
-                            {
-                              "key": "id",
-                              "value": "6072",
-                              "description": "ID studenta w bazie"
-                            }
-                          ]
-                        }
-                      },
-                      "status": "OK",
-                      "code": 200,
-                      "_postman_previewlanguage": "text",
-                      "header": [],
-                      "cookie": [],
-                      "body": ""
-                    },
-                    {
-                      "name": "Nie znaleziono studenta",
-                      "originalRequest": {
-                        "method": "GET",
-                        "header": [],
-                        "url": {
-                          "raw": "{{baseUrl}}/api/students/:id",
-                          "host": [
-                            "{{baseUrl}}"
-                          ],
-                          "path": [
-                            "api",
-                            "students",
-                            ":id"
-                          ],
-                          "variable": [
-                            {
-                              "key": "id",
-                              "value": "6072",
-                              "description": "ID studenta w bazie"
-                            }
-                          ]
-                        }
-                      },
-                      "status": "Not Found",
-                      "code": 404,
-                      "_postman_previewlanguage": "text",
-                      "header": [],
-                      "cookie": [],
-                      "body": ""
-                    }
-                  ]
-                },
-                {
-                  "name": "Aktualizuje dane studenta",
-                  "request": {
-                    "method": "PUT",
-                    "header": [
-                      {
-                        "key": "Content-Type",
-                        "value": "application/json"
-                      }
-                    ],
-                    "body": {
-                      "mode": "raw",
-                      "raw": "{\n  \"imie\": \"string\",\n  \"nazwisko\": \"string\",\n  \"numer_indeksu\": \"string\",\n  \"email\": \"string\"\n}",
-                      "options": {
-                        "raw": {
-                          "headerFamily": "json",
-                          "language": "json"
-                        }
-                      }
-                    },
-                    "url": {
-                      "raw": "{{baseUrl}}/api/students/:id",
-                      "host": [
-                        "{{baseUrl}}"
-                      ],
-                      "path": [
-                        "api",
-                        "students",
-                        ":id"
-                      ],
-                      "variable": [
-                        {
-                          "key": "id",
-                          "value": "6072",
-                          "description": "ID studenta w bazie"
-                        }
-                      ]
-                    }
-                  },
-                  "response": [
-                    {
-                      "name": "Student zaktualizowany",
-                      "originalRequest": {
-                        "method": "PUT",
-                        "header": [
-                          {
-                            "key": "Content-Type",
-                            "value": "application/json"
-                          }
-                        ],
-                        "body": {
-                          "mode": "raw",
-                          "raw": "{\n  \"imie\": \"string\",\n  \"nazwisko\": \"string\",\n  \"numer_indeksu\": \"string\",\n  \"email\": \"string\"\n}",
-                          "options": {
-                            "raw": {
-                              "headerFamily": "json",
-                              "language": "json"
-                            }
-                          }
-                        },
-                        "url": {
-                          "raw": "{{baseUrl}}/api/students/:id",
-                          "host": [
-                            "{{baseUrl}}"
-                          ],
-                          "path": [
-                            "api",
-                            "students",
-                            ":id"
-                          ],
-                          "variable": [
-                            {
-                              "key": "id",
-                              "value": "6072",
-                              "description": "ID studenta w bazie"
-                            }
-                          ]
-                        }
-                      },
-                      "status": "OK",
-                      "code": 200,
-                      "_postman_previewlanguage": "text",
-                      "header": [],
-                      "cookie": [],
-                      "body": ""
-                    },
-                    {
-                      "name": "Nie znaleziono studenta",
-                      "originalRequest": {
-                        "method": "PUT",
-                        "header": [
-                          {
-                            "key": "Content-Type",
-                            "value": "application/json"
-                          }
-                        ],
-                        "body": {
-                          "mode": "raw",
-                          "raw": "{\n  \"imie\": \"string\",\n  \"nazwisko\": \"string\",\n  \"numer_indeksu\": \"string\",\n  \"email\": \"string\"\n}",
-                          "options": {
-                            "raw": {
-                              "headerFamily": "json",
-                              "language": "json"
-                            }
-                          }
-                        },
-                        "url": {
-                          "raw": "{{baseUrl}}/api/students/:id",
-                          "host": [
-                            "{{baseUrl}}"
-                          ],
-                          "path": [
-                            "api",
-                            "students",
-                            ":id"
-                          ],
-                          "variable": [
-                            {
-                              "key": "id",
-                              "value": "6072",
-                              "description": "ID studenta w bazie"
-                            }
-                          ]
-                        }
-                      },
-                      "status": "Not Found",
-                      "code": 404,
-                      "_postman_previewlanguage": "text",
-                      "header": [],
-                      "cookie": [],
-                      "body": ""
-                    }
-                  ]
-                },
-                {
-                  "name": "Usuwa studenta z bazy",
-                  "request": {
-                    "method": "DELETE",
-                    "header": [],
-                    "url": {
-                      "raw": "{{baseUrl}}/api/students/:id",
-                      "host": [
-                        "{{baseUrl}}"
-                      ],
-                      "path": [
-                        "api",
-                        "students",
-                        ":id"
-                      ],
-                      "variable": [
-                        {
-                          "key": "id",
-                          "value": "6072",
-                          "description": "ID studenta w bazie"
-                        }
-                      ]
-                    }
-                  },
-                  "response": [
-                    {
-                      "name": "Student usunięty",
-                      "originalRequest": {
-                        "method": "DELETE",
-                        "header": [],
-                        "url": {
-                          "raw": "{{baseUrl}}/api/students/:id",
-                          "host": [
-                            "{{baseUrl}}"
-                          ],
-                          "path": [
-                            "api",
-                            "students",
-                            ":id"
-                          ],
-                          "variable": [
-                            {
-                              "key": "id",
-                              "value": "6072",
-                              "description": "ID studenta w bazie"
-                            }
-                          ]
-                        }
-                      },
-                      "status": "OK",
-                      "code": 200,
-                      "_postman_previewlanguage": "text",
-                      "header": [],
-                      "cookie": [],
-                      "body": ""
-                    },
-                    {
-                      "name": "Nie znaleziono studenta",
-                      "originalRequest": {
-                        "method": "DELETE",
-                        "header": [],
-                        "url": {
-                          "raw": "{{baseUrl}}/api/students/:id",
-                          "host": [
-                            "{{baseUrl}}"
-                          ],
-                          "path": [
-                            "api",
-                            "students",
-                            ":id"
-                          ],
-                          "variable": [
-                            {
-                              "key": "id",
-                              "value": "6072",
-                              "description": "ID studenta w bazie"
-                            }
-                          ]
-                        }
-                      },
-                      "status": "Not Found",
-                      "code": 404,
-                      "_postman_previewlanguage": "text",
-                      "header": [],
-                      "cookie": [],
-                      "body": ""
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "name": "Pobiera listę wszystkich studentów",
-              "request": {
-                "method": "GET",
-                "header": [],
-                "url": {
-                  "raw": "{{baseUrl}}/api/students",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "api",
-                    "students"
-                  ]
-                }
-              },
-              "response": [
-                {
-                  "name": "Lista studentów pobrana pomyślnie",
-                  "originalRequest": {
-                    "method": "GET",
-                    "header": [],
-                    "url": {
-                      "raw": "{{baseUrl}}/api/students",
-                      "host": [
-                        "{{baseUrl}}"
-                      ],
-                      "path": [
-                        "api",
-                        "students"
-                      ]
-                    }
-                  },
-                  "status": "OK",
-                  "code": 200,
-                  "_postman_previewlanguage": "text",
-                  "header": [],
-                  "cookie": [],
-                  "body": ""
-                }
-              ]
-            },
-            {
-              "name": "Dodaje nowego studenta",
-              "request": {
-                "method": "POST",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"imie\": \"Jan\",\n  \"nazwisko\": \"Kowalski\",\n  \"numer_indeksu\": \"123456\",\n  \"email\": \"jan@student.uczelnia.pl\"\n}",
-                  "options": {
-                    "raw": {
-                      "headerFamily": "json",
-                      "language": "json"
-                    }
-                  }
-                },
-                "url": {
-                  "raw": "{{baseUrl}}/api/students",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "api",
-                    "students"
-                  ]
-                }
-              },
-              "response": [
-                {
-                  "name": "Student utworzony pomyślnie",
-                  "originalRequest": {
-                    "method": "POST",
-                    "header": [
-                      {
-                        "key": "Content-Type",
-                        "value": "application/json"
-                      }
-                    ],
-                    "body": {
-                      "mode": "raw",
-                      "raw": "{\n  \"imie\": \"Jan\",\n  \"nazwisko\": \"Kowalski\",\n  \"numer_indeksu\": \"123456\",\n  \"email\": \"jan@student.uczelnia.pl\"\n}",
-                      "options": {
-                        "raw": {
-                          "headerFamily": "json",
-                          "language": "json"
-                        }
-                      }
-                    },
-                    "url": {
-                      "raw": "{{baseUrl}}/api/students",
-                      "host": [
-                        "{{baseUrl}}"
-                      ],
-                      "path": [
-                        "api",
-                        "students"
-                      ]
-                    }
-                  },
-                  "status": "Created",
-                  "code": 201,
-                  "_postman_previewlanguage": "text",
-                  "header": [],
-                  "cookie": [],
-                  "body": ""
-                },
-                {
-                  "name": "Błąd walidacji danych (braki w polach)",
-                  "originalRequest": {
-                    "method": "POST",
-                    "header": [
-                      {
-                        "key": "Content-Type",
-                        "value": "application/json"
-                      }
-                    ],
-                    "body": {
-                      "mode": "raw",
-                      "raw": "{\n  \"imie\": \"Jan\",\n  \"nazwisko\": \"Kowalski\",\n  \"numer_indeksu\": \"123456\",\n  \"email\": \"jan@student.uczelnia.pl\"\n}",
-                      "options": {
-                        "raw": {
-                          "headerFamily": "json",
-                          "language": "json"
-                        }
-                      }
-                    },
-                    "url": {
-                      "raw": "{{baseUrl}}/api/students",
-                      "host": [
-                        "{{baseUrl}}"
-                      ],
-                      "path": [
-                        "api",
-                        "students"
-                      ]
-                    }
-                  },
-                  "status": "Bad Request",
-                  "code": 400,
-                  "_postman_previewlanguage": "text",
-                  "header": [],
-                  "cookie": [],
-                  "body": ""
-                }
-              ]
-            }
-          ]
+          "name": "Lista studentów",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/students", "host": ["{{baseUrl}}"], "path": ["api", "students"] }
+          }
         },
         {
-          "name": "internships",
-          "item": [
-            {
-              "name": "{id}",
-              "item": [
-                {
-                  "name": "Aktualizuje status praktyki",
-                  "request": {
-                    "method": "PUT",
-                    "header": [
-                      {
-                        "key": "Content-Type",
-                        "value": "application/json"
-                      }
-                    ],
-                    "body": {
-                      "mode": "raw",
-                      "raw": "{\n  \"status\": \"Zatwierdzona\"\n}",
-                      "options": {
-                        "raw": {
-                          "headerFamily": "json",
-                          "language": "json"
-                        }
-                      }
-                    },
-                    "url": {
-                      "raw": "{{baseUrl}}/api/internships/:id",
-                      "host": [
-                        "{{baseUrl}}"
-                      ],
-                      "path": [
-                        "api",
-                        "internships",
-                        ":id"
-                      ],
-                      "variable": [
-                        {
-                          "key": "id",
-                          "value": "6072",
-                          "description": "ID praktyki"
-                        }
-                      ]
-                    }
-                  },
-                  "response": [
-                    {
-                      "name": "Status zaktualizowany",
-                      "originalRequest": {
-                        "method": "PUT",
-                        "header": [
-                          {
-                            "key": "Content-Type",
-                            "value": "application/json"
-                          }
-                        ],
-                        "body": {
-                          "mode": "raw",
-                          "raw": "{\n  \"status\": \"Zatwierdzona\"\n}",
-                          "options": {
-                            "raw": {
-                              "headerFamily": "json",
-                              "language": "json"
-                            }
-                          }
-                        },
-                        "url": {
-                          "raw": "{{baseUrl}}/api/internships/:id",
-                          "host": [
-                            "{{baseUrl}}"
-                          ],
-                          "path": [
-                            "api",
-                            "internships",
-                            ":id"
-                          ],
-                          "variable": [
-                            {
-                              "key": "id",
-                              "value": "6072",
-                              "description": "ID praktyki"
-                            }
-                          ]
-                        }
-                      },
-                      "status": "OK",
-                      "code": 200,
-                      "_postman_previewlanguage": "text",
-                      "header": [],
-                      "cookie": [],
-                      "body": ""
-                    },
-                    {
-                      "name": "Nie znaleziono praktyki",
-                      "originalRequest": {
-                        "method": "PUT",
-                        "header": [
-                          {
-                            "key": "Content-Type",
-                            "value": "application/json"
-                          }
-                        ],
-                        "body": {
-                          "mode": "raw",
-                          "raw": "{\n  \"status\": \"Zatwierdzona\"\n}",
-                          "options": {
-                            "raw": {
-                              "headerFamily": "json",
-                              "language": "json"
-                            }
-                          }
-                        },
-                        "url": {
-                          "raw": "{{baseUrl}}/api/internships/:id",
-                          "host": [
-                            "{{baseUrl}}"
-                          ],
-                          "path": [
-                            "api",
-                            "internships",
-                            ":id"
-                          ],
-                          "variable": [
-                            {
-                              "key": "id",
-                              "value": "6072",
-                              "description": "ID praktyki"
-                            }
-                          ]
-                        }
-                      },
-                      "status": "Not Found",
-                      "code": 404,
-                      "_postman_previewlanguage": "text",
-                      "header": [],
-                      "cookie": [],
-                      "body": ""
-                    }
-                  ]
-                },
-                {
-                  "name": "Usuwa praktykę",
-                  "request": {
-                    "method": "DELETE",
-                    "header": [],
-                    "url": {
-                      "raw": "{{baseUrl}}/api/internships/:id",
-                      "host": [
-                        "{{baseUrl}}"
-                      ],
-                      "path": [
-                        "api",
-                        "internships",
-                        ":id"
-                      ],
-                      "variable": [
-                        {
-                          "key": "id",
-                          "value": "6072",
-                          "description": "ID praktyki"
-                        }
-                      ]
-                    }
-                  },
-                  "response": [
-                    {
-                      "name": "Praktyka usunięta",
-                      "originalRequest": {
-                        "method": "DELETE",
-                        "header": [],
-                        "url": {
-                          "raw": "{{baseUrl}}/api/internships/:id",
-                          "host": [
-                            "{{baseUrl}}"
-                          ],
-                          "path": [
-                            "api",
-                            "internships",
-                            ":id"
-                          ],
-                          "variable": [
-                            {
-                              "key": "id",
-                              "value": "6072",
-                              "description": "ID praktyki"
-                            }
-                          ]
-                        }
-                      },
-                      "status": "OK",
-                      "code": 200,
-                      "_postman_previewlanguage": "text",
-                      "header": [],
-                      "cookie": [],
-                      "body": ""
-                    },
-                    {
-                      "name": "Nie znaleziono praktyki",
-                      "originalRequest": {
-                        "method": "DELETE",
-                        "header": [],
-                        "url": {
-                          "raw": "{{baseUrl}}/api/internships/:id",
-                          "host": [
-                            "{{baseUrl}}"
-                          ],
-                          "path": [
-                            "api",
-                            "internships",
-                            ":id"
-                          ],
-                          "variable": [
-                            {
-                              "key": "id",
-                              "value": "6072",
-                              "description": "ID praktyki"
-                            }
-                          ]
-                        }
-                      },
-                      "status": "Not Found",
-                      "code": 404,
-                      "_postman_previewlanguage": "text",
-                      "header": [],
-                      "cookie": [],
-                      "body": ""
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "name": "Pobiera listę praktyk",
-              "request": {
-                "method": "GET",
-                "header": [],
-                "url": {
-                  "raw": "{{baseUrl}}/api/internships?student_id=6072",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "api",
-                    "internships"
-                  ],
-                  "query": [
-                    {
-                      "key": "student_id",
-                      "value": "6072",
-                      "description": "Opcjonalne filtrowanie po ID studenta"
-                    }
-                  ]
-                }
-              },
-              "response": [
-                {
-                  "name": "Zwraca listę praktyk",
-                  "originalRequest": {
-                    "method": "GET",
-                    "header": [],
-                    "url": {
-                      "raw": "{{baseUrl}}/api/internships?student_id=6072",
-                      "host": [
-                        "{{baseUrl}}"
-                      ],
-                      "path": [
-                        "api",
-                        "internships"
-                      ],
-                      "query": [
-                        {
-                          "description": "Opcjonalne filtrowanie po ID studenta",
-                          "key": "student_id",
-                          "value": "6072"
-                        }
-                      ]
-                    }
-                  },
-                  "status": "OK",
-                  "code": 200,
-                  "_postman_previewlanguage": "text",
-                  "header": [],
-                  "cookie": [],
-                  "body": ""
-                }
-              ]
-            },
-            {
-              "name": "Rejestruje nową praktykę",
-              "request": {
-                "method": "POST",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"student_id\": 1,\n  \"nazwa_firmy\": \"Google Polska\",\n  \"data_rozpoczecia\": \"2026-07-01\",\n  \"data_zakonczenia\": \"2026-09-30\",\n  \"status\": \"Oczekująca\"\n}",
-                  "options": {
-                    "raw": {
-                      "headerFamily": "json",
-                      "language": "json"
-                    }
-                  }
-                },
-                "url": {
-                  "raw": "{{baseUrl}}/api/internships",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "api",
-                    "internships"
-                  ]
-                }
-              },
-              "response": [
-                {
-                  "name": "Praktyka dodana",
-                  "originalRequest": {
-                    "method": "POST",
-                    "header": [
-                      {
-                        "key": "Content-Type",
-                        "value": "application/json"
-                      }
-                    ],
-                    "body": {
-                      "mode": "raw",
-                      "raw": "{\n  \"student_id\": 1,\n  \"nazwa_firmy\": \"Google Polska\",\n  \"data_rozpoczecia\": \"2026-07-01\",\n  \"data_zakonczenia\": \"2026-09-30\",\n  \"status\": \"Oczekująca\"\n}",
-                      "options": {
-                        "raw": {
-                          "headerFamily": "json",
-                          "language": "json"
-                        }
-                      }
-                    },
-                    "url": {
-                      "raw": "{{baseUrl}}/api/internships",
-                      "host": [
-                        "{{baseUrl}}"
-                      ],
-                      "path": [
-                        "api",
-                        "internships"
-                      ]
-                    }
-                  },
-                  "status": "Created",
-                  "code": 201,
-                  "_postman_previewlanguage": "text",
-                  "header": [],
-                  "cookie": [],
-                  "body": ""
-                },
-                {
-                  "name": "Błędne daty",
-                  "originalRequest": {
-                    "method": "POST",
-                    "header": [
-                      {
-                        "key": "Content-Type",
-                        "value": "application/json"
-                      }
-                    ],
-                    "body": {
-                      "mode": "raw",
-                      "raw": "{\n  \"student_id\": 1,\n  \"nazwa_firmy\": \"Google Polska\",\n  \"data_rozpoczecia\": \"2026-07-01\",\n  \"data_zakonczenia\": \"2026-09-30\",\n  \"status\": \"Oczekująca\"\n}",
-                      "options": {
-                        "raw": {
-                          "headerFamily": "json",
-                          "language": "json"
-                        }
-                      }
-                    },
-                    "url": {
-                      "raw": "{{baseUrl}}/api/internships",
-                      "host": [
-                        "{{baseUrl}}"
-                      ],
-                      "path": [
-                        "api",
-                        "internships"
-                      ]
-                    }
-                  },
-                  "status": "Bad Request",
-                  "code": 400,
-                  "_postman_previewlanguage": "text",
-                  "header": [],
-                  "cookie": [],
-                  "body": ""
-                },
-                {
-                  "name": "Student nie istnieje",
-                  "originalRequest": {
-                    "method": "POST",
-                    "header": [
-                      {
-                        "key": "Content-Type",
-                        "value": "application/json"
-                      }
-                    ],
-                    "body": {
-                      "mode": "raw",
-                      "raw": "{\n  \"student_id\": 1,\n  \"nazwa_firmy\": \"Google Polska\",\n  \"data_rozpoczecia\": \"2026-07-01\",\n  \"data_zakonczenia\": \"2026-09-30\",\n  \"status\": \"Oczekująca\"\n}",
-                      "options": {
-                        "raw": {
-                          "headerFamily": "json",
-                          "language": "json"
-                        }
-                      }
-                    },
-                    "url": {
-                      "raw": "{{baseUrl}}/api/internships",
-                      "host": [
-                        "{{baseUrl}}"
-                      ],
-                      "path": [
-                        "api",
-                        "internships"
-                      ]
-                    }
-                  },
-                  "status": "Not Found",
-                  "code": 404,
-                  "_postman_previewlanguage": "text",
-                  "header": [],
-                  "cookie": [],
-                  "body": ""
-                }
-              ]
-            }
-          ]
+          "name": "Szczegóły studenta",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/students/{{studentId}}", "host": ["{{baseUrl}}"], "path": ["api", "students", "{{studentId}}"] }
+          }
         },
         {
-          "name": "documents",
-          "item": [
-            {
-              "name": "{id}",
-              "item": [
-                {
-                  "name": "Usuwa dokument",
-                  "request": {
-                    "method": "DELETE",
-                    "header": [],
-                    "url": {
-                      "raw": "{{baseUrl}}/api/documents/:id",
-                      "host": [
-                        "{{baseUrl}}"
-                      ],
-                      "path": [
-                        "api",
-                        "documents",
-                        ":id"
-                      ],
-                      "variable": [
-                        {
-                          "key": "id",
-                          "value": "6072",
-                          "description": "ID dokumentu"
-                        }
-                      ]
-                    }
-                  },
-                  "response": [
-                    {
-                      "name": "Dokument usunięty",
-                      "originalRequest": {
-                        "method": "DELETE",
-                        "header": [],
-                        "url": {
-                          "raw": "{{baseUrl}}/api/documents/:id",
-                          "host": [
-                            "{{baseUrl}}"
-                          ],
-                          "path": [
-                            "api",
-                            "documents",
-                            ":id"
-                          ],
-                          "variable": [
-                            {
-                              "key": "id",
-                              "value": "6072",
-                              "description": "ID dokumentu"
-                            }
-                          ]
-                        }
-                      },
-                      "status": "OK",
-                      "code": 200,
-                      "_postman_previewlanguage": "text",
-                      "header": [],
-                      "cookie": [],
-                      "body": ""
-                    },
-                    {
-                      "name": "Nie znaleziono dokumentu",
-                      "originalRequest": {
-                        "method": "DELETE",
-                        "header": [],
-                        "url": {
-                          "raw": "{{baseUrl}}/api/documents/:id",
-                          "host": [
-                            "{{baseUrl}}"
-                          ],
-                          "path": [
-                            "api",
-                            "documents",
-                            ":id"
-                          ],
-                          "variable": [
-                            {
-                              "key": "id",
-                              "value": "6072",
-                              "description": "ID dokumentu"
-                            }
-                          ]
-                        }
-                      },
-                      "status": "Not Found",
-                      "code": 404,
-                      "_postman_previewlanguage": "text",
-                      "header": [],
-                      "cookie": [],
-                      "body": ""
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "name": "Pobiera listę dokumentów",
-              "request": {
-                "method": "GET",
-                "header": [],
-                "url": {
-                  "raw": "{{baseUrl}}/api/documents?internship_id=6072",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "api",
-                    "documents"
-                  ],
-                  "query": [
-                    {
-                      "key": "internship_id",
-                      "value": "6072",
-                      "description": "ID praktyki w celu przefiltrowania dokumentów"
-                    }
-                  ]
-                }
-              },
-              "response": [
-                {
-                  "name": "Lista dokumentów",
-                  "originalRequest": {
-                    "method": "GET",
-                    "header": [],
-                    "url": {
-                      "raw": "{{baseUrl}}/api/documents?internship_id=6072",
-                      "host": [
-                        "{{baseUrl}}"
-                      ],
-                      "path": [
-                        "api",
-                        "documents"
-                      ],
-                      "query": [
-                        {
-                          "description": "ID praktyki w celu przefiltrowania dokumentów",
-                          "key": "internship_id",
-                          "value": "6072"
-                        }
-                      ]
-                    }
-                  },
-                  "status": "OK",
-                  "code": 200,
-                  "_postman_previewlanguage": "text",
-                  "header": [],
-                  "cookie": [],
-                  "body": ""
-                }
-              ]
-            },
-            {
-              "name": "Przesyła nowy dokument",
-              "request": {
-                "method": "POST",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"identyfikator_praktyki\": 1,\n  \"nazwa_dokumentu\": \"Skierowanie.pdf\",\n  \"typ_dokumentu\": \"Skierowanie\",\n  \"komentarz_opiekuna\": \"Brak uwag\"\n}",
-                  "options": {
-                    "raw": {
-                      "headerFamily": "json",
-                      "language": "json"
-                    }
-                  }
-                },
-                "url": {
-                  "raw": "{{baseUrl}}/api/documents",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "api",
-                    "documents"
-                  ]
-                }
-              },
-              "response": [
-                {
-                  "name": "Dokument przesłany",
-                  "originalRequest": {
-                    "method": "POST",
-                    "header": [
-                      {
-                        "key": "Content-Type",
-                        "value": "application/json"
-                      }
-                    ],
-                    "body": {
-                      "mode": "raw",
-                      "raw": "{\n  \"identyfikator_praktyki\": 1,\n  \"nazwa_dokumentu\": \"Skierowanie.pdf\",\n  \"typ_dokumentu\": \"Skierowanie\",\n  \"komentarz_opiekuna\": \"Brak uwag\"\n}",
-                      "options": {
-                        "raw": {
-                          "headerFamily": "json",
-                          "language": "json"
-                        }
-                      }
-                    },
-                    "url": {
-                      "raw": "{{baseUrl}}/api/documents",
-                      "host": [
-                        "{{baseUrl}}"
-                      ],
-                      "path": [
-                        "api",
-                        "documents"
-                      ]
-                    }
-                  },
-                  "status": "Created",
-                  "code": 201,
-                  "_postman_previewlanguage": "text",
-                  "header": [],
-                  "cookie": [],
-                  "body": ""
-                },
-                {
-                  "name": "Przypisana praktyka nie istnieje",
-                  "originalRequest": {
-                    "method": "POST",
-                    "header": [
-                      {
-                        "key": "Content-Type",
-                        "value": "application/json"
-                      }
-                    ],
-                    "body": {
-                      "mode": "raw",
-                      "raw": "{\n  \"identyfikator_praktyki\": 1,\n  \"nazwa_dokumentu\": \"Skierowanie.pdf\",\n  \"typ_dokumentu\": \"Skierowanie\",\n  \"komentarz_opiekuna\": \"Brak uwag\"\n}",
-                      "options": {
-                        "raw": {
-                          "headerFamily": "json",
-                          "language": "json"
-                        }
-                      }
-                    },
-                    "url": {
-                      "raw": "{{baseUrl}}/api/documents",
-                      "host": [
-                        "{{baseUrl}}"
-                      ],
-                      "path": [
-                        "api",
-                        "documents"
-                      ]
-                    }
-                  },
-                  "status": "Not Found",
-                  "code": 404,
-                  "_postman_previewlanguage": "text",
-                  "header": [],
-                  "cookie": [],
-                  "body": ""
-                }
-              ]
-            }
-          ]
+          "name": "Utwórz studenta",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"imie\": \"Adam\",\n  \"nazwisko\": \"Nowak\",\n  \"numer_indeksu\": \"987654\",\n  \"email\": \"adam@uczelnia.pl\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": { "raw": "{{baseUrl}}/api/students", "host": ["{{baseUrl}}"], "path": ["api", "students"] }
+          }
+        },
+        {
+          "name": "Aktualizuj studenta",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"imie\": \"Adam\",\n  \"nazwisko\": \"Kowalczyk\",\n  \"email\": \"adam.k@uczelnia.pl\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": { "raw": "{{baseUrl}}/api/students/{{studentId}}", "host": ["{{baseUrl}}"], "path": ["api", "students", "{{studentId}}"] }
+          }
+        },
+        {
+          "name": "Usuń studenta",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/students/{{studentId}}", "host": ["{{baseUrl}}"], "path": ["api", "students", "{{studentId}}"] }
+          }
         }
       ]
-    }
-  ],
-  "variable": [
+    },
     {
-      "key": "baseUrl",
-      "value": "/"
+      "name": "Praktyki",
+      "item": [
+        {
+          "name": "Lista praktyk",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/internships", "host": ["{{baseUrl}}"], "path": ["api", "internships"] }
+          }
+        },
+        {
+          "name": "Rejestracja praktyki",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"id_studenta\": 1,\n  \"id_firmy\": 1,\n  \"data_od\": \"2026-07-01\",\n  \"data_do\": \"2026-12-15\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": { "raw": "{{baseUrl}}/api/internships", "host": ["{{baseUrl}}"], "path": ["api", "internships"] }
+          }
+        },
+        {
+          "name": "Usuń praktykę",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/internships/{{internshipId}}", "host": ["{{baseUrl}}"], "path": ["api", "internships", "{{internshipId}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Praktyki - Workflow",
+      "item": [
+        {
+          "name": "Podpisz dokument (sign)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": { "mode": "urlencoded", "urlencoded": [{ "key": "dokument", "value": "ZAL1", "type": "text" }] },
+            "url": { "raw": "{{baseUrl}}/api/internships/{{internshipId}}/sign", "host": ["{{baseUrl}}"], "path": ["api", "internships", "{{internshipId}}", "sign"] }
+          }
+        },
+        {
+          "name": "Metadane Porozumienia (Zał. 1)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": { "mode": "urlencoded", "urlencoded": [
+              { "key": "nr_porozumienia", "value": "PZ/2026/001", "type": "text" },
+              { "key": "data_porozumienia", "value": "2026-06-01", "type": "text" },
+              { "key": "przedstawiciel_firmy", "value": "Piotr Zieliński", "type": "text" }
+            ] },
+            "url": { "raw": "{{baseUrl}}/api/internships/{{internshipId}}/meta", "host": ["{{baseUrl}}"], "path": ["api", "internships", "{{internshipId}}", "meta"] }
+          }
+        },
+        {
+          "name": "Program i harmonogram (Zał. 2a)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": { "mode": "urlencoded", "urlencoded": [
+              { "key": "efekt_01", "value": "Opis prac dla efektu 01", "type": "text" },
+              { "key": "dzial_01", "value": "Dział IT", "type": "text" },
+              { "key": "dni_01", "value": "120", "type": "text" }
+            ] },
+            "url": { "raw": "{{baseUrl}}/api/internships/{{internshipId}}/zal2a", "host": ["{{baseUrl}}"], "path": ["api", "internships", "{{internshipId}}", "zal2a"] }
+          }
+        },
+        {
+          "name": "Odrzuć Zał. 2a",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/internships/{{internshipId}}/zal2a/reject", "host": ["{{baseUrl}}"], "path": ["api", "internships", "{{internshipId}}", "zal2a", "reject"] }
+          }
+        },
+        {
+          "name": "Sprawozdanie (Zał. 7)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": { "mode": "urlencoded", "urlencoded": [
+              { "key": "charakterystyka_miejsca", "value": "Charakterystyka miejsca odbywania praktyki...", "type": "text" },
+              { "key": "opis_i_analiza_prac", "value": "Opis i analiza wykonywanych prac...", "type": "text" },
+              { "key": "samoocena_kompetencji", "value": "Samoocena zdobytych kompetencji...", "type": "text" }
+            ] },
+            "url": { "raw": "{{baseUrl}}/api/internships/{{internshipId}}/zal7", "host": ["{{baseUrl}}"], "path": ["api", "internships", "{{internshipId}}", "zal7"] }
+          }
+        },
+        {
+          "name": "Karta str. 2 - ocena zakładowa (Zał. 3.2 ZOPZ)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": { "mode": "urlencoded", "urlencoded": [
+              { "key": "ocena_zopz_param", "value": "4", "type": "text" },
+              { "key": "ocena_zopz_opis", "value": "Student wywiązał się bardzo dobrze.", "type": "text" },
+              { "key": "uwagi_odbycie", "value": "Praktyka odbyta w pełnym wymiarze.", "type": "text" }
+            ] },
+            "url": { "raw": "{{baseUrl}}/api/internships/{{internshipId}}/zal32/zopz", "host": ["{{baseUrl}}"], "path": ["api", "internships", "{{internshipId}}", "zal32", "zopz"] }
+          }
+        },
+        {
+          "name": "Karta str. 2 - ocena uczelniana (Zał. 3.2 UOPZ)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": { "mode": "urlencoded", "urlencoded": [
+              { "key": "ocena_uopz_param", "value": "4", "type": "text" },
+              { "key": "ocena_uopz_opis", "value": "Efekty osiągnięte w stopniu dobrym.", "type": "text" },
+              { "key": "ocena_sprawozdania", "value": "4", "type": "text" }
+            ] },
+            "url": { "raw": "{{baseUrl}}/api/internships/{{internshipId}}/zal32/uopz", "host": ["{{baseUrl}}"], "path": ["api", "internships", "{{internshipId}}", "zal32", "uopz"] }
+          }
+        },
+        {
+          "name": "Potwierdzenie efektów (Zał. 4 ZOPZ)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": { "mode": "urlencoded", "urlencoded": [
+              { "key": "ef_01", "value": "1", "type": "text" },
+              { "key": "ef_02", "value": "1", "type": "text" },
+              { "key": "ef_13", "value": "1", "type": "text" }
+            ] },
+            "url": { "raw": "{{baseUrl}}/api/internships/{{internshipId}}/zal4/zopz", "host": ["{{baseUrl}}"], "path": ["api", "internships", "{{internshipId}}", "zal4", "zopz"] }
+          }
+        },
+        {
+          "name": "Opinia UOPZ do Zał. 4",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": { "mode": "urlencoded", "urlencoded": [
+              { "key": "opinia_uopz", "value": "Opinia uczelnianego opiekuna praktyk.", "type": "text" }
+            ] },
+            "url": { "raw": "{{baseUrl}}/api/internships/{{internshipId}}/zal4/uopz", "host": ["{{baseUrl}}"], "path": ["api", "internships", "{{internshipId}}", "zal4", "uopz"] }
+          }
+        },
+        {
+          "name": "Kwestionariusz ankiety (Zał. 5)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": { "mode": "urlencoded", "urlencoded": [
+              { "key": "q1", "value": "zd_tak", "type": "text" },
+              { "key": "q14", "value": "rk_tak", "type": "text" },
+              { "key": "uwagi", "value": "Brak uwag.", "type": "text" }
+            ] },
+            "url": { "raw": "{{baseUrl}}/api/internships/{{internshipId}}/zal5", "host": ["{{baseUrl}}"], "path": ["api", "internships", "{{internshipId}}", "zal5"] }
+          }
+        },
+        {
+          "name": "Protokół Zaliczenia (Zał. 8)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": { "mode": "urlencoded", "urlencoded": [
+              { "key": "data_zaliczenia", "value": "2026-12-20", "type": "text" },
+              { "key": "ocena_s", "value": "4", "type": "text" },
+              { "key": "czlonek_1", "value": "dr hab. Marek Kowalski", "type": "text" },
+              { "key": "czlonek_2", "value": "mgr inż. Jan Nowak", "type": "text" },
+              { "key": "pytanie_1", "value": "Omów architekturę aplikacji.", "type": "text" },
+              { "key": "ocena_p1", "value": "4", "type": "text" },
+              { "key": "pytanie_2", "value": "Jakie wzorce zastosowano?", "type": "text" },
+              { "key": "ocena_p2", "value": "4.5", "type": "text" },
+              { "key": "pytanie_3", "value": "Opisz proces testowania.", "type": "text" },
+              { "key": "ocena_p3", "value": "4", "type": "text" }
+            ] },
+            "url": { "raw": "{{baseUrl}}/api/internships/{{internshipId}}/zal8", "host": ["{{baseUrl}}"], "path": ["api", "internships", "{{internshipId}}", "zal8"] }
+          }
+        },
+        {
+          "name": "Wpis USOS / zakończenie (UOPZ)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/internships/{{internshipId}}/usos", "host": ["{{baseUrl}}"], "path": ["api", "internships", "{{internshipId}}", "usos"] }
+          }
+        },
+        {
+          "name": "Reset Zał. 4 (administrator)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/internships/{{internshipId}}/reset/zal4", "host": ["{{baseUrl}}"], "path": ["api", "internships", "{{internshipId}}", "reset", "zal4"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Dokumenty",
+      "item": [
+        {
+          "name": "Lista dokumentów",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/documents?internship_id={{internshipId}}", "host": ["{{baseUrl}}"], "path": ["api", "documents"], "query": [{ "key": "internship_id", "value": "{{internshipId}}" }] }
+          }
+        },
+        {
+          "name": "Dodaj dokument",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"identyfikator_praktyki\": 1,\n  \"nazwa_dokumentu\": \"Skierowanie.pdf\",\n  \"typ_dokumentu\": \"Skierowanie\",\n  \"komentarz_opiekuna\": \"Brak uwag\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": { "raw": "{{baseUrl}}/api/documents", "host": ["{{baseUrl}}"], "path": ["api", "documents"] }
+          }
+        },
+        {
+          "name": "Usuń dokument",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/documents/1", "host": ["{{baseUrl}}"], "path": ["api", "documents", "1"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Dziennik",
+      "item": [
+        {
+          "name": "Lista wpisów",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/journal?internship_id={{internshipId}}", "host": ["{{baseUrl}}"], "path": ["api", "journal"], "query": [{ "key": "internship_id", "value": "{{internshipId}}" }] }
+          }
+        },
+        {
+          "name": "Dodaj wpis",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": { "mode": "urlencoded", "urlencoded": [
+              { "key": "praktyka_id", "value": "{{internshipId}}", "type": "text" },
+              { "key": "data", "value": "2026-07-01", "type": "text" },
+              { "key": "opis", "value": "Zapoznanie ze strukturą firmy i regulaminem.", "type": "text" },
+              { "key": "efekty", "value": "01", "type": "text" },
+              { "key": "efekty", "value": "05", "type": "text" }
+            ] },
+            "url": { "raw": "{{baseUrl}}/api/journal/add", "host": ["{{baseUrl}}"], "path": ["api", "journal", "add"] }
+          }
+        },
+        {
+          "name": "Wypełnij dziennik (test)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": { "mode": "urlencoded", "urlencoded": [{ "key": "praktyka_id", "value": "{{internshipId}}", "type": "text" }] },
+            "url": { "raw": "{{baseUrl}}/api/journal/fill_test", "host": ["{{baseUrl}}"], "path": ["api", "journal", "fill_test"] }
+          }
+        },
+        {
+          "name": "Cofnij ostatni wpis",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": { "mode": "urlencoded", "urlencoded": [{ "key": "praktyka_id", "value": "{{internshipId}}", "type": "text" }] },
+            "url": { "raw": "{{baseUrl}}/api/journal/undo_last", "host": ["{{baseUrl}}"], "path": ["api", "journal", "undo_last"] }
+          }
+        },
+        {
+          "name": "Usuń wpis",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/journal/1", "host": ["{{baseUrl}}"], "path": ["api", "journal", "1"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Efekty uczenia się",
+      "item": [
+        {
+          "name": "Lista potwierdzeń",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/outcomes?internship_id={{internshipId}}", "host": ["{{baseUrl}}"], "path": ["api", "outcomes"], "query": [{ "key": "internship_id", "value": "{{internshipId}}" }] }
+          }
+        },
+        {
+          "name": "Zapisz potwierdzenie efektu",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"id_formularza\": 1,\n  \"id_efektu\": 1,\n  \"czy_uzyskany\": 1\n}", "options": { "raw": { "language": "json" } } },
+            "url": { "raw": "{{baseUrl}}/api/outcomes", "host": ["{{baseUrl}}"], "path": ["api", "outcomes"] }
+          }
+        },
+        {
+          "name": "Usuń potwierdzenie",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/outcomes/1", "host": ["{{baseUrl}}"], "path": ["api", "outcomes", "1"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Firmy",
+      "item": [
+        {
+          "name": "Lista firm",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/firms", "host": ["{{baseUrl}}"], "path": ["api", "firms"] }
+          }
+        },
+        {
+          "name": "Dodaj firmę",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nazwa\": \"ABC Software Sp. z o.o.\",\n  \"adres\": \"Elbląg\",\n  \"przedstawiciel\": \"Piotr Zieliński\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": { "raw": "{{baseUrl}}/api/firms", "host": ["{{baseUrl}}"], "path": ["api", "firms"] }
+          }
+        },
+        {
+          "name": "Usuń firmę",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/firms/1", "host": ["{{baseUrl}}"], "path": ["api", "firms", "1"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Generowanie PDF",
+      "item": [
+        {
+          "name": "Pojedynczy załącznik (PDF)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/pdf/{{internshipId}}/zal8", "host": ["{{baseUrl}}"], "path": ["api", "pdf", "{{internshipId}}", "zal8"] }
+          }
+        },
+        {
+          "name": "Wybrane załączniki (ZIP)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": { "mode": "urlencoded", "urlencoded": [
+              { "key": "zalaczniki", "value": "zal1", "type": "text" },
+              { "key": "zalaczniki", "value": "zal2a", "type": "text" },
+              { "key": "zalaczniki", "value": "zal8", "type": "text" }
+            ] },
+            "url": { "raw": "{{baseUrl}}/api/pdf/{{internshipId}}/zip", "host": ["{{baseUrl}}"], "path": ["api", "pdf", "{{internshipId}}", "zip"] }
+          }
+        },
+        {
+          "name": "Wszystkie załączniki (ZIP)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/pdf/generate-pdf/{{internshipId}}", "host": ["{{baseUrl}}"], "path": ["api", "pdf", "generate-pdf", "{{internshipId}}"] }
+          }
+        }
+      ]
     }
   ]
 }

@@ -57,13 +57,13 @@ def register():
         email=email,
         full_name=full_name,
         auth_provider='local',
-        role='student',
+        role='konto_do_zatwierdzenia',
         password_hash=generate_password_hash(password)
     )
     db.session.add(nowy_user)
     db.session.commit()
-    flash('Konto studenckie utworzone. Możesz się zalogować.', 'success')
-    return redirect('/auth/login')
+    flash('Konto zostało utworzone i oczekuje na zatwierdzenie przez administratora.', 'success')
+    return redirect('/auth/pending')
 
 
 @auth_bp.route('/login/microsoft')
@@ -168,10 +168,14 @@ def approve_user(user_id):
         return redirect('/auth/dashboard')
     user = User.query.get_or_404(user_id)
     new_role = request.form.get('role')
-    if new_role not in ['uopz', 'zopz', 'dyrektor']:
+    if new_role not in ['student', 'uopz', 'zopz', 'dyrektor']:
         flash('Nieprawidłowa rola.', 'danger')
         return redirect('/auth/admin/approvals')
     user.role = new_role
+    if new_role == 'student' and not Student.query.filter_by(user_id=user.id).first():
+        student = _make_student_record(user)
+        if student:
+            db.session.add(student)
     db.session.commit()
     flash(f'Konto {user.full_name} ({user.email}) zatwierdzone jako {new_role}.', 'success')
     return redirect('/auth/admin/approvals')
