@@ -139,7 +139,7 @@ swagger.yaml    # specyfikacja OpenAPI API
 
 - **Frontend:** [Dokumentacja/Frontend/README.md](Dokumentacja/Frontend/README.md)
   — dokumentacja techniczna interfejsu oraz testy i raport błędów.
-- **Moduł PDF (weryfikacja, ETAP 11A):** [Dokumentacja/PDF/Weryfikacja-PDF.md](Dokumentacja/PDF/ETAP11-Weryfikacja-PDF.md)
+- **Moduł PDF:** [Dokumentacja/PDF/Weryfikacja-PDF.md](Dokumentacja/PDF/ETAP11-Weryfikacja-PDF.md)
   — testy generowania, analiza techniczna, raport błędów i podglądy dokumentów.
 - **API backendu:** [Dokumentacja/Backend/API.md](Dokumentacja/Backend/API.md)
   oraz specyfikacja [swagger.yaml](swagger.yaml).
