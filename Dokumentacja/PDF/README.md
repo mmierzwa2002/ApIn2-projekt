@@ -4,8 +4,8 @@ Weryfikacja i testy modułu generowania dokumentów PDF (załączniki praktyki Z
 
 ## Zawartość
 
-- **[ETAP11-Weryfikacja-PDF.md](ETAP11-Weryfikacja-PDF.md)** — pełna dokumentacja
-  testów i weryfikacji (Zadania 1–8): generowanie dziennika, potwierdzenia efektów,
+- **[Weryfikacja-PDF.md](Weryfikacja-PDF.md)** — pełna dokumentacja
+  testów i weryfikacji: generowanie dziennika, potwierdzenia efektów,
   protokołu, testy szablonów, pobierania, odporności, analiza techniczna i
   rozszerzenia funkcjonalne. Zawiera raport błędów i instrukcję odtworzenia testów.
 - **[Podglady/](Podglady/)** — podglądy (PNG) pierwszych stron wszystkich typów

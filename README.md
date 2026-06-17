@@ -94,7 +94,7 @@ je do ZIP; dokument, którego nie uda się wygenerować, jest pomijany, a jego o
 trafia do pliku `_BLEDY.txt` w archiwum — jeden uszkodzony załącznik nie psuje
 całej paczki (odporność modułu).
 
-### Endpointy
+### Endpointy PDF
 
 | Metoda | Ścieżka                      | Opis                                                         |
 | ------ | ---------------------------- | ------------------------------------------------------------ |
