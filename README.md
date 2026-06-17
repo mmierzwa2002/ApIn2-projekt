@@ -49,14 +49,14 @@ Aplikacja startuje pod `http://localhost:5000/auth/login`. Przy starcie wykonywa
 Szablon ze wszystkimi zmiennymi i opisami: [`.env.example`](.env.example).
 Minimalny zestaw do uruchomienia lokalnie:
 
-| Zmienna | Opis | Wymagana? |
-|---------|------|-----------|
-| `DATABASE_URL` | Connection string PostgreSQL (`postgresql://user:pass@host/db`) | tak (bez niej używany jest SQLite) |
-| `SECRET_KEY` | Losowy ciąg chroniący podpis sesji (min. 32 znaki) | tak w produkcji |
-| `MICROSOFT_CLIENT_ID/SECRET/TENANT_ID` | Dane aplikacji z Azure AD — do logowania kontem uczelni | tylko jeśli OAuth Microsoft ma działać |
-| `GOOGLE_CLIENT_ID/SECRET` | Dane z Google Cloud Console — do logowania kontem Google | tylko jeśli OAuth Google ma działać |
+| Zmienna                                | Opis                                                            | Wymagana?                              |
+| -------------------------------------- | --------------------------------------------------------------- | -------------------------------------- |
+| `DATABASE_URL`                         | Connection string PostgreSQL (`postgresql://user:pass@host/db`) | tak (bez niej używany jest SQLite)     |
+| `SECRET_KEY`                           | Losowy ciąg chroniący podpis sesji (min. 32 znaki)              | tak w produkcji                        |
+| `MICROSOFT_CLIENT_ID/SECRET/TENANT_ID` | Dane aplikacji z Azure AD — do logowania kontem uczelni         | tylko jeśli OAuth Microsoft ma działać |
+| `GOOGLE_CLIENT_ID/SECRET`              | Dane z Google Cloud Console — do logowania kontem Google        | tylko jeśli OAuth Google ma działać    |
 
-Logowanie lokalne (e-mail + hasło) działa bez żadnych kluczy OAuth.
+Logowanie lokalne (e-mail + hasło) działa bez żadnych kluczy OAuth, lecz wymaga potwierdzenia przez administratora.
 
 ## Moduł generowania PDF
 
@@ -76,8 +76,8 @@ biblioteki Pythona — **nie uruchamia przeglądarki** ani procesów zewnętrzny
 ### Proces generowania (krok po kroku)
 
 1. **Żądanie** trafia do endpointu w blueprincie `pdf_bp` (`/api/pdf/...`).
-2. **`_ensure_fonts()`** rejestruje (raz na proces) czcionki TrueType: *Arial* dla
-   polskich znaków oraz *Segoe UI Symbol* dla glifów ✓ ☐ ✗ — domyślna Helvetica w
+2. **`_ensure_fonts()`** rejestruje (raz na proces) czcionki TrueType: _Arial_ dla
+   polskich znaków oraz _Segoe UI Symbol_ dla glifów ✓ ☐ ✗ — domyślna Helvetica w
    xhtml2pdf nie zawiera tych znaków i renderowałaby je jako puste kwadraty.
 3. **`_build_context()`** pobiera z bazy dane potrzebne danemu załącznikowi
    (wpisy dziennika, efekty, oceny, protokół itd.) i buduje kontekst szablonu.
@@ -99,11 +99,11 @@ całej paczki (odporność modułu).
 
 ### Endpointy
 
-| Metoda | Ścieżka | Opis |
-|--------|---------|------|
-| `GET`  | `/api/pdf/<id>/<zal_key>`      | pojedynczy załącznik (`zal_key` = `zal1`…`zal8`) |
-| `POST` | `/api/pdf/<id>/zip`            | ZIP z załącznikami zaznaczonymi w panelu |
-| `GET`  | `/api/pdf/generate-pdf/<id>`   | ZIP ze wszystkimi dostępnymi załącznikami (eksport zbiorczy) |
+| Metoda | Ścieżka                      | Opis                                                         |
+| ------ | ---------------------------- | ------------------------------------------------------------ |
+| `GET`  | `/api/pdf/<id>/<zal_key>`    | pojedynczy załącznik (`zal_key` = `zal1`…`zal8`)             |
+| `POST` | `/api/pdf/<id>/zip`          | ZIP z załącznikami zaznaczonymi w panelu                     |
+| `GET`  | `/api/pdf/generate-pdf/<id>` | ZIP ze wszystkimi dostępnymi załącznikami (eksport zbiorczy) |
 
 ### Uruchomienie i odtwarzanie testów modułu PDF
 
@@ -118,8 +118,8 @@ całej paczki (odporność modułu).
 .\venv\Scripts\python.exe tools\test_pdf_resilience.py
 ```
 
-Pełna dokumentacja testów i weryfikacji modułu (Zadania 1–8 etapu 11A):
-[Dokumentacja/PDF/ETAP11-Weryfikacja-PDF.md](Dokumentacja/PDF/ETAP11-Weryfikacja-PDF.md).
+Pełna dokumentacja testów i weryfikacji modułu:
+[Dokumentacja/PDF/ETAP11-Weryfikacja-PDF.md](Dokumentacja/PDF/Weryfikacja-PDF.md).
 
 ## Struktura projektu
 
@@ -135,7 +135,7 @@ seed_demo.py    # dane demonstracyjne
 swagger.yaml    # specyfikacja OpenAPI API
 ```
 
-## Dokumentacja
+## Pozostała dokumentacja:
 
 - **Frontend:** [Dokumentacja/Frontend/README.md](Dokumentacja/Frontend/README.md)
   — dokumentacja techniczna interfejsu oraz testy i raport błędów.
@@ -144,4 +144,4 @@ swagger.yaml    # specyfikacja OpenAPI API
 - **API backendu:** [Dokumentacja/Backend/API.md](Dokumentacja/Backend/API.md)
   oraz specyfikacja [swagger.yaml](swagger.yaml).
 - **Baza danych:** [Dokumentacja/Szkielet-Bazy-Danych.sql](Dokumentacja/Szkielet-Bazy-Danych.sql).
-- **Diagramy (procesy, ERD, uprawnienia) oraz wybór bazy danych:** [Dokumentacja/Opis(lab4-7).pdf](Dokumentacja/Opis(lab4-7).pdf).
+- **Diagramy (procesy, ERD, uprawnienia) oraz wybór bazy danych:** [Dokumentacja/Opis(lab4-7).pdf](<Dokumentacja/Opis(lab4-7).pdf>).
