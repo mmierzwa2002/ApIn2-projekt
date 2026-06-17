@@ -1,8 +1,5 @@
 # System Rozliczania Praktyk (ApIn2-projekt)
 
-Autor: **Michał Mierzwa, nr albumu 21273**
-Przedmiot: Aplikacje Internetowe II — projekt zaliczeniowy.
-
 Aplikacja webowa do obsługi dokumentacji studenckich praktyk zawodowych (ANS Elbląg):
 prowadzi praktykę przez cały proces — od porozumienia, przez dziennik i sprawozdanie,
 aż po protokół zaliczenia — i generuje komplet załączników urzędowych (Zał. 1–8) w PDF.
@@ -62,12 +59,12 @@ Logowanie lokalne (e-mail + hasło) działa bez żadnych kluczy OAuth, lecz wyma
 
 System tworzy urzędowe załączniki praktyki (Zał. 1–8) jako pliki PDF na podstawie
 tych samych szablonów Jinja2, które renderują widoki HTML — dzięki temu wersja na
-ekranie i wersja do druku pochodzą z jednego źródła i nie rozjeżdżają się.
+ekranie i wersja do druku pochodzą z jednego źródła.
 
 ### Architektura i biblioteki
 
 Cały moduł mieści się w pliku [app/api/pdf.py](app/api/pdf.py). Wykorzystuje wyłącznie
-biblioteki Pythona — **nie uruchamia przeglądarki** ani procesów zewnętrznych:
+biblioteki Pythona — **nie uruchamia procesów zewnętrznych**:
 
 - **`xhtml2pdf` (pisa)** — silnik renderujący HTML/CSS → PDF,
 - **`reportlab`** — warstwa niższego poziomu (osadzanie czcionek TrueType, rysowanie),
