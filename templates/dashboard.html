@@ -44,15 +44,17 @@
         {% elif not p.zal7_zopz %}Sprawozdanie złożone — oczekuje na potwierdzenie ZOPZ.
         {% elif not p.zal5_student %}Wypełnij Kwestionariusz ankiety (Zał. 5).
         {% else %}Dokumenty złożone — oczekuj na oceny opiekunów.{% endif %}
-      {% elif p.faza_procesu == 4 and not p.usos_wpisany %}
+      {% elif p.faza_procesu == 4 and not p.zal8_dyrektor %}
         Oczekuj na wyznaczenie terminu egzaminu i wystawienie Protokołu (Zał. 8).
-      {% elif p.faza_procesu == 4 and p.usos_wpisany %}
+      {% elif p.faza_procesu == 4 and p.zal8_dyrektor and not p.zal8_uopz %}
+        Protokół zaliczenia wystawiony — oczekuje na zatwierdzenie przez UOPZ.
+      {% elif p.faza_procesu == 4 and p.zal8_uopz %}
         Praktyka została zakończona i zaliczona.
       {% endif %}
     </p>
 
     {# Zakończona: faza 4 + usos_wpisany #}
-    {% if p.faza_procesu == 4 and p.usos_wpisany %}
+    {% if p.faza_procesu == 4 and p.zal8_uopz and p.usos_wpisany %}
     <div style="text-align:center;padding:1.5rem 0">
       <div style="font-size:4rem;line-height:1;color:#059669">✓</div>
       <p style="font-size:1.05rem;font-weight:700;color:#065f46;margin:0.75rem 0 0.25rem">

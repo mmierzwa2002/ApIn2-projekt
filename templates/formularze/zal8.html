@@ -7,32 +7,32 @@
   max-width: 900px; margin: 0 auto 2rem; background: #fff;
   border: 1px solid var(--border); border-radius: var(--radius);
   box-shadow: var(--shadow-card); padding: 3rem 3.5rem;
-  font-size: 0.9rem; line-height: 1.7; color: #1e293b;
+  font-size: 0.9rem; line-height: 1.45; color: #1e293b;
 }
-.dok-naglowek { text-align: right; font-size: 0.85rem; font-weight: 600; margin-bottom: 1.5rem; color: var(--text-muted); }
-.dok-instytucja { font-size: 0.88rem; font-weight: 700; margin-bottom: 1.5rem; }
-.dok-tytul { text-align: center; margin-bottom: 2rem; }
+.dok-naglowek { text-align: right; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.8rem; color: var(--text-muted); }
+.dok-instytucja { font-size: 0.88rem; font-weight: 700; margin-bottom: 1rem; }
+.dok-tytul { text-align: center; margin-bottom: 1rem; }
 .dok-tytul h2 { font-size: 1.05rem; font-weight: 700; letter-spacing: 0.3px; }
-.proto-tabela { width: 100%; border-collapse: collapse; margin: 1rem 0; }
-.proto-tabela th, .proto-tabela td { border: 1px solid #334155; padding: 0.5rem 0.75rem; vertical-align: middle; }
+.proto-tabela { width: 100%; border-collapse: collapse; margin: 0.5rem 0; }
+.proto-tabela th, .proto-tabela td { border: 1px solid #334155; padding: 0.35rem 0.6rem; vertical-align: middle; }
 .proto-tabela th { background: #f8fafc; font-weight: 600; white-space: nowrap; }
 .proto-tabela .col-ocena { width: 6rem; text-align: center; font-weight: 700; }
 .podpis-uopz-cell { text-align: center; vertical-align: middle; padding: 0.6rem 0.75rem !important; }
 .podpis-uopz-linia { width: 80%; margin: 1.2rem auto 0; border-top: 1px solid #334155; }
 .podpis-uopz-opis { font-size: 0.72rem; color: var(--text-muted); font-style: italic; margin-top: 0.3rem; }
-.komisja-tabela { width: 100%; border-collapse: collapse; margin: 1rem 0; }
-.komisja-tabela td { border: 1px solid #334155; padding: 0.5rem 0.75rem; }
+.komisja-tabela { width: 100%; border-collapse: collapse; margin: 0.5rem 0; }
+.komisja-tabela td { border: 1px solid #334155; padding: 0.3rem 0.6rem; }
 .komisja-tabela .lp { width: 2rem; text-align: center; font-weight: 700; }
 .komisja-tabela .rola { width: 30%; font-style: italic; color: var(--text-muted); font-size: 0.82rem; }
 .dok-formula { font-size: 0.9rem; background: #f8fafc; border: 1px solid #e2e8f0;
-               border-radius: 8px; padding: 0.75rem 1.25rem; margin: 1.25rem 0; }
+               border-radius: 8px; padding: 0.5rem 1rem; margin: 0.75rem 0; }
 .dok-wynik { font-size: 1.25rem; font-weight: 800; color: #1e293b; }
 .dok-pieczatka { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.3rem 0.8rem;
                  border-radius: 50px; font-size: 0.8rem; font-weight: 600; }
 .pieczatka-ok    { background: #d1fae5; color: #065f46; }
 .pieczatka-czeka { background: #fef3c7; color: #92400e; }
-.dok-podpis-blok { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; margin-top: 2rem; }
-.dok-podpis-linia { width: 220px; border-top: 1px solid #334155; margin-top: 2.5rem; }
+.dok-podpis-blok { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; margin-top: 1rem; }
+.dok-podpis-linia { width: 220px; border-top: 1px solid #334155; margin-top: 1.4rem; }
 .dok-podpis-opis { font-size: 0.78rem; color: var(--text-muted); text-align: center; width: 220px; }
 .dok-podpis-osoba { font-weight: 700; font-size: 0.92rem; color: #1e293b; }
 
@@ -50,8 +50,8 @@
           font-size: 0.88rem; font-weight: 600; text-decoration: none; cursor: pointer; border: none; }
 .btn-back  { background: #e2e8f0; color: #334155; }
 .btn-print { background: var(--primary); color: #fff; }
-.pytania-tabela { width: 100%; border-collapse: collapse; margin: 1rem 0; }
-.pytania-tabela th, .pytania-tabela td { border: 1px solid #334155; padding: 0.5rem 0.75rem; }
+.pytania-tabela { width: 100%; border-collapse: collapse; margin: 0.5rem 0; }
+.pytania-tabela th, .pytania-tabela td { border: 1px solid #334155; padding: 0.3rem 0.6rem; }
 .pytania-tabela th { background: #1e293b; color: #fff; font-size: 0.82rem; }
 .pytania-tabela .col-nr   { width: 3rem; text-align: center; }
 .pytania-tabela .col-ocena { width: 7rem; text-align: center; }
@@ -96,7 +96,7 @@
   <p><strong>Student:</strong> {{ p.student_record.full_name }} &nbsp;&nbsp;
      <strong>Nr albumu:</strong> {{ p.student_record.nr_albumu }}</p>
 
-  <p style="font-weight:700;margin:1.25rem 0 0.3rem">Miejsce i okres realizacji PZ:</p>
+  <p style="font-weight:700;margin:0.75rem 0 0.3rem">Miejsce i okres realizacji PZ:</p>
   <table class="proto-tabela" style="width:520pt">
     <thead>
       <tr>
@@ -141,7 +141,7 @@
   </table>
 
   {# Skład komisji i data #}
-  <div style="display:grid;grid-template-columns:1fr auto;gap:2rem;margin-top:1.25rem;align-items:start">
+  <div style="display:grid;grid-template-columns:1fr auto;gap:2rem;margin-top:0.75rem;align-items:start">
     <div>
       <p style="font-weight:700;margin-bottom:0.4rem">Skład komisji:</p>
       <table class="komisja-tabela" width="100%">
@@ -174,7 +174,7 @@
   </div>
 
   {# Pytania i oceny cząstkowe #}
-  <table class="pytania-tabela" style="margin-top:1.25rem">
+  <table class="pytania-tabela" style="margin-top:0.75rem">
     <thead>
       <tr>
         <th class="col-nr">Lp.</th>
@@ -203,7 +203,7 @@
     <strong>{{ pr.ocena_k if pr else '—' }}</strong>
   </div>
 
-  <p style="margin-top:1.5rem;font-size:1.05rem">
+  <p style="margin-top:0.9rem;font-size:1.05rem">
     <strong>Zaliczam praktykę zawodową na ocenę (K):</strong>
     {% if pr and pr.ocena_finalna %}
     <span class="dok-wynik">&nbsp;{{ pr.ocena_finalna }}</span>
@@ -212,7 +212,7 @@
     {% endif %}
   </p>
 
-  <div style="display:flex;justify-content:flex-end;margin-top:2rem">
+  <div style="display:flex;justify-content:flex-end;margin-top:1rem">
     <div class="dok-podpis-blok">
       <div class="dok-podpis-linia"></div>
       {% if p.zal8_dyrektor %}<div class="dok-podpis-osoba">{{ staff('dyrektor') }}</div>{% endif %}
@@ -220,7 +220,7 @@
     </div>
   </div>
 
-  <div style="display:flex;gap:4rem;margin-top:1.5rem">
+  <div style="display:flex;gap:4rem;margin-top:0.75rem">
     <div class="dok-podpis-blok">
       <div class="dok-podpis-linia"></div>
       <div class="dok-podpis-opis">2) …………………………</div>
@@ -235,11 +235,11 @@
     </div>
   </div>
 
-  <p style="font-size:0.78rem;color:var(--text-muted);margin-top:1.5rem">
+  <p style="font-size:0.78rem;color:var(--text-muted);margin-top:0.9rem">
     *) U i Z – oceny odpowiednio Opiekuna uczelnianego i Opiekuna zakładowego zapisane w Karcie praktyki zawodowej
   </p>
 
-  <div style="margin-top:1rem;text-align:center">
+  <div style="margin-top:0.6rem;text-align:center">
     {% if p.usos_wpisany %}
     <span class="dok-pieczatka pieczatka-ok">✓ Praktyka zakończona</span>
     {% elif p.zal8_dyrektor %}
