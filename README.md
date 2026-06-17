@@ -35,13 +35,28 @@ aż po protokół zaliczenia — i generuje komplet załączników urzędowych (
 python -m venv venv
 .\venv\Scripts\activate
 pip install -r requirements.txt
-# skonfiguruj DATABASE_URL w pliku .env (PostgreSQL)
+cp .env.example .env        # skopiuj szablon konfiguracji
+# uzupełnij .env (co najmniej DATABASE_URL i SECRET_KEY — patrz komentarze w pliku)
 .\venv\Scripts\python.exe run.py
 ```
 
 Aplikacja startuje pod `http://localhost:5000/auth/login`. Przy starcie wykonywane jest
 `ensure_schema()` i seed kont testowych. Dane demonstracyjne:
 `.\venv\Scripts\python.exe seed_demo.py` (konto `demo@ans.elblag.pl` / `Demo1234!`).
+
+### Konfiguracja `.env`
+
+Szablon ze wszystkimi zmiennymi i opisami: [`.env.example`](.env.example).
+Minimalny zestaw do uruchomienia lokalnie:
+
+| Zmienna | Opis | Wymagana? |
+|---------|------|-----------|
+| `DATABASE_URL` | Connection string PostgreSQL (`postgresql://user:pass@host/db`) | tak (bez niej używany jest SQLite) |
+| `SECRET_KEY` | Losowy ciąg chroniący podpis sesji (min. 32 znaki) | tak w produkcji |
+| `MICROSOFT_CLIENT_ID/SECRET/TENANT_ID` | Dane aplikacji z Azure AD — do logowania kontem uczelni | tylko jeśli OAuth Microsoft ma działać |
+| `GOOGLE_CLIENT_ID/SECRET` | Dane z Google Cloud Console — do logowania kontem Google | tylko jeśli OAuth Google ma działać |
+
+Logowanie lokalne (e-mail + hasło) działa bez żadnych kluczy OAuth.
 
 ## Moduł generowania PDF
 
