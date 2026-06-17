@@ -30,6 +30,7 @@ table.dziennik-tabela th { background: #f1f5f9; font-weight: 700; text-align: ce
 table.dziennik-tabela td.c { text-align: center; white-space: nowrap; }
 .dz-pusty { text-align: center; color: var(--text-muted); padding: 2rem; }
 .dz-podpis-ok { color: #065f46; font-weight: 600; }
+.dok-podpis-osoba { font-weight: 700; font-size: 0.95rem; color: #1e293b; }
 .dok-potwierdzenie { margin-top: 2rem; padding-top: 1.25rem; border-top: 1px dashed #cbd5e1; font-size: 0.88rem; }
 .dok-podpis-linia { margin-top: 2rem; text-align: center; color: #475569; }
 .dok-podpis-linia small { color: var(--text-muted); font-size: 0.78rem; }
@@ -149,20 +150,15 @@ table.dziennik-tabela td.c { text-align: center; white-space: nowrap; }
 
   {# Potwierdzenie całości przez ZOPZ (regulamin: ZOPZ potwierdza dziennik, nie każdy dzień osobno) #}
   <div class="dok-potwierdzenie">
-    {% if p.dziennik_zatwierdzony %}
-      <span class="dz-podpis-ok">✓ Potwierdzam zgodność powyższych wpisów ze stanem faktycznym</span><br>
-      <span style="font-size:0.82rem;color:var(--text-muted)">
-        Zakładowy opiekun praktyki (ZOPZ) — potwierdzenie elektroniczne
-      </span>
-    {% else %}
-      <span style="color:var(--text-muted)">
-        Dziennik oczekuje na potwierdzenie zakładowego opiekuna praktyki (ZOPZ).
-      </span>
-      <div class="dok-podpis-linia">
+    <p style="margin-bottom:0.5rem">Potwierdzam zgodność powyższych wpisów ze stanem faktycznym.</p>
+    <div class="dok-podpis-linia">
+      {% if p.dziennik_zatwierdzony %}
+        <span class="dok-podpis-osoba">{{ p.firma.przedstawiciel or staff('zopz') }}</span><br>
+      {% else %}
         ......................................................<br>
-        <small>data i podpis zakładowego opiekuna praktyki (ZOPZ)</small>
-      </div>
-    {% endif %}
+      {% endif %}
+      <small>data i podpis zakładowego opiekuna praktyki (ZOPZ)</small>
+    </div>
   </div>
 </div>
 

@@ -96,6 +96,12 @@ table.dok-tabela td.left { text-align: left; }
   color: var(--text-muted);
   max-width: 240px;
 }
+.dok-podpis-osoba {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #1e293b;
+  margin-top: 0.2rem;
+}
 .dok-pieczatka {
   display: inline-flex;
   align-items: center;
@@ -205,13 +211,13 @@ table.dok-tabela td.left { text-align: left; }
 
     {# ── § 1 ── #}
     <p><strong>1.</strong>&nbsp;Uczelnia kieruje studentów Uczelni na praktyki zawodowe na wskazany okres:</p>
-    <table class="dok-tabela">
+    <table class="dok-tabela" style="table-layout:fixed;width:100%">
       <thead>
         <tr>
-          <th style="width:40px">Lp.</th>
-          <th>Imię i nazwisko</th>
-          <th>Termin odbywania praktyki zawodowej</th>
-          <th>Wymiar praktyki zawodowej</th>
+          <th style="width:7%">Lp.</th>
+          <th style="width:33%">Imię i nazwisko</th>
+          <th style="width:33%">Termin odbywania praktyki zawodowej</th>
+          <th style="width:27%">Wymiar praktyki zawodowej</th>
         </tr>
       </thead>
       <tbody>
@@ -278,13 +284,11 @@ table.dok-tabela td.left { text-align: left; }
 
     {# Dyrektor #}
     <div class="dok-podpis-box">
-      {% if p.zal1_dyrektor %}
-        <span class="dok-pieczatka pieczatka-ok">✓ Podpisano cyfrowo</span>
-      {% else %}
-        <span class="dok-pieczatka pieczatka-czeka">Oczekuje na podpis</span>
-      {% endif %}
       <div class="dok-podpis-linia"></div>
-      <div class="dok-podpis-opis">(podpis Dyrektora Instytutu)</div>
+      {% if p.zal1_dyrektor %}
+        <div class="dok-podpis-osoba">{{ staff('dyrektor') }}</div>
+      {% endif %}
+      <div class="dok-podpis-opis">(data i podpis Dyrektora Instytutu)</div>
 
       {% if current_user.role == 'dyrektor' and not p.zal1_dyrektor and p.faza_procesu == 1 %}
       <form action="/api/internships/{{ p.id_formularza }}/sign" method="POST" style="width:100%">
@@ -297,13 +301,11 @@ table.dok-tabela td.left { text-align: left; }
 
     {# ZOPZ / przedstawiciel Zakładu #}
     <div class="dok-podpis-box">
-      {% if p.zal1_zopz %}
-        <span class="dok-pieczatka pieczatka-ok">✓ Podpisano cyfrowo</span>
-      {% else %}
-        <span class="dok-pieczatka pieczatka-czeka">Oczekuje na podpis</span>
-      {% endif %}
       <div class="dok-podpis-linia"></div>
-      <div class="dok-podpis-opis">(podpis osoby uprawnionej do reprezentacji w&nbsp;imieniu Zakładu pracy)</div>
+      {% if p.zal1_zopz %}
+        <div class="dok-podpis-osoba">{{ p.firma.przedstawiciel or staff('zopz') }}</div>
+      {% endif %}
+      <div class="dok-podpis-opis">(data i podpis osoby uprawnionej do reprezentacji w&nbsp;imieniu Zakładu pracy)</div>
 
       {% if current_user.role == 'zopz' and not p.zal1_zopz and p.faza_procesu == 1 %}
       <form action="/api/internships/{{ p.id_formularza }}/sign" method="POST" style="width:100%">

@@ -93,8 +93,21 @@ Frontend uruchamia się razem z backendem (jeden serwer Flask):
    Przy starcie wykonywane jest `ensure_schema()` (uzupełnienie brakujących kolumn) oraz
    seed kont testowych.
 4. Otwórz w przeglądarce `http://localhost:5000/auth/login`.
-5. (Opcjonalnie) załaduj dane demonstracyjne: `.\venv\Scripts\python.exe seed_demo.py`
-   (konto `demo@ans.elblag.pl` / `Demo1234!`).
+5. (Opcjonalnie) załaduj dane demonstracyjne (zakończona przykładowa praktyka):
+   `.\venv\Scripts\python.exe seed_demo.py` — konto `demo@ans.elblag.pl` / `Demo1234!`.
+
+### Konta testowe
+
+Zakładane automatycznie przy starcie aplikacji:
+
+| Rola | E-mail | Hasło |
+|---|---|---|
+| Administrator | `admin@test.local` | `admin123` |
+| UOPZ (opiekun uczelniany) | `uopz@test.local` | `uopz123` |
+| ZOPZ (opiekun zakładowy) | `zopz@test.local` | `zopz123` |
+| Dyrektor | `dyrektor@test.local` | `dyrektor123` |
+| Student | `student@test.local` | `student123` |
+| Konto oczekujące na zatwierdzenie | `pending@test.local` | `pending123` |
 
 Interfejs nie wymaga osobnego procesu budowania (brak bundlera) — wszystkie zasoby
 serwowane są statycznie przez Flask z katalogu `static/`.

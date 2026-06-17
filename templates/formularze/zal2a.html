@@ -249,38 +249,26 @@
 
     {# UOPZ (uczelniany opiekun) #}
     <div style="text-align:center">
-      <div style="min-height:3rem;border-bottom:1px solid var(--border);margin-bottom:0.5rem">
-        {% if p.zal2a_uopz %}
-        <span class="badge badge-active">Podpisano (UOPZ)</span>
-        {% else %}
-        <span class="badge badge-pending">Oczekuje na podpis</span>
-        {% endif %}
+      <div style="min-height:3rem;border-bottom:1px solid var(--border);margin-bottom:0.5rem;display:flex;align-items:flex-end;justify-content:center">
+        {% if p.zal2a_uopz %}<span class="dok-podpis-osoba">{{ staff('uopz') }}</span>{% endif %}
       </div>
-      <small style="color:var(--text-muted)">(podpis uczelnianego opiekuna praktyki)</small>
+      <small style="color:var(--text-muted)">(data i podpis uczelnianego opiekuna praktyki)</small>
     </div>
 
     {# ZOPZ (zakładowy opiekun) #}
     <div style="text-align:center">
-      <div style="min-height:3rem;border-bottom:1px solid var(--border);margin-bottom:0.5rem">
-        {% if p.zal2a_zopz %}
-        <span class="badge badge-active">Podpisano (ZOPZ)</span>
-        {% else %}
-        <span class="badge badge-pending">Oczekuje na podpis</span>
-        {% endif %}
+      <div style="min-height:3rem;border-bottom:1px solid var(--border);margin-bottom:0.5rem;display:flex;align-items:flex-end;justify-content:center">
+        {% if p.zal2a_zopz %}<span class="dok-podpis-osoba">{{ p.firma.przedstawiciel or staff('zopz') }}</span>{% endif %}
       </div>
-      <small style="color:var(--text-muted)">(podpis zakładowego opiekuna praktyki)</small>
+      <small style="color:var(--text-muted)">(data i podpis zakładowego opiekuna praktyki)</small>
     </div>
 
     {# Student #}
     <div style="text-align:center">
-      <div style="min-height:3rem;border-bottom:1px solid var(--border);margin-bottom:0.5rem">
-        {% if p.zal2a_student %}
-        <span class="badge badge-active">Podpisano (Student)</span>
-        {% else %}
-        <span class="badge badge-pending">Oczekuje na podpis</span>
-        {% endif %}
+      <div style="min-height:3rem;border-bottom:1px solid var(--border);margin-bottom:0.5rem;display:flex;align-items:flex-end;justify-content:center">
+        {% if p.zal2a_student %}<span class="dok-podpis-osoba">{{ p.student_record.full_name }}</span>{% endif %}
       </div>
-      <small style="color:var(--text-muted)">(podpis studenta)</small>
+      <small style="color:var(--text-muted)">(data i podpis studenta)</small>
     </div>
   </div>
 
@@ -363,6 +351,7 @@
   min-width: 8rem;
   padding-bottom: 1px;
 }
+.dok-podpis-osoba { font-weight: 700; font-size: 0.95rem; color: #1e293b; }
 .dokument {
   background: var(--surface);
   border: 1px solid var(--border);

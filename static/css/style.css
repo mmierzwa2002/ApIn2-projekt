@@ -9,7 +9,8 @@
   --accent-blue: #1d4ed8;
   --warning: #b45309;
   --border: #cbd5e1;
-  --shadow-card: 0 1px 3px rgba(15, 23, 42, 0.08), 0 4px 12px rgba(15, 23, 42, 0.06);
+  --shadow-card:
+    0 1px 3px rgba(15, 23, 42, 0.08), 0 4px 12px rgba(15, 23, 42, 0.06);
   --radius: 12px;
 }
 
@@ -30,19 +31,57 @@ html[data-theme="dark"] {
 html[data-theme="dark"] .academic-table th {
   background: var(--surface-alt);
 }
-html[data-theme="dark"] .badge-active    { background: #134e4a; color: #5eead4; }
-html[data-theme="dark"] .badge-pending   { background: #3f1a00; color: #fcd34d; }
-html[data-theme="dark"] .badge-closed    { background: #1e293b; color: #94a3b8; }
-html[data-theme="dark"] .badge-completed { background: #1e3a5f; color: #93c5fd; }
-html[data-theme="dark"] .alert-success   { background: #052e16; color: #86efac; }
-html[data-theme="dark"] .alert-danger    { background: #450a0a; color: #fca5a5; }
-html[data-theme="dark"] .alert-warning   { background: #3f1a00; color: #fcd34d; }
-html[data-theme="dark"] .alert-info      { background: #0c1a3d; color: #93c5fd; }
-html[data-theme="dark"] .auth-alert-success { background: #052e16; color: #86efac; }
-html[data-theme="dark"] .auth-alert-danger  { background: #450a0a; color: #fca5a5; }
-html[data-theme="dark"] .auth-alert-warning { background: #3f1a00; color: #fcd34d; }
-html[data-theme="dark"] .auth-alert-info    { background: #0c1a3d; color: #93c5fd; }
-html[data-theme="dark"] .auth-forms      { background: #0f172a; }
+html[data-theme="dark"] .badge-active {
+  background: #134e4a;
+  color: #5eead4;
+}
+html[data-theme="dark"] .badge-pending {
+  background: #3f1a00;
+  color: #fcd34d;
+}
+html[data-theme="dark"] .badge-closed {
+  background: #1e293b;
+  color: #94a3b8;
+}
+html[data-theme="dark"] .badge-completed {
+  background: #1e3a5f;
+  color: #93c5fd;
+}
+html[data-theme="dark"] .alert-success {
+  background: #052e16;
+  color: #86efac;
+}
+html[data-theme="dark"] .alert-danger {
+  background: #450a0a;
+  color: #fca5a5;
+}
+html[data-theme="dark"] .alert-warning {
+  background: #3f1a00;
+  color: #fcd34d;
+}
+html[data-theme="dark"] .alert-info {
+  background: #0c1a3d;
+  color: #93c5fd;
+}
+html[data-theme="dark"] .auth-alert-success {
+  background: #052e16;
+  color: #86efac;
+}
+html[data-theme="dark"] .auth-alert-danger {
+  background: #450a0a;
+  color: #fca5a5;
+}
+html[data-theme="dark"] .auth-alert-warning {
+  background: #3f1a00;
+  color: #fcd34d;
+}
+html[data-theme="dark"] .auth-alert-info {
+  background: #0c1a3d;
+  color: #93c5fd;
+}
+html[data-theme="dark"] .auth-forms {
+  background: #0f172a;
+}
 html[data-theme="dark"] .custom-input:focus,
 html[data-theme="dark"] .custom-select:focus {
   box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.2);
@@ -282,10 +321,22 @@ body {
   font-size: 0.9rem;
   font-weight: 500;
 }
-.alert-success { background: #d1fae5; color: #065f46; }
-.alert-danger  { background: #fee2e2; color: #b91c1c; }
-.alert-warning { background: #fef3c7; color: #92400e; }
-.alert-info    { background: #dbeafe; color: #1e40af; }
+.alert-success {
+  background: #d1fae5;
+  color: #065f46;
+}
+.alert-danger {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+.alert-warning {
+  background: #fef3c7;
+  color: #92400e;
+}
+.alert-info {
+  background: #dbeafe;
+  color: #1e40af;
+}
 
 /* ---- Auth page — split layout ---- */
 .auth-body {
@@ -398,8 +449,12 @@ body {
   background: var(--border);
 }
 
-.auth-divider::before { left: 0; }
-.auth-divider::after  { right: 0; }
+.auth-divider::before {
+  left: 0;
+}
+.auth-divider::after {
+  right: 0;
+}
 
 .auth-hint {
   font-size: 0.8rem;
@@ -437,10 +492,22 @@ body {
   font-weight: 500;
 }
 
-.auth-alert-success { background: #d1fae5; color: #065f46; }
-.auth-alert-danger  { background: #fee2e2; color: #b91c1c; }
-.auth-alert-warning { background: #fef3c7; color: #92400e; }
-.auth-alert-info    { background: #dbeafe; color: #1e40af; }
+.auth-alert-success {
+  background: #d1fae5;
+  color: #065f46;
+}
+.auth-alert-danger {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+.auth-alert-warning {
+  background: #fef3c7;
+  color: #92400e;
+}
+.auth-alert-info {
+  background: #dbeafe;
+  color: #1e40af;
+}
 
 .approvals-btn {
   text-decoration: none;
@@ -452,7 +519,9 @@ body {
   color: var(--text-main);
   transition: opacity 0.15s;
 }
-.approvals-btn:hover { opacity: 0.8; }
+.approvals-btn:hover {
+  opacity: 0.8;
+}
 .approvals-btn--alert {
   background: #b45309;
   color: #fff;
@@ -463,8 +532,12 @@ body {
   text-decoration: none;
   font-weight: 600;
 }
-.doc-link-done { color: #10b981; }  /* zielony – komplet podpisów */
-.doc-link-wait { color: #f59e0b; }  /* pomarańczowy – oczekuje na podpis/wypełnienie */
+.doc-link-done {
+  color: #10b981;
+} /* zielony – komplet podpisów */
+.doc-link-wait {
+  color: #f59e0b;
+} /* pomarańczowy – oczekuje na podpis/wypełnienie */
 
 .action-hint {
   font-size: 0.78rem;
@@ -481,22 +554,105 @@ body {
   color: var(--text-main);
   font-size: 0.82rem;
   font-weight: 600;
-  transition: background 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s;
   line-height: 1.4;
 }
 .theme-toggle:hover {
   background: var(--surface-alt);
 }
 
-@media (max-width: 680px) {
-  .auth-body   { height: auto; overflow: auto; }
-  .auth-page   { grid-template-columns: 1fr; height: auto; }
-  .auth-brand  { display: none; }
-  .auth-forms-inner { padding: 1.5rem 1rem; }
+/* Pulpit studenta — układ dwukolumnowy (zwijany na mobile) */
+.dashboard-split {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 2rem;
+  margin-top: 2rem;
 }
 
-@page { margin: 0; }
-.hidden { display: none !important; }
+@media (max-width: 680px) {
+  .auth-body {
+    height: auto;
+    overflow: auto;
+  }
+  .auth-page {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+  .auth-brand {
+    display: none;
+  }
+  .auth-forms-inner {
+    padding: 1.5rem 1rem;
+  }
+
+  /* Pulpit studenta: jedna kolumna zamiast 1fr 2fr */
+  .dashboard-split {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+  .zip-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Oś faz: mniejsze kółka i etykiety, by zmieściły się w rzędzie */
+  .workflow-timeline {
+    margin-bottom: 2rem;
+    padding: 0;
+  }
+  .workflow-timeline::before {
+    top: 18px;
+  }
+  .step-icon {
+    width: 36px;
+    height: 36px;
+    font-size: 0.8rem;
+    border-width: 2px;
+  }
+  .step-label {
+    font-size: 0.6rem;
+    line-height: 1.25;
+  }
+
+  /* Tabele dokumentów: układ kafelkowy zamiast ściśniętych kolumn.
+     Każdy wiersz staje się blokiem (nazwa / plakietka statusu / odnośnik),
+     dzięki czemu nic się nie rozjeżdża na wąskim ekranie telefonu. */
+  .table-wrapper {
+    overflow-x: visible;
+  }
+  .academic-table thead {
+    display: none;
+  }
+  .academic-table tr {
+    display: block;
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .academic-table tr:last-child {
+    border: none;
+  }
+  .academic-table td {
+    display: block;
+    padding: 0.15rem 0;
+    border: none;
+    font-size: 0.9rem;
+  }
+
+  /* Plakietki statusu: pełna szerokość wiersza — nie „pękają" na fragmenty */
+  .badge {
+    display: inline-block;
+    white-space: normal;
+    line-height: 1.6;
+  }
+}
+
+@page {
+  margin: 0;
+}
+.hidden {
+  display: none !important;
+}
 
 /* Rounded checkboxes */
 input[type="checkbox"] {
@@ -509,7 +665,9 @@ input[type="checkbox"] {
   background: var(--surface);
   cursor: pointer;
   flex-shrink: 0;
-  transition: background 0.15s, border-color 0.15s;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
   position: relative;
 }
 input[type="checkbox"]:checked {
@@ -517,7 +675,7 @@ input[type="checkbox"]:checked {
   border-color: var(--primary);
 }
 input[type="checkbox"]:checked::after {
-  content: '';
+  content: "";
   position: absolute;
   left: 3px;
   top: 0px;

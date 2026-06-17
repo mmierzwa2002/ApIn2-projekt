@@ -29,6 +29,7 @@
 .pieczatka-ok    { background: #d1fae5; color: #065f46; }
 .pieczatka-czeka { background: #fef3c7; color: #92400e; }
 .podpis-opis { font-size: 0.78rem; color: var(--text-muted); }
+.dok-podpis-osoba { font-weight: 700; font-size: 0.95rem; color: #1e293b; }
 
 .panel {
   max-width: 860px; margin: 0 auto 1.5rem; background: var(--surface);
@@ -95,9 +96,8 @@
     <p style="margin-top:0.6rem"><strong>Uwagi:</strong></p>
     <div class="spr-tresc">{% if k and k.uwagi_odbycie %}{{ k.uwagi_odbycie }}{% else %}<span class="spr-pusty">— brak uwag —</span>{% endif %}</div>
     <p style="margin-top:0.75rem">
-      {% if p.zal3_strona2_zopz %}<span class="dok-pieczatka pieczatka-ok">✓ Potwierdzone cyfrowo (ZOPZ)</span>
-      {% else %}<span class="dok-pieczatka pieczatka-czeka">Oczekuje na potwierdzenie</span>{% endif %}
-      <br><span class="podpis-opis">(pieczęć i podpis kierownika zakładu / zakładowego opiekuna praktyki)</span>
+      {% if p.zal3_strona2_zopz %}<strong class="dok-podpis-osoba">{{ p.firma.przedstawiciel or staff('zopz') }}</strong><br>{% endif %}
+      <span class="podpis-opis">(data, pieczęć i podpis kierownika zakładu / zakładowego opiekuna praktyki)</span>
     </p>
   </div>
 

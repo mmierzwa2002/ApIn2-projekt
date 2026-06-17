@@ -1,11 +1,7 @@
 import io
 import os
 import re
-import shutil
 import zipfile
-import tempfile
-import subprocess
-from pathlib import Path
 from flask import Blueprint, request, send_file, abort, render_template, redirect, flash, current_app
 from flask_login import login_required, current_user
 from xhtml2pdf import pisa
@@ -22,13 +18,19 @@ from app import db
 # nazwy font-family w słowniku xhtml2pdf, by 'font-family: Arial' wskazywał na
 # osadzony font Unicode.
 _fonts_registered = False
+_symbol_font = None   # nazwa zarejestrowanego fontu z glifami ✓ ☐ ☑ ✗ (lub None)
 
 # Kandydaci na pliki czcionek (Windows; pierwszy istniejący wygrywa)
 _FONT_FILES = {
     'normal': [r'C:\Windows\Fonts\arial.ttf', r'C:\Windows\Fonts\segoeui.ttf'],
     'bold':   [r'C:\Windows\Fonts\arialbd.ttf', r'C:\Windows\Fonts\segoeuib.ttf'],
     'italic': [r'C:\Windows\Fonts\ariali.ttf', r'C:\Windows\Fonts\segoeuii.ttf'],
+    # Font z symbolami (checkbox/ptaszek) — Arial ich nie ma, więc używamy osobnego
+    'symbol': [r'C:\Windows\Fonts\seguisym.ttf', r'C:\Windows\Fonts\DejaVuSans.ttf'],
 }
+
+# Symbole wymagające osobnego fontu (Arial renderuje je jako puste kwadraty)
+_SYMBOLE = '✓✔✗☐☑●'
 
 def _first_existing(paths):
     for p in paths:
@@ -38,7 +40,7 @@ def _first_existing(paths):
 
 def _ensure_fonts():
     """Rejestruje czcionkę PL raz na proces. Cicho pomija, gdy brak plików."""
-    global _fonts_registered
+    global _fonts_registered, _symbol_font
     if _fonts_registered:
         return
     _fonts_registered = True  # nie próbuj ponownie nawet przy częściowym braku
@@ -62,6 +64,16 @@ def _ensure_fonts():
             DEFAULT_FONT[name] = 'Arial'
     except Exception:
         current_app.logger.exception('Rejestracja czcionki PDF nie powiodła się')
+
+    # Font z symbolami (✓ ☐ ☑ ✗) — Arial ich nie zawiera
+    symbol = _first_existing(_FONT_FILES['symbol'])
+    if symbol:
+        try:
+            pdfmetrics.registerFont(TTFont('SymbolPL', symbol))
+            DEFAULT_FONT['symbolpl'] = 'SymbolPL'
+            _symbol_font = 'SymbolPL'
+        except Exception:
+            current_app.logger.exception('Rejestracja fontu symboli nie powiodła się')
 
 # Wartości jasnego motywu — xhtml2pdf nie obsługuje CSS custom properties
 _CSS_VARS = {
@@ -93,104 +105,27 @@ def _strip_for_pdf(html: str) -> str:
     html = re.sub(r'<link[^>]+>', '', html)
     html = re.sub(r'<style[^>]*>.*?</style>', '', html, flags=re.DOTALL)
     html = _resolve_vars(html)
+    # Elementy .no-print z inline 'display:flex/grid' nie znikają w PDF, bo inline
+    # nadpisuje regułę CSS. Dopisz 'display:none' na końcu ich stylu (wygrywa
+    # ostatnia deklaracja — działa też w xhtml2pdf).
+    html = re.sub(r'class="no-print"(\s+style=")([^"]*)"',
+                  lambda m: f'class="no-print"{m.group(1)}{m.group(2)};display:none"', html)
     # xhtml2pdf nie obsługuje rem/em w szerokościach — konwertuj na px (1rem=16px)
     html = re.sub(r'(\d*\.?\d+)rem', lambda m: f'{round(float(m.group(1))*16)}px', html)
     html = re.sub(r'(\d*\.?\d+)em', lambda m: f'{round(float(m.group(1))*16)}px', html)
+    # Puste komórki <td></td>/<th></th> psują obliczanie szerokości kolumn w xhtml2pdf
+    # (cała tabela zwija się do minimalnej szerokości) — wypełnij je twardą spacją.
+    html = re.sub(r'<(td|th)([^>]*)>(\s*)</\1>', r'<\1\2>&nbsp;</\1>', html)
+    # Symbole (✓ ☐ ☑ ✗) renderuj osobnym fontem — Arial pokazuje je jako kwadraty.
+    if _symbol_font:
+        for ch in _SYMBOLE:
+            html = html.replace(ch, f'<font face="{_symbol_font}">{ch}</font>')
     html = html.replace('</head>', f'<style>{_PDF_CSS}</style></head>', 1)
+    # Stopka z numeracją stron (xhtml2pdf renderuje ją w ramce footer_frame)
+    footer = ('<div id="pdfFooter" style="text-align:center;font-size:8pt;color:#555">'
+              'Strona <pdf:pagenumber> z <pdf:pagecount></div>')
+    html = re.sub(r'(<body[^>]*>)', lambda m: m.group(1) + footer, html, count=1)
     return html
-
-# ── Renderowanie przez przeglądarkę (Chromium/Edge) ──────────────────────────
-# Formularze używają nowoczesnego CSS (flexbox, grid, tabele bez sztywnych
-# szerokości) zaprojektowanego pod druk przeglądarkowy (przycisk window.print()
-# + reguły @media print w każdym szablonie). xhtml2pdf tego nie obsługuje i
-# rozjeżdża układ. Dlatego priorytetowo renderujemy headless-em Edge/Chrome —
-# wynik jest piksel-w-piksel taki jak podgląd na ekranie. Gdy przeglądarki brak,
-# używamy uproszczonego renderera xhtml2pdf (mechanizm awaryjny).
-
-_BROWSER_PATHS = [
-    r'C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe',
-    r'C:\Program Files\Microsoft\Edge\Application\msedge.exe',
-    r'C:\Program Files\Google\Chrome\Application\chrome.exe',
-    r'C:\Program Files (x86)\Google\Chrome\Application\chrome.exe',
-]
-_browser_path = None      # cache ścieżki
-_browser_checked = False
-
-def _find_browser():
-    """Zwraca ścieżkę do Edge/Chrome (cache'owaną) lub None."""
-    global _browser_path, _browser_checked
-    if _browser_checked:
-        return _browser_path
-    _browser_checked = True
-    for p in _BROWSER_PATHS:
-        if os.path.exists(p):
-            _browser_path = p
-            break
-    return _browser_path
-
-
-def _inline_css(html: str) -> str:
-    """Wkleja treść style.css do HTML i wymusza jasny motyw.
-
-    Konieczne, bo plik renderujemy z dysku (file://) — link do /css/style.css
-    by się nie rozwiązał. Reguły @media print z szablonów (chowanie nawigacji,
-    paneli, marginesy strony) zadziałają natywnie w przeglądarce.
-    """
-    css = ''
-    try:
-        with open(os.path.join(current_app.static_folder, 'css', 'style.css'), encoding='utf-8') as f:
-            css = f.read()
-    except OSError:
-        current_app.logger.warning('Nie udało się wczytać style.css do PDF')
-    page_number_css = """
-@page {
-  margin-bottom: 1.8cm;
-  @bottom-center {
-    content: "Strona " counter(page) " z " counter(pages);
-    font-size: 8pt;
-    color: #64748b;
-    font-family: Arial, sans-serif;
-  }
-}
-"""
-    html = re.sub(r'<link\b[^>]*stylesheet[^>]*>', '', html, flags=re.IGNORECASE)
-    html = html.replace('</head>', f'<style>{css}{page_number_css}</style></head>', 1)
-    # Wymuś jasny motyw (brak localStorage w headless -> i tak 'light', ale pewniej)
-    html = re.sub(r'<html\b', '<html data-theme="light"', html, count=1)
-    return html
-
-
-def _render_via_browser(html: str, browser: str):
-    """Renderuje HTML do PDF headless-em. Zwraca bytes lub None przy błędzie."""
-    tmpdir = tempfile.mkdtemp(prefix='pdfgen_')
-    try:
-        html_path = os.path.join(tmpdir, 'doc.html')
-        pdf_path = os.path.join(tmpdir, 'doc.pdf')
-        with open(html_path, 'w', encoding='utf-8') as f:
-            f.write(html)
-        cmd = [
-            browser,
-            '--headless',
-            '--disable-gpu',
-            '--no-sandbox',
-            '--no-pdf-header-footer',
-            '--run-all-compositor-stages-before-draw',
-            '--virtual-time-budget=5000',
-            f'--user-data-dir={os.path.join(tmpdir, "ud")}',
-            f'--print-to-pdf={pdf_path}',
-            Path(html_path).as_uri(),
-        ]
-        subprocess.run(cmd, capture_output=True, timeout=60, check=False)
-        if os.path.exists(pdf_path) and os.path.getsize(pdf_path) > 0:
-            with open(pdf_path, 'rb') as f:
-                return f.read()
-        current_app.logger.warning('Headless nie wygenerował PDF (brak pliku wynikowego)')
-        return None
-    except Exception:
-        current_app.logger.exception('Renderowanie przez przeglądarkę nie powiodło się')
-        return None
-    finally:
-        shutil.rmtree(tmpdir, ignore_errors=True)
 
 
 pdf_bp = Blueprint('pdf', __name__, url_prefix='/api/pdf')
@@ -284,24 +219,76 @@ def _build_context(internship_id, zal_key):
 
 
 _PDF_CSS = """
-body { font-family: Arial; font-size: 10pt; color: #000; background: #fff; }
+@page {
+  size: a4 portrait;
+  margin: 1.2cm 1.3cm 1.7cm 1.3cm;
+  @frame footer_frame {
+    -pdf-frame-content: pdfFooter;
+    left: 40pt; right: 40pt; bottom: 20pt; height: 14pt;
+  }
+}
+body { font-family: Arial; font-size: 9.5pt; color: #000; background: #fff; line-height: 1.3; }
+
+/* Elementy interfejsu — w PDF zostaje sam dokument */
+.nav-container, nav, .dok-toolbar, .dok-meta-panel, .academic-card,
+.panel, .alert, .dok-blokada, .theme-toggle, .no-print,
+form, button, .btn-academic, .btn-sm { display: none !important; }
+
+/* Kontener dokumentu */
+.dokument { max-width: 100%; margin: 0; padding: 0; border: none; box-shadow: none;
+            font-size: 10pt; color: #000; }
+
+/* Nagłówki dokumentu */
+.dok-naglowek { text-align: right; font-size: 9pt; font-weight: bold; margin-bottom: 6pt; }
+.dok-tytul { text-align: center; margin-bottom: 10pt; }
+.dok-tytul h2 { font-size: 12pt; font-weight: bold; margin: 0 0 2pt; }
+.dok-tytul p { font-size: 9.5pt; font-style: italic; margin: 0; }
+h2 { font-size: 12pt; text-align: center; }
+h3 { font-size: 10.5pt; }
+
+/* Treść */
+.dok-tresc p { margin: 0 0 3pt; text-align: justify; }
+.dok-tresc ol, .dok-tresc ul { margin: 1pt 0 5pt 16pt; }
+.dok-tresc li { margin-bottom: 1pt; }
+
+/* Tabele */
 table { border-collapse: collapse; width: 100%; }
-th, td { border: 1px solid #334155; padding: 4pt 6pt; vertical-align: top; }
-th { background: #e2e8f0; font-weight: bold; }
-h2 { font-size: 13pt; text-align: center; }
-.nav-container, .dok-toolbar, .panel, .alert, .dok-blokada,
-.btn-academic, .btn-sm { display: none !important; }
-.dok-pieczatka { padding: 2pt 6pt; font-weight: bold; }
-.pieczatka-ok    { color: #065f46; }
-.pieczatka-czeka { color: #92400e; }
-.dokument { padding: 0; border: none; box-shadow: none; }
+th, td { border: 1px solid #333; padding: 2pt 4pt; vertical-align: top; font-size: 8.5pt; }
+th { background: #e8edf3; font-weight: bold; text-align: center; }
+thead { display: table-header-group; }   /* powtarzaj nagłówek na każdej stronie */
+
+/* Linie / pola do wpisania */
+.dok-blank { border-bottom: 1px solid #888; display: inline-block; min-width: 90px; }
+
+/* ── Podpisy (czarno-białe, drukowalne) ── */
+/* Cała sekcja podpisów trzymana razem, by nie „sierociała" na osobnej stronie */
+.dok-podpisy { margin-top: 10pt; padding-top: 6pt; border-top: 1px solid #ccc; page-break-inside: avoid; }
+.dok-podpis-box, .dok-podpis-blok, .dok-conf-box, .dok-ocena-blok {
+  page-break-inside: avoid;
+}
+.dok-podpis-box { text-align: center; margin: 0 0 8pt; }
+.dok-podpis-blok { margin-top: 10pt; }
+.dok-podpis-osoba { font-weight: bold; font-size: 9.5pt; }
+.dok-podpis-linia, .podpis-uopz-linia { border-top: 1px solid #333; width: 70%; margin: 14pt auto 2pt; }
+.dok-podpis-opis, .podpis-uopz-opis, .podpis-opis { font-size: 8pt; color: #333; }
+
+/* Neutralizacja dawnych „pieczątek" (gdyby gdzieś pozostały) */
+.dok-pieczatka { padding: 0; font-weight: bold; background: none !important; color: #000 !important; }
+.pieczatka-ok, .pieczatka-czeka { background: none !important; color: #000 !important; }
 """
 
 
-def _render_xhtml2pdf(html_str):
-    """Awaryjny renderer (gdy brak przeglądarki). Wymaga uproszczonego CSS."""
+def _render_pdf_bytes(internship_id, zal_key):
+    """Renderuje szablon załącznika do PDF (xhtml2pdf) i zwraca bytes.
+
+    Rzuca RuntimeError, gdy renderowanie się nie powiedzie — wywołujący decyduje,
+    czy zgłosić błąd (pojedynczy PDF), czy odnotować w manifeście (ZIP).
+    """
     _ensure_fonts()
+    ctx = _build_context(internship_id, zal_key)
+    html_str = render_template(f'formularze/{zal_key}.html', **ctx)
     html_str = _strip_for_pdf(html_str)
+
     result = io.BytesIO()
     status = pisa.CreatePDF(html_str, dest=result, encoding='utf-8')
     if status.err:
@@ -310,26 +297,6 @@ def _render_xhtml2pdf(html_str):
     if not data:
         raise RuntimeError('xhtml2pdf wygenerował pusty dokument')
     return data
-
-
-def _render_pdf_bytes(internship_id, zal_key):
-    """Renderuje szablon załącznika do PDF i zwraca bytes.
-
-    Priorytet: headless Edge/Chrome (wierny układ jak na ekranie). Fallback:
-    xhtml2pdf. Rzuca RuntimeError, gdy żadna metoda nie zadziała — wywołujący
-    decyduje, czy zgłosić błąd (pojedynczy PDF), czy odnotować w manifeście (ZIP).
-    """
-    ctx = _build_context(internship_id, zal_key)
-    html_str = render_template(f'formularze/{zal_key}.html', **ctx)
-
-    browser = _find_browser()
-    if browser:
-        data = _render_via_browser(_inline_css(html_str), browser)
-        if data:
-            return data
-        current_app.logger.warning('Przeglądarka zawiodła dla %s — próba xhtml2pdf', zal_key)
-
-    return _render_xhtml2pdf(html_str)
 
 
 def _zip_attachments(internship_id, keys):
@@ -441,7 +408,7 @@ def download_zip(id):
     )
 
 
-# ── Alias /generate-pdf/<id> wymagany przez lab11 ────────────────────────────
+# ── /generate-pdf/<id> ────────────────────────────
 
 @pdf_bp.route('/generate-pdf/<int:id>')
 @login_required

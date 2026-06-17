@@ -108,16 +108,16 @@
     {% endif %}
   {% endmacro %}
 
-  <table class="ankieta-tabela">
+  <table class="ankieta-tabela" style="table-layout:fixed;width:100%">
     <thead>
       <tr>
-        <th></th>
-        <th></th>
-        <th class="col-odp">zdecydowanie<br>tak</th>
-        <th class="col-odp">raczej<br>tak</th>
-        <th class="col-odp">trudno<br>powiedzieć</th>
-        <th class="col-odp">raczej<br>nie</th>
-        <th class="col-odp">zdecydowanie<br>nie</th>
+        <th style="width:5%"></th>
+        <th style="width:35%"></th>
+        <th class="col-odp" style="width:12%">zdecydowanie<br>tak</th>
+        <th class="col-odp" style="width:12%">raczej<br>tak</th>
+        <th class="col-odp" style="width:12%">trudno<br>powiedzieć</th>
+        <th class="col-odp" style="width:12%">raczej<br>nie</th>
+        <th class="col-odp" style="width:12%">zdecydowanie<br>nie</th>
       </tr>
     </thead>
     <tbody>
@@ -142,9 +142,9 @@
   </div>
   <div style="border-bottom:1px solid #334155;min-height:1.8rem;margin-bottom:0.5rem"></div>
 
-  <table class="metryczka" style="margin-top:1.5rem">
+  <table class="metryczka" style="margin-top:1.5rem;table-layout:fixed;width:100%">
     <caption style="font-weight:700;text-align:center;padding:0.5rem;border:1px solid #334155;border-bottom:none;background:#f8fafc">Metryczka</caption>
-    <tr><th>Rok akademicki</th><td>{{ rok_ak }}</td></tr>
+    <tr><th style="width:55%">Rok akademicki</th><td>{{ rok_ak }}</td></tr>
     <tr><th>Kierunek studiów</th><td>Informatyka</td></tr>
     <tr><th>Forma studiów</th><td>stacjonarne</td></tr>
     <tr><th>Semestr studiów</th><td>7</td></tr>
@@ -153,12 +153,10 @@
 
   <p style="text-align:right;font-style:italic;font-weight:700;margin-top:2rem">Dziękujemy za udział w badaniu</p>
 
-  <div style="margin-top:1.5rem;text-align:center">
-    {% if p.zal5_student %}
-    <span class="dok-pieczatka pieczatka-ok">✓ Ankieta wypełniona</span>
-    {% else %}
-    <span class="dok-pieczatka pieczatka-czeka">Ankieta nie wypełniona</span>
-    {% endif %}
+  <div style="margin-top:2.5rem;text-align:center">
+    <div style="width:260px;border-top:1px solid #334155;margin:2rem auto 0.3rem"></div>
+    {% if p.zal5_student %}<div style="font-weight:700;font-size:0.95rem;color:#1e293b">{{ p.student_record.full_name }}</div>{% endif %}
+    <div style="font-size:0.78rem;color:var(--text-muted)">(data i podpis studenta)</div>
   </div>
 </div>
 

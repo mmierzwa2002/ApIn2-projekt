@@ -90,6 +90,7 @@
 }
 .pieczatka-ok    { background: #d1fae5; color: #065f46; }
 .pieczatka-czeka { background: #fef3c7; color: #92400e; }
+.dok-podpis-osoba { font-weight: 700; font-size: 0.95rem; color: #1e293b; margin-top: 0.2rem; }
 .dok-opiekun { border: 1px solid #334155; border-radius: 8px; padding: 1rem 1.25rem; margin: 2rem 0 1.5rem; }
 .dok-opiekun .label { font-weight: 600; }
 .dok-opiekun .opis { font-size: 0.78rem; color: var(--text-muted); font-style: italic; }
@@ -197,13 +198,11 @@
   {# ══ Podpis Dyrektora ══ #}
   <div class="dok-podpisy" style="grid-template-columns:1fr">
     <div class="dok-podpis-box">
-      {% if p.zal31_dyrektor %}
-        <span class="dok-pieczatka pieczatka-ok">✓ Skierowanie wystawione cyfrowo</span>
-      {% else %}
-        <span class="dok-pieczatka pieczatka-czeka">Oczekuje na wystawienie</span>
-      {% endif %}
       <div class="dok-podpis-linia"></div>
-      <div class="dok-podpis-opis">Dyrektor Instytutu lub osoba upoważniona<br>(podpis)</div>
+      {% if p.zal31_dyrektor %}
+        <div class="dok-podpis-osoba">{{ staff('dyrektor') }}</div>
+      {% endif %}
+      <div class="dok-podpis-opis">Dyrektor Instytutu lub osoba upoważniona<br>(data i podpis)</div>
 
       {% if current_user.role == 'dyrektor' and not p.zal31_dyrektor and p.faza_procesu == 1 %}
         {% if p.zal2a_uopz %}
@@ -240,10 +239,9 @@
   <div class="dok-potwierdzenie">
     <h3>Potwierdzam zgłoszenie się studenta na praktykę:</h3>
     <div class="dok-conf-box">
+      <div class="dok-podpis-linia"></div>
       {% if p.zal32_zgloszenie_zopz %}
-        <span class="dok-pieczatka pieczatka-ok">✓ Potwierdzono cyfrowo</span>
-      {% else %}
-        <span class="dok-pieczatka pieczatka-czeka">Oczekuje na potwierdzenie</span>
+        <div class="dok-podpis-osoba">{{ p.firma.przedstawiciel or staff('zopz') }}</div>
       {% endif %}
       <div class="dok-podpis-opis">(data, pieczęć i podpis zakładowego opiekuna praktyki)</div>
       {% if current_user.role == 'zopz' and p.zal31_dyrektor and not p.zal32_zgloszenie_zopz and p.faza_procesu == 1 %}
@@ -260,10 +258,9 @@
   <div class="dok-potwierdzenie">
     <h3>Potwierdzam odbycie szkolenia BHP:</h3>
     <div class="dok-conf-box">
+      <div class="dok-podpis-linia"></div>
       {% if p.zal32_bhp_zopz %}
-        <span class="dok-pieczatka pieczatka-ok">✓ Potwierdzono cyfrowo</span>
-      {% else %}
-        <span class="dok-pieczatka pieczatka-czeka">Oczekuje na potwierdzenie</span>
+        <div class="dok-podpis-osoba">{{ p.firma.przedstawiciel or staff('zopz') }}</div>
       {% endif %}
       <div class="dok-podpis-opis">(data, pieczęć i podpis upoważnionego pracownika zakładu)</div>
       {% if current_user.role == 'zopz' and p.zal31_dyrektor and not p.zal32_bhp_zopz and p.faza_procesu == 1 %}

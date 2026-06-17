@@ -63,7 +63,13 @@ def create_app():
         pending_count = 0
         if current_user.is_authenticated and current_user.role == 'administrator':
             pending_count = User.query.filter_by(role='konto_do_zatwierdzenia').count()
-        return {'pending_count': pending_count}
+
+        def staff(role):
+            """Imię i nazwisko pierwszej osoby o danej roli (podpis na dokumentach)."""
+            u = User.query.filter_by(role=role).order_by(User.id).first()
+            return u.full_name if u else ''
+
+        return {'pending_count': pending_count, 'staff': staff}
 
     from app.auth.routes import auth_bp
     app.register_blueprint(auth_bp, url_prefix='/auth')

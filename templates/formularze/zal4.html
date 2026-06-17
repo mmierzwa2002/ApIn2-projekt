@@ -26,6 +26,7 @@
 .dok-podpis-blok { margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border); display: flex; flex-direction: column; align-items: flex-end; gap: 0.35rem; }
 .dok-podpis-linia { width: 260px; border-top: 1px solid #334155; margin-top: 2rem; }
 .dok-podpis-opis { font-size: 0.78rem; color: var(--text-muted); text-align: center; width: 260px; }
+.dok-podpis-osoba { font-weight: 700; font-size: 0.92rem; color: #1e293b; text-align: center; width: 260px; }
 .dok-pieczatka { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.3rem 0.8rem; border-radius: 50px; font-size: 0.8rem; font-weight: 600; }
 .pieczatka-ok    { background: #d1fae5; color: #065f46; }
 .pieczatka-czeka { background: #fef3c7; color: #92400e; }
@@ -96,12 +97,12 @@
     zakładane efekty uczenia się:
   </p>
 
-  <table class="efekty-tabela">
+  <table class="efekty-tabela" style="table-layout:fixed;width:100%">
     <thead>
       <tr>
-        <th>Lp.</th>
-        <th>Efekty uczenia się</th>
-        <th>Potwierdzenie uzyskania efektów</th>
+        <th style="width:8%">Lp.</th>
+        <th style="width:62%">Efekty uczenia się</th>
+        <th style="width:30%">Potwierdzenie uzyskania efektów</th>
       </tr>
     </thead>
     <tbody>
@@ -128,12 +129,10 @@
 
   {# Podpis ZOPZ #}
   <div class="dok-podpis-blok">
-    {% if p.zal4_zopz %}
-      <span class="dok-pieczatka pieczatka-ok">✓ Potwierdzone cyfrowo (ZOPZ)</span>
-    {% else %}
-      <span class="dok-pieczatka pieczatka-czeka">Oczekuje na potwierdzenie ZOPZ</span>
-    {% endif %}
     <div class="dok-podpis-linia"></div>
+    {% if p.zal4_zopz %}
+      <div class="dok-podpis-osoba">{{ p.firma.przedstawiciel or staff('zopz') }}</div>
+    {% endif %}
     <div class="dok-podpis-opis">Data, podpis i pieczęć zakładu pracy<br>(bezpośredni opiekun zakładowy)</div>
   </div>
 
@@ -145,12 +144,10 @@
       {% else %}<span class="opinia-pusty">— nie wypełniono —</span>{% endif %}
     </div>
     <div class="dok-podpis-blok">
-      {% if p.zal4_uopz %}
-        <span class="dok-pieczatka pieczatka-ok">✓ Opinia UOPZ zapisana</span>
-      {% else %}
-        <span class="dok-pieczatka pieczatka-czeka">Oczekuje na opinię UOPZ</span>
-      {% endif %}
       <div class="dok-podpis-linia"></div>
+      {% if p.zal4_uopz %}
+        <div class="dok-podpis-osoba">{{ staff('uopz') }}</div>
+      {% endif %}
       <div class="dok-podpis-opis">Data, podpis opiekuna uczelnianego</div>
     </div>
   </div>
