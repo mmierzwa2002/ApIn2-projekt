@@ -34,6 +34,7 @@ python -m venv venv
 pip install -r requirements.txt
 cp .env.example .env        # skopiuj szablon konfiguracji
 # uzupełnij .env (co najmniej DATABASE_URL i SECRET_KEY — patrz komentarze w pliku)
+# należy również utworzyć pustą bazę danych w pgAdmin o tej samej nazwie co w DATABASE_URL
 .\venv\Scripts\python.exe run.py
 ```
 
@@ -46,14 +47,14 @@ Aplikacja startuje pod `http://localhost:5000/auth/login`. Przy starcie wykonywa
 Szablon ze wszystkimi zmiennymi i opisami: [`.env.example`](.env.example).
 Minimalny zestaw do uruchomienia lokalnie:
 
-| Zmienna                                | Opis                                                            | Wymagana?                              |
-| -------------------------------------- | --------------------------------------------------------------- | -------------------------------------- |
-| `DATABASE_URL`                         | Connection string PostgreSQL (`postgresql://user:pass@host/db`) | tak (bez niej używany jest SQLite)     |
-| `SECRET_KEY`                           | Losowy ciąg chroniący podpis sesji (min. 32 znaki)              | tak w produkcji                        |
-| `MICROSOFT_CLIENT_ID/SECRET/TENANT_ID` | Dane aplikacji z Azure AD — do logowania kontem uczelni         | tylko jeśli OAuth Microsoft ma działać |
-| `GOOGLE_CLIENT_ID/SECRET`              | Dane z Google Cloud Console — do logowania kontem Google        | tylko jeśli OAuth Google ma działać    |
+| Zmienna                                | Opis                                                            | Wymagana?                                         |
+| -------------------------------------- | --------------------------------------------------------------- | ------------------------------------------------- |
+| `DATABASE_URL`                         | Connection string PostgreSQL (`postgresql://user:pass@host/db`) | tak                                               |
+| `SECRET_KEY`                           | Losowy ciąg chroniący podpis sesji (min. 32 znaki)              | tak w produkcji                                   |
+| `MICROSOFT_CLIENT_ID/SECRET/TENANT_ID` | Dane aplikacji z Azure AD — do logowania kontem uczelni         | tak                                               |
+| `GOOGLE_CLIENT_ID/SECRET`              | Dane z Google Cloud Console — do logowania kontem Google        | tylko jeśli OAuth Google ma działać (nie używany) |
 
-Logowanie lokalne (e-mail + hasło) działa bez żadnych kluczy OAuth, lecz wymaga potwierdzenia przez administratora.
+Logowanie lokalne (e-mail + hasło) działa bez żadnych kluczy OAuth, lecz wymaga potwierdzenia przez administratora, natomiast aby stworzyć nowe konto studenta wymagane jest logowanie przez Microsoft, rejestracja lokalna jest dla UOPZ, ZOPZ bądź dyrektora.
 
 ## Moduł generowania PDF
 

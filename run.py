@@ -194,4 +194,4 @@ if __name__ == '__main__':
         seed_test_data()
         seed_efekty_ksztalcenia()
 
-    app.run(debug=True, port=5000)
+    app.run(debug=True, host='0.0.0.0', port=5000)
