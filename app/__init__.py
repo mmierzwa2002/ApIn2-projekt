@@ -1,6 +1,7 @@
 from flask import Flask, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
+from flask_wtf.csrf import CSRFProtect
 from flasgger import Swagger
 from dotenv import load_dotenv
 from flask_cors import CORS
@@ -8,6 +9,7 @@ import os
 
 db = SQLAlchemy()
 login_manager = LoginManager()
+csrf = CSRFProtect()
 
 def create_app():
     load_dotenv()
@@ -23,6 +25,7 @@ def create_app():
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     db.init_app(app)
+    csrf.init_app(app)
     CORS(app, supports_credentials=True)
 
     app.config['SWAGGER'] = {'title': 'API Systemu Praktyk', 'uiversion': 3, 'openapi': '3.0.0'}
@@ -91,5 +94,18 @@ def create_app():
     app.register_blueprint(outcomes_bp)
     app.register_blueprint(firms_bp)
     app.register_blueprint(pdf_bp)
+
+    # Ochrona CSRF obejmuje wszystkie formularze przeglądarkowe (token wstrzykiwany
+    # w szablonach). Czysto-JSON-owe zasoby REST (konsumowane przez Postman/Swagger,
+    # bez formularzy HTML) są zwolnione — uwierzytelnia je sesja + reguła roli.
+    for bp in (students_bp, documents_bp, outcomes_bp):
+        csrf.exempt(bp)
+
+    # Endpointy CRUD JSON w blueprintach obsługujących też formularze — należą do
+    # udokumentowanego REST API (Postman/Swagger), więc zwolnione z CSRF. Operacje
+    # przeglądarkowe na tych zasobach idą innymi trasami (np. usuwanie przez /auth/...).
+    for endpoint in ('internships.create_internship', 'internships.delete_internship',
+                     'firms.delete_firm', 'journal.delete_journal_entry'):
+        csrf.exempt(app.view_functions[endpoint])
 
     return app

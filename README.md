@@ -28,6 +28,45 @@ aż po protokół zaliczenia — i generuje komplet załączników urzędowych (
 
 ## Uruchomienie
 
+Aplikację można uruchomić w kontenerach **Docker** (zalecane) albo lokalnie w środowisku
+wirtualnym `venv`. W obu przypadkach startuje pod `http://localhost:5000/auth/login`,
+a przy pierwszym starcie `run.py` automatycznie tworzy schemat bazy (`ensure_schema()`)
+i zakłada konta testowe.
+
+### Wariant A — Docker (zalecany)
+
+Wymaga uruchomionego **Docker Desktop**.
+
+```bash
+cp .env.example .env        # uzupełnij SECRET_KEY (oraz klucze Microsoft, jeśli używasz OAuth)
+docker compose up --build
+```
+
+`docker compose` stawia dwa kontenery: **`db`** (PostgreSQL 16) oraz **`web`** (aplikacja
+Flask). Kilka rzeczy dzieje się automatycznie:
+
+- `DATABASE_URL` jest **nadpisywany** przez `docker-compose.yml` na
+  `postgresql://postgres:postgres@db:5432/praktyki` — nie musisz instalować PostgreSQL
+  ani zakładać bazy ręcznie (wartość z `.env` jest w tym wariancie ignorowana).
+- kontener `web` startuje dopiero, gdy baza przejdzie `healthcheck`,
+- dane bazy są trwałe w wolumenie `postgres_data`.
+
+Przydatne polecenia:
+
+```bash
+docker compose up                              # ponowny start (bez przebudowy obrazu)
+docker compose down                            # zatrzymanie kontenerów
+docker compose down -v                         # zatrzymanie + usunięcie danych bazy (czysty start)
+docker compose exec web python seed_demo.py    # dane demonstracyjne (demo@ans.elblag.pl / Demo1234!)
+```
+
+> Po zmianie kodu lub `requirements.txt` uruchom ponownie z flagą `--build`,
+> aby obraz został przebudowany.
+
+### Wariant B — lokalnie (venv)
+
+Wymaga lokalnie zainstalowanego PostgreSQL.
+
 ```bash
 python -m venv venv
 .\venv\Scripts\activate
@@ -38,9 +77,8 @@ cp .env.example .env        # skopiuj szablon konfiguracji
 .\venv\Scripts\python.exe run.py
 ```
 
-Aplikacja startuje pod `http://localhost:5000/auth/login`. Przy starcie wykonywane jest
-`ensure_schema()` i seed kont testowych. Dane demonstracyjne:
-`.\venv\Scripts\python.exe seed_demo.py` (konto `demo@ans.elblag.pl` / `Demo1234!`).
+Dane demonstracyjne: `.\venv\Scripts\python.exe seed_demo.py`
+(konto `demo@ans.elblag.pl` / `Demo1234!`).
 
 ### Konfiguracja `.env`
 
@@ -52,7 +90,6 @@ Minimalny zestaw do uruchomienia lokalnie:
 | `DATABASE_URL`                         | Connection string PostgreSQL (`postgresql://user:pass@host/db`) | tak                                               |
 | `SECRET_KEY`                           | Losowy ciąg chroniący podpis sesji (min. 32 znaki)              | tak w produkcji                                   |
 | `MICROSOFT_CLIENT_ID/SECRET/TENANT_ID` | Dane aplikacji z Azure AD — do logowania kontem uczelni         | tak                                               |
-| `GOOGLE_CLIENT_ID/SECRET`              | Dane z Google Cloud Console — do logowania kontem Google        | tylko jeśli OAuth Google ma działać (nie używany) |
 
 Logowanie lokalne (e-mail + hasło) działa bez żadnych kluczy OAuth, lecz wymaga potwierdzenia przez administratora, natomiast aby stworzyć nowe konto studenta wymagane jest logowanie przez Microsoft, rejestracja lokalna jest dla UOPZ, ZOPZ bądź dyrektora.
 
@@ -131,6 +168,8 @@ Dokumentacja/   # dokumentacja projektu (API, frontend, PDF, diagramy, baza)
 run.py          # punkt wejścia aplikacji
 seed_demo.py    # dane demonstracyjne
 swagger.yaml    # specyfikacja OpenAPI API
+Dockerfile          # obraz aplikacji (Python 3.12 + zależności)
+docker-compose.yml  # uruchomienie web + PostgreSQL w kontenerach
 ```
 
 ## Pozostała dokumentacja:
