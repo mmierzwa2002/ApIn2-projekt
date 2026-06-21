@@ -85,11 +85,11 @@ Dane demonstracyjne: `.\venv\Scripts\python.exe seed_demo.py`
 Szablon ze wszystkimi zmiennymi i opisami: [`.env.example`](.env.example).
 Minimalny zestaw do uruchomienia lokalnie:
 
-| Zmienna                                | Opis                                                            | Wymagana?                                         |
-| -------------------------------------- | --------------------------------------------------------------- | ------------------------------------------------- |
-| `DATABASE_URL`                         | Connection string PostgreSQL (`postgresql://user:pass@host/db`) | tak                                               |
-| `SECRET_KEY`                           | Losowy ciąg chroniący podpis sesji (min. 32 znaki)              | tak w produkcji                                   |
-| `MICROSOFT_CLIENT_ID/SECRET/TENANT_ID` | Dane aplikacji z Azure AD — do logowania kontem uczelni         | tak                                               |
+| Zmienna                                | Opis                                                            | Wymagana?       |
+| -------------------------------------- | --------------------------------------------------------------- | --------------- |
+| `DATABASE_URL`                         | Connection string PostgreSQL (`postgresql://user:pass@host/db`) | tak             |
+| `SECRET_KEY`                           | Losowy ciąg chroniący podpis sesji (min. 32 znaki)              | tak w produkcji |
+| `MICROSOFT_CLIENT_ID/SECRET/TENANT_ID` | Dane aplikacji z Azure AD — do logowania kontem uczelni         | tak             |
 
 Logowanie lokalne (e-mail + hasło) działa bez żadnych kluczy OAuth, lecz wymaga potwierdzenia przez administratora, natomiast aby stworzyć nowe konto studenta wymagane jest logowanie przez Microsoft, rejestracja lokalna jest dla UOPZ, ZOPZ bądź dyrektora.
 
@@ -176,7 +176,7 @@ docker-compose.yml  # uruchomienie web + PostgreSQL w kontenerach
 
 - **Frontend:** [Dokumentacja/Frontend/README.md](Dokumentacja/Frontend/README.md)
   — dokumentacja techniczna interfejsu oraz testy i raport błędów.
-- **Moduł PDF:** [Dokumentacja/PDF/Weryfikacja-PDF.md](Dokumentacja/PDF/ETAP11-Weryfikacja-PDF.md)
+- **Moduł PDF:** [Dokumentacja/PDF/Weryfikacja-PDF.md](Dokumentacja/PDF/Weryfikacja-PDF.md)
   — testy generowania, analiza techniczna, raport błędów i podglądy dokumentów.
 - **API backendu:** [Dokumentacja/Backend/API.md](Dokumentacja/Backend/API.md)
   oraz specyfikacja [swagger.yaml](swagger.yaml).
