@@ -19,6 +19,26 @@ aż po protokół zaliczenia — i generuje komplet załączników urzędowych (
 - **REST API** (38 endpointów) z dokumentacją Swagger UI pod `/apidocs/`.
 - **Logowanie** lokalne oraz przez Microsoft OAuth.
 
+## Załączniki i fazy procesu
+
+Proces praktyki dzieli się na 4 fazy; przejście do kolejnej następuje dopiero po
+komplecie podpisów z fazy bieżącej. Poniżej każdy załącznik z przypisaną fazą i osobami,
+które go wypełniają/podpisują (`→` = wymagana kolejność, `+` = obie strony niezależnie).
+
+| Faza                | Załącznik                                                      | Kto wypełnia / podpisuje                                        |
+| ------------------- | -------------------------------------------------------------- | --------------------------------------------------------------- |
+| **1. Inicjacja**    | Zał. 1 — Porozumienie o organizacji praktyki                   | ZOPZ + Dyrektor                                                 |
+| **1. Inicjacja**    | Zał. 2a — Program i harmonogram praktyki (13 efektów, 120 dni) | ZOPZ → Student → UOPZ                                           |
+| **1. Inicjacja**    | Zał. 3.1 — Karta praktyki, str. 1 (skierowanie)                | Dyrektor (skierowanie) → ZOPZ (zgłoszenie + BHP)                |
+| **2. Realizacja**   | Zał. 6 — Dziennik praktyki (120 wpisów)                        | Student (wpisy) → ZOPZ (zatwierdzenie)                          |
+| **3. Podsumowanie** | Zał. 7 — Sprawozdanie z praktyki                               | Student → ZOPZ (potwierdzenie)                                  |
+| **3. Podsumowanie** | Zał. 3.2 — Karta praktyki, str. 2 (oceny)                      | ZOPZ (ocena zakładowa) → UOPZ (ocena uczelniana + sprawozdania) |
+| **3. Podsumowanie** | Zał. 4 — Potwierdzenie efektów uczenia się                     | ZOPZ (13 efektów) → UOPZ (opinia)                               |
+| **3. Podsumowanie** | Zał. 5 — Kwestionariusz ankiety                                | Student                                                         |
+| **4. Zaliczenie**   | Zał. 8 — Protokół zaliczenia praktyki                          | Dyrektor (protokół) → UOPZ (wpis do USOS)                       |
+
+> ZOPZ — opiekun zakładowy, UOPZ — opiekun uczelniany.
+
 ## Technologie
 
 - Backend: **Python / Flask**, **SQLAlchemy**, **Flask-Login**
