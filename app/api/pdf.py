@@ -20,13 +20,20 @@ from app import db
 _fonts_registered = False
 _symbol_font = None   # nazwa zarejestrowanego fontu z glifami ✓ ☐ ☑ ✗ (lub None)
 
-# Kandydaci na pliki czcionek (Windows; pierwszy istniejący wygrywa)
+# Kandydaci na pliki czcionek (pierwszy istniejący wygrywa). Najpierw ścieżki Windows
+# (Arial/Segoe), potem linuksowe DejaVu — dzięki temu ten sam kod działa lokalnie na
+# Windows i w kontenerze Docker (Debian), gdzie z apt instalujemy pakiet `fonts-dejavu`.
+_DEJAVU = '/usr/share/fonts/truetype/dejavu'
 _FONT_FILES = {
-    'normal': [r'C:\Windows\Fonts\arial.ttf', r'C:\Windows\Fonts\segoeui.ttf'],
-    'bold':   [r'C:\Windows\Fonts\arialbd.ttf', r'C:\Windows\Fonts\segoeuib.ttf'],
-    'italic': [r'C:\Windows\Fonts\ariali.ttf', r'C:\Windows\Fonts\segoeuii.ttf'],
+    'normal': [r'C:\Windows\Fonts\arial.ttf', r'C:\Windows\Fonts\segoeui.ttf',
+               f'{_DEJAVU}/DejaVuSans.ttf'],
+    'bold':   [r'C:\Windows\Fonts\arialbd.ttf', r'C:\Windows\Fonts\segoeuib.ttf',
+               f'{_DEJAVU}/DejaVuSans-Bold.ttf'],
+    'italic': [r'C:\Windows\Fonts\ariali.ttf', r'C:\Windows\Fonts\segoeuii.ttf',
+               f'{_DEJAVU}/DejaVuSans-Oblique.ttf'],
     # Font z symbolami (checkbox/ptaszek) — Arial ich nie ma, więc używamy osobnego
-    'symbol': [r'C:\Windows\Fonts\seguisym.ttf', r'C:\Windows\Fonts\DejaVuSans.ttf'],
+    'symbol': [r'C:\Windows\Fonts\seguisym.ttf', r'C:\Windows\Fonts\DejaVuSans.ttf',
+               f'{_DEJAVU}/DejaVuSans.ttf'],
 }
 
 # Symbole wymagające osobnego fontu (Arial renderuje je jako puste kwadraty)
