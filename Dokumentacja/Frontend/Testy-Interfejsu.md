@@ -1,4 +1,4 @@
-# ETAP 10A — Testowanie i weryfikacja interfejsu użytkownika
+# ETAP 10A – Testowanie i weryfikacja interfejsu użytkownika
 
 Dokument obejmuje weryfikację interfejsu aplikacji do rozliczania praktyk zawodowych
 (ANS Elbląg). Interfejs zrealizowano jako renderowane po stronie serwera widoki
@@ -14,34 +14,34 @@ Jinja2 (SSR) z jednym arkuszem `static/css/style.css` i skryptami inline.
 | ---------------------------------------------- | ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Logowanie / rejestracja (`login.html`)         | `/auth/login`                 | Logowanie Microsoft OAuth lub lokalne; rejestracja nowego konta                                                                                       |
 | Konto oczekujące (`pending.html`)              | `/auth/pending`               | Informacja, że konto czeka na zatwierdzenie przez administratora                                                                                      |
-| Pulpit (`dashboard.html`)                      | `/auth/dashboard`             | Konsola zależna od roli: student widzi swoją praktykę i dokumenty; personel (UOPZ/ZOPZ/Dyrektor) — listę praktyk i akcje; administrator — zarządzanie |
+| Pulpit (`dashboard.html`)                      | `/auth/dashboard`             | Konsola zależna od roli: student widzi swoją praktykę i dokumenty; personel (UOPZ/ZOPZ/Dyrektor) – listę praktyk i akcje; administrator – zarządzanie |
 | Zatwierdzanie kont (`admin_approvals.html`)    | `/auth/admin/approvals`       | Administrator nadaje rolę i akceptuje/odrzuca nowe konta                                                                                              |
-| Porozumienie — Zał. 1 (`zal1.html`)            | `/auth/formularze/<id>/zal1`  | Podgląd i podpis Porozumienia (ZOPZ, Dyrektor) + metadane                                                                                             |
-| Program i harmonogram — Zał. 2a (`zal2a.html`) | `/auth/formularze/<id>/zal2a` | Wypełnienie 13 efektów i harmonogramu (suma 120 dni), podpisy                                                                                         |
-| Karta str. 1 — Zał. 3.1 (`zal31.html`)         | `/auth/formularze/<id>/zal31` | Skierowanie i potwierdzenia zakładu (zgłoszenie, BHP)                                                                                                 |
-| Karta str. 2 — Zał. 3.2 (`zal32.html`)         | `/auth/formularze/<id>/zal32` | Zaświadczenie odbycia i oceny zakładowa/uczelniana                                                                                                    |
-| Potwierdzenie efektów — Zał. 4 (`zal4.html`)   | `/auth/formularze/<id>/zal4`  | Potwierdzenie 13 efektów (ZOPZ) + opinia UOPZ                                                                                                         |
-| Ankieta — Zał. 5 (`zal5.html`)                 | `/auth/formularze/<id>/zal5`  | Kwestionariusz 14 pytań wypełniany przez studenta                                                                                                     |
-| Dziennik — Zał. 6 (`zal6.html`)                | `/auth/formularze/<id>/zal6`  | Dynamiczna tabela 120 wpisów dziennych z efektami                                                                                                     |
-| Sprawozdanie — Zał. 7 (`zal7.html`)            | `/auth/formularze/<id>/zal7`  | Trzy sekcje sprawozdania studenta + potwierdzenie ZOPZ                                                                                                |
-| Protokół zaliczenia — Zał. 8 (`zal8.html`)     | `/auth/formularze/<id>/zal8`  | Protokół komisji, oceny cząstkowe, ocena końcowa K                                                                                                    |
-| Szablon bazowy (`base.html`)                   | —                             | Wspólna nawigacja, przełącznik motywu (jasny/ciemny), stopka                                                                                          |
+| Porozumienie – Zał. 1 (`zal1.html`)            | `/auth/formularze/<id>/zal1`  | Podgląd i podpis Porozumienia (ZOPZ, Dyrektor) + metadane                                                                                             |
+| Program i harmonogram – Zał. 2a (`zal2a.html`) | `/auth/formularze/<id>/zal2a` | Wypełnienie 13 efektów i harmonogramu (suma 120 dni), podpisy                                                                                         |
+| Karta str. 1 – Zał. 3.1 (`zal31.html`)         | `/auth/formularze/<id>/zal31` | Skierowanie i potwierdzenia zakładu (zgłoszenie, BHP)                                                                                                 |
+| Karta str. 2 – Zał. 3.2 (`zal32.html`)         | `/auth/formularze/<id>/zal32` | Zaświadczenie odbycia i oceny zakładowa/uczelniana                                                                                                    |
+| Potwierdzenie efektów – Zał. 4 (`zal4.html`)   | `/auth/formularze/<id>/zal4`  | Potwierdzenie 13 efektów (ZOPZ) + opinia UOPZ                                                                                                         |
+| Ankieta – Zał. 5 (`zal5.html`)                 | `/auth/formularze/<id>/zal5`  | Kwestionariusz 14 pytań wypełniany przez studenta                                                                                                     |
+| Dziennik – Zał. 6 (`zal6.html`)                | `/auth/formularze/<id>/zal6`  | Dynamiczna tabela 120 wpisów dziennych z efektami                                                                                                     |
+| Sprawozdanie – Zał. 7 (`zal7.html`)            | `/auth/formularze/<id>/zal7`  | Trzy sekcje sprawozdania studenta + potwierdzenie ZOPZ                                                                                                |
+| Protokół zaliczenia – Zał. 8 (`zal8.html`)     | `/auth/formularze/<id>/zal8`  | Protokół komisji, oceny cząstkowe, ocena końcowa K                                                                                                    |
+| Szablon bazowy (`base.html`)                   | –                             | Wspólna nawigacja, przełącznik motywu (jasny/ciemny), stopka                                                                                          |
 
 ### Tabela stanu działania interfejsu
 
 | Widok                   | Status działania | Uwagi                                                                                  |
 | ----------------------- | ---------------- | -------------------------------------------------------------------------------------- |
 | Logowanie / rejestracja | OK               | Walidacja e-mail i hasła po stronie klienta; rejestracja kieruje do ekranu oczekiwania |
-| Konto oczekujące        | OK               | —                                                                                      |
+| Konto oczekujące        | OK               | –                                                                                      |
 | Pulpit (student)        | OK               | Karta postępu faz, stan załączników, pobieranie PDF/ZIP                                |
 | Pulpit (personel)       | OK               | Lista praktyk, akcje wg fazy i roli, pobieranie ZIP po zakończeniu                     |
 | Pulpit (administrator)  | OK               | Zarządzanie kontami, praktykami, firmami                                               |
 | Zatwierdzanie kont      | OK               | Wybór roli (student/uopz/zopz/dyrektor), akceptacja/odrzucenie                         |
-| Zał. 1 – Porozumienie   | OK               | —                                                                                      |
+| Zał. 1 – Porozumienie   | OK               | –                                                                                      |
 | Zał. 2a – Harmonogram   | OK               | Walidacja sumy dni = 120 i kompletu 13 efektów                                         |
-| Zał. 3.1 – Karta str. 1 | OK               | —                                                                                      |
+| Zał. 3.1 – Karta str. 1 | OK               | –                                                                                      |
 | Zał. 3.2 – Karta str. 2 | OK               | Oceny w skali 2–5, opisy min. 10 znaków                                                |
-| Zał. 4 – Efekty         | OK               | —                                                                                      |
+| Zał. 4 – Efekty         | OK               | –                                                                                      |
 | Zał. 5 – Ankieta        | OK               | Wszystkie 14 pytań wymagane                                                            |
 | Zał. 6 – Dziennik       | OK               | Walidacja dat (dni robocze, w okresie praktyki)                                        |
 | Zał. 7 – Sprawozdanie   | OK               | Trzy sekcje min. 30 znaków                                                             |
@@ -77,21 +77,21 @@ Dla każdego formularza przygotowano przypadki testowe z danymi poprawnymi i bł
 | Zał. 5                | Brak odpowiedzi na pytanie                        | Komunikat: „Brakuje odpowiedzi na pytanie N"                                        | OK    |
 
 > **Uwaga dot. „edycji praktyki":** aplikacja nie udostępnia ogólnego formularza edycji
-> praktyki — zmiana stanu praktyki odbywa się przez podpisy kolejnych załączników
+> praktyki – zmiana stanu praktyki odbywa się przez podpisy kolejnych załączników
 > (workflow faz), a nie przez ręczną edycję pól. Korekta błędnego dokumentu realizowana
 > jest mechanizmem odrzucenia (np. `POST /api/internships/<id>/zal2a/reject`).
 
 ---
 
-## Zadanie 3 — Weryfikacja komunikacji frontend ↔ API
+## Zadanie 3 – Weryfikacja komunikacji frontend ↔ API
 
-Interfejs działa w modelu **SSR (Server-Side Rendering)** — strony renderuje serwer Flask,
+Interfejs działa w modelu **SSR (Server-Side Rendering)** – strony renderuje serwer Flask,
 więc widoki (np. pulpit) **nie** wykonują osobnych zapytań AJAX do API; dane wstrzykiwane są
 bezpośrednio w szablon. W praktyce komunikacja frontend ↔ API obserwowalna w przeglądarce
 przebiega wg wzorca **Post/Redirect/Get**: formularz wysyła `POST`, serwer odpowiada
 przekierowaniem `302`, a wynik operacji prezentowany jest jako komunikat `flash`.
 
-Weryfikację wykonano w narzędziach developerskich (zakładka **Network**) — udokumentowano
+Weryfikację wykonano w narzędziach developerskich (zakładka **Network**) – udokumentowano
 zrzutami ekranu (patrz instrukcja na końcu dokumentu).
 
 | Metoda      | Akcja w interfejsie                              | Endpoint                                  | Zaobserwowany wynik                                                            |
@@ -103,29 +103,29 @@ zrzutami ekranu (patrz instrukcja na końcu dokumentu).
 | POST        | Podpis dokumentu                                 | `POST /api/internships/<id>/sign`         | 302 → przekierowanie + flash                                                   |
 | POST        | Usunięcie praktyki (administrator)               | `POST /auth/admin/internship/<id>/delete` | 302 → przekierowanie + flash „Praktyka #N została usunięta"                    |
 | GET         | Próba pobrania nieistniejącego zasobu            | `GET /api/internships/9999`               | 404 + JSON `{"error": "Resource not found"}`                                   |
-| PUT / PATCH | —                                                | —                                         | nie występuje (patrz uwaga poniżej)                                            |
+| PUT / PATCH | –                                                | –                                         | nie występuje (patrz uwaga poniżej)                                            |
 
 ### Zrzuty ekranu
 
 | Akcja                                                      | Zrzut                                                                  |
 | ---------------------------------------------------------- | ---------------------------------------------------------------------- |
-| POST — rejestracja praktyki (dane poprawne, flash sukcesu) | [Zrzuty/PrawidlowyWpis.png](Zrzuty/PrawidlowyWpis.png)                 |
-| POST — rejestracja praktyki (dane błędne, flash błędu)     | [Zrzuty/BlednyWpis.png](Zrzuty/BlednyWpis.png)                         |
-| DELETE (jako POST) — usunięcie zasobu przez administratora | [Zrzuty/UsuniecieUzytkownika.png](Zrzuty/UsuniecieUzytkownika.png)     |
-| GET — błąd API 404 (nieistniejący zasób)                   | [Zrzuty/PodstronaNieZnaleziona.png](Zrzuty/PodstronaNieZnaleziona.png) |
+| POST – rejestracja praktyki (dane poprawne, flash sukcesu) | [Zrzuty/PrawidlowyWpis.png](Zrzuty/PrawidlowyWpis.png)                 |
+| POST – rejestracja praktyki (dane błędne, flash błędu)     | [Zrzuty/BlednyWpis.png](Zrzuty/BlednyWpis.png)                         |
+| DELETE (jako POST) – usunięcie zasobu przez administratora | [Zrzuty/UsuniecieUzytkownika.png](Zrzuty/UsuniecieUzytkownika.png)     |
+| GET – błąd API 404 (nieistniejący zasób)                   | [Zrzuty/PodstronaNieZnaleziona.png](Zrzuty/PodstronaNieZnaleziona.png) |
 
-> **Uwaga — status 302 vs 400/JSON:** wszystkie akcje wywoływane z formularzy HTML zwracają
+> **Uwaga – status 302 vs 400/JSON:** wszystkie akcje wywoływane z formularzy HTML zwracają
 > `302` (Post/Redirect/Get), a błąd prezentowany jest komunikatem `flash`, **nie** jako
 > odpowiedź JSON ze statusem 400. Odpowiedzi `400`/`404` z ciałem JSON `{"error": "..."}`
 > (moduł `app/api/errors.py`) zwracane są tylko przy bezpośrednim wywołaniu API
-> (Postman/curl) — przetestowano w Lab09. Wpisanie adresu API w pasku przeglądarki to
+> (Postman/curl) – przetestowano w Lab09. Wpisanie adresu API w pasku przeglądarki to
 > żądanie `GET`, na którym można zaobserwować zarówno poprawną odpowiedź `200`, jak i błąd `404`.
 
-> **Uwaga — brak PUT/PATCH:** aplikacja nie wykorzystuje metod `PUT`/`PATCH`. Aktualizacja
+> **Uwaga – brak PUT/PATCH:** aplikacja nie wykorzystuje metod `PUT`/`PATCH`. Aktualizacja
 > stanu praktyki realizowana jest dedykowanymi endpointami `POST` (workflow podpisów kolejnych
 > załączników), co eliminuje potrzebę pełnej/cząstkowej podmiany zasobu.
 
-> **Uwaga — DELETE z interfejsu:** usunięcie praktyki przez UI wysyła `POST`
+> **Uwaga – DELETE z interfejsu:** usunięcie praktyki przez UI wysyła `POST`
 > na `/auth/admin/internship/<id>/delete` (formularze HTML nie obsługują metody `DELETE`),
 > z odpowiedzią `302` + flash. Właściwy endpoint REST `DELETE /api/internships/<id>`
 > istnieje w API i został przetestowany kolekcją Postman (Lab09).
@@ -198,14 +198,14 @@ Zrzut „przed naprawą": [Zrzuty/TestMobilnyBladUX.png](Zrzuty/TestMobilnyBladU
 **Naprawa:** rozszerzono regułę `@media (max-width: 680px)` w `static/css/style.css`:
 
 - układ pulpitu studenta zwijany jest do **jednej kolumny** (klasa `.dashboard-split`),
-- tabele dokumentów przełączane są na **układ kafelkowy** — nagłówek tabeli jest ukrywany,
+- tabele dokumentów przełączane są na **układ kafelkowy** – nagłówek tabeli jest ukrywany,
   a każdy wiersz staje się blokiem (nazwa załącznika / plakietka statusu / odnośnik),
 - plakietki statusu są `inline-block` na pełną szerokość wiersza, więc nie pękają,
 - oś faz ma mniejsze kółka i etykiety, dzięki czemu mieści się w jednym rzędzie,
 - siatka wyboru załączników do ZIP (`.zip-grid`) zwijana jest do jednej kolumny.
 
 **Wynik (po naprawie):** przy szerokości ~375 px wszystkie elementy układają się pionowo
-i są w pełni czytelne — żaden element się nie rozjeżdża.
+i są w pełni czytelne – żaden element się nie rozjeżdża.
 
 Zrzut „po naprawie": [Zrzuty/TestMobilnyNaprawiony.png](Zrzuty/TestMobilnyNaprawiony.png)
 
@@ -222,8 +222,8 @@ Raport błędów do uzupełnienia po testach (procedura na końcu dokumentu):
 | #   | Opis błędu                                                                                                                                                             | Sposób odtworzenia                                                               | Propozycja rozwiązania                                                                                                        | Status                   |
 | --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ------------------------ |
 | 1   | Rozjeżdżający się układ pulpitu i tabeli „Stan załączników" w trybie mobilnym (~375 px): plakietki statusu pękały, kolumny tabeli i odnośniki „Otwórz →" nakładały się | DevTools → tryb urządzenia (Ctrl+Shift+M), szerokość ~375 px, zalogowany student | Rozszerzenie `@media (max-width: 680px)`: zwinięcie pulpitu do 1 kolumny, kafelkowy układ tabel, plakietki na pełną szerokość | ✅ Naprawione            |
-| 2   | Brak błędów JavaScript — konsola czysta                                                                                                                                | Przejście przez wszystkie widoki z otwartą zakładką **Console**                  | —                                                                                                                             | OK                       |
-| 3   | Po utracie połączenia z API (zatrzymany backend) próba wysłania formularza kończy się standardowym błędem połączenia przeglądarki                                      | Zatrzymać `run.py`, wysłać dowolny formularz                                     | Aplikacja nie „wywala się" po stronie JS (SSR, brak AJAX); ewentualne usprawnienie — dedykowana strona błędu 5xx              | OK (zachowanie poprawne) |
+| 2   | Brak błędów JavaScript – konsola czysta                                                                                                                                | Przejście przez wszystkie widoki z otwartą zakładką **Console**                  | –                                                                                                                             | OK                       |
+| 3   | Po utracie połączenia z API (zatrzymany backend) próba wysłania formularza kończy się standardowym błędem połączenia przeglądarki                                      | Zatrzymać `run.py`, wysłać dowolny formularz                                     | Aplikacja nie „wywala się" po stronie JS (SSR, brak AJAX); ewentualne usprawnienie – dedykowana strona błędu 5xx              | OK (zachowanie poprawne) |
 | 4   | Odporność na niepoprawne dane                                                                                                                                          | Ręczne wpisanie błędnych wartości / ominięcie walidacji HTML5 przez DevTools     | Dane odrzucane przez walidację serwerową (komunikat `flash`), aplikacja pozostaje stabilna                                    | OK                       |
 
 **Wniosek:** nie wykryto błędów krytycznych. Jedyny zauważony problem (responsywność mobilna,

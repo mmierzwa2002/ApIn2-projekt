@@ -4,11 +4,11 @@ Weryfikacja i testy modułu generowania dokumentów PDF (załączniki praktyki Z
 
 ## Zawartość
 
-- **[Weryfikacja-PDF.md](Weryfikacja-PDF.md)** — pełna dokumentacja
+- **[Weryfikacja-PDF.md](Weryfikacja-PDF.md)** – pełna dokumentacja
   testów i weryfikacji: generowanie dziennika, potwierdzenia efektów,
   protokołu, testy szablonów, pobierania, odporności, analiza techniczna i
   rozszerzenia funkcjonalne. Zawiera raport błędów i instrukcję odtworzenia testów.
-- **[Podglady/](Podglady/)** — podglądy (PNG) pierwszych stron wszystkich typów
+- **[Podglady/](Podglady/)** – podglądy (PNG) pierwszych stron wszystkich typów
   dokumentów (Zał. 1–8).
 
 ## Powiązane

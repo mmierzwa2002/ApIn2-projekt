@@ -13,12 +13,12 @@ Opis architektury i procesu generowania: [README → Moduł generowania PDF](../
 
 | Element     | Wartość                                                       |
 | ----------- | ------------------------------------------------------------- |
-| Silnik PDF  | `xhtml2pdf` (pisa) 0.2.17 + `reportlab` 4.5.1 — czysty Python |
+| Silnik PDF  | `xhtml2pdf` (pisa) 0.2.17 + `reportlab` 4.5.1 – czysty Python |
 | Czcionki    | Arial (polskie znaki) + Segoe UI Symbol (glify ✓ ☐ ✗)         |
 | Baza danych | PostgreSQL                                                    |
 | System      | Windows 11, Python (venv)                                     |
 
-### Dane wejściowe — trzy kompletne praktyki
+### Dane wejściowe – trzy kompletne praktyki
 
 Wszystkie testy oparto o trzy praktyki różnych studentów, każda w fazie 4
 (zakończona) z kompletem danych.
@@ -77,7 +77,7 @@ przypisane kody efektów uczenia się) dla każdego z trzech studentów.
 | #7 Michał Mierzwa      | 13                          | 13                | ✓               |
 
 Liczba potwierdzeń w bazie jest równa liczbie zaznaczeń „✓" w wygenerowanym
-dokumencie dla wszystkich trzech użytkowników — dane są zgodne.
+dokumencie dla wszystkich trzech użytkowników – dane są zgodne.
 
 **Analiza poprawności:**
 
@@ -93,14 +93,14 @@ dokumencie dla wszystkich trzech użytkowników — dane są zgodne.
 
 ---
 
-## Weryfikacja raportu końcowego (Zał. 8 — Protokół zaliczenia)
+## Weryfikacja raportu końcowego (Zał. 8 – Protokół zaliczenia)
 
-Protokół zaliczenia praktyki zawodowej pełni rolę raportu końcowego — podsumowuje
+Protokół zaliczenia praktyki zawodowej pełni rolę raportu końcowego – podsumowuje
 oceny cząstkowe, składowe (S, U, Z, E) oraz ocenę końcową K wyliczaną wg wzoru
 `K = 0,4·E + 0,1·S + 0,2·U + 0,3·Z`.
 
 **Opis procesu generowania:** pełny, krokowy opis znajduje się w głównym README
-projektu — [README → Moduł generowania PDF](../../README.md#moduł-generowania-pdf).
+projektu – [README → Moduł generowania PDF](../../README.md#moduł-generowania-pdf).
 
 **Weryfikacja danych (PDF ↔ baza):**
 
@@ -127,26 +127,26 @@ projektu — [README → Moduł generowania PDF](../../README.md#moduł-generowa
 ## Testowanie szablonów dokumentów PDF
 
 Wszystkie szablony korzystają ze wspólnego arkusza `_PDF_CSS` (zdefiniowanego w
-[app/api/pdf.py](../../app/api/pdf.py)) — zapewnia to spójny wygląd: te same marginesy
+[app/api/pdf.py](../../app/api/pdf.py)) – zapewnia to spójny wygląd: te same marginesy
 strony (`@page margin: 1,2cm 1,3cm 1,7cm 1,3cm`), tę samą czcionkę, jednolite tabele
 i wspólną stopkę z numeracją stron.
 
 **Zrzuty ekranu dokumentów** (pierwsza strona każdego typu, praktyka #7):
-katalog [Podglady/](Podglady/) — `Zal1.png` … `Zal8.png`.
+katalog [Podglady/](Podglady/) – `Zal1.png` … `Zal8.png`.
 
 **Porównanie typów dokumentów:**
 
 | Załącznik                      | Typ układu                    | Strony | Spójność stylu |
 | ------------------------------ | ----------------------------- | ------ | -------------- |
-| Zał. 1 — Porozumienie          | tekst + tabela §              | 1      | OK             |
-| Zał. 2a — Harmonogram          | dwie tabele (działy + efekty) | 2      | OK             |
-| Zał. 3.1 — Karta str. 1        | tekst + potwierdzenia         | 1      | OK             |
-| Zał. 3.2 — Karta str. 2        | tabele ocen                   | 1      | OK             |
-| Zał. 4 — Potwierdzenie efektów | tabela 13 efektów             | 2      | OK             |
-| Zał. 5 — Ankieta               | tabela pytań (skala)          | 2      | OK             |
-| Zał. 6 — Dziennik              | tabela 120 wpisów             | 4–5    | OK             |
-| Zał. 7 — Sprawozdanie          | sekcje opisowe                | 1      | OK             |
-| Zał. 8 — Protokół              | formularz złożony             | 1      | OK             |
+| Zał. 1 – Porozumienie          | tekst + tabela §              | 1      | OK             |
+| Zał. 2a – Harmonogram          | dwie tabele (działy + efekty) | 2      | OK             |
+| Zał. 3.1 – Karta str. 1        | tekst + potwierdzenia         | 1      | OK             |
+| Zał. 3.2 – Karta str. 2        | tabele ocen                   | 1      | OK             |
+| Zał. 4 – Potwierdzenie efektów | tabela 13 efektów             | 2      | OK             |
+| Zał. 5 – Ankieta               | tabela pytań (skala)          | 2      | OK             |
+| Zał. 6 – Dziennik              | tabela 120 wpisów             | 4–5    | OK             |
+| Zał. 7 – Sprawozdanie          | sekcje opisowe                | 1      | OK             |
+| Zał. 8 – Protokół              | formularz złożony             | 1      | OK             |
 
 **Wskazane elementy poprawione w ramach etapu** (historia w sekcji _Raport błędów_):
 marginesy i łamanie stron (eliminacja stron-sierot), czytelność tabel (pełna
@@ -154,7 +154,7 @@ szerokość kolumn), spójny styl podpisów (imię i nazwisko zamiast „pieczą
 
 **Elementy do ewentualnej dalszej poprawy (niski priorytet):**
 
-- tła nagłówków tabel (`#e8edf3`) wymagają drukarki kolorowej — przy druku mono są
+- tła nagłówków tabel (`#e8edf3`) wymagają drukarki kolorowej – przy druku mono są
   jasnoszare, ale czytelne; można rozważyć wzmocnienie obramowań,
 - przy bardzo długich nazwach działów/firm tabela Zał. 2a może wymagać dostrojenia
   proporcji kolumn.
@@ -171,10 +171,10 @@ szerokość kolumn), spójny styl podpisów (imię i nazwisko zamiast „pieczą
 | Poprawność nazw plików         | OK     | `Praktyka_<id>_<Załącznik>.pdf`, ZIP: `Praktyka_<id>_<Nazwisko_Imie>.zip`    |
 | Poprawność rozszerzeń          | OK     | `application/pdf` oraz `application/zip`                                     |
 | Endpoint generujący PDF        | OK     | `/api/pdf/<id>/<zal_key>`, `/api/pdf/<id>/zip`, `/api/pdf/generate-pdf/<id>` |
-| Reakcja na błąd generowania    | OK     | komunikat flash + przekierowanie na pulpit; w ZIP — plik `_BLEDY.txt`        |
+| Reakcja na błąd generowania    | OK     | komunikat flash + przekierowanie na pulpit; w ZIP – plik `_BLEDY.txt`        |
 | Kontrola dostępu               | OK     | student pobiera wyłącznie własne dokumenty (`_check_access` → 403)           |
 
-Odporność endpointu na błędne dane została potwierdzona automatycznie — zob. poniżej
+Odporność endpointu na błędne dane została potwierdzona automatycznie – zob. poniżej
 (przypadki 7–8: nieistniejące ID praktyki → HTTP 404, nieprawidłowy
 klucz załącznika → kontrolowany wyjątek).
 
@@ -190,7 +190,7 @@ klucz załącznika → kontrolowany wyjątek).
 ## Testowanie odporności modułu PDF
 
 Zautomatyzowany zestaw testów: [tools/test_pdf_resilience.py](../../tools/test_pdf_resilience.py).
-Skrypt tworzy dane brzegowe w transakcji i wycofuje ją (ROLLBACK) — nie zaśmieca bazy.
+Skrypt tworzy dane brzegowe w transakcji i wycofuje ją (ROLLBACK) – nie zaśmieca bazy.
 Wykonano **13 przypadków testowych** (wymóg: min. 10), wszystkie zaliczone:
 
 | Nr  | Przypadek testowy                        | Oczekiwany wynik                        | Status |
@@ -211,20 +211,20 @@ Wykonano **13 przypadków testowych** (wymóg: min. 10), wszystkie zaliczone:
 
 **Opis błędów (wykrytych i zabezpieczonych):**
 
-- _puste komórki tabel_ zwijały całą tabelę do minimalnej szerokości w xhtml2pdf —
+- _puste komórki tabel_ zwijały całą tabelę do minimalnej szerokości w xhtml2pdf –
   zabezpieczone automatycznym wypełnianiem twardą spacją (`_strip_for_pdf`),
-- _symbole ✓ ☐ ✗_ renderowały się jako puste kwadraty (Arial nie ma tych glifów) —
+- _symbole ✓ ☐ ✗_ renderowały się jako puste kwadraty (Arial nie ma tych glifów) –
   zabezpieczone rejestracją osobnego fontu Segoe UI Symbol,
-- _brakujące rekordy powiązane_ (dziennik/ankieta/protokół) — szablony obsługują
+- _brakujące rekordy powiązane_ (dziennik/ankieta/protokół) – szablony obsługują
   wartości `None` i wyświetlają puste pola / „nie wypełniono".
 
 **Propozycje zabezpieczeń modułu (zrealizowane):**
 
 1. obsługa wartości `None` we wszystkich szablonach (brak wyjątków przy pustych danych),
-2. eksport zbiorczy odporny na pojedynczy błąd — uszkodzony załącznik trafia do
+2. eksport zbiorczy odporny na pojedynczy błąd – uszkodzony załącznik trafia do
    `_BLEDY.txt`, reszta paczki generuje się normalnie,
 3. autoescaping Jinja chroni przed wstrzyknięciem HTML/JS przez dane użytkownika,
-4. kontrola dostępu (`_check_access`) — student nie pobierze cudzych dokumentów.
+4. kontrola dostępu (`_check_access`) – student nie pobierze cudzych dokumentów.
 
 ---
 
@@ -237,17 +237,17 @@ rejestracja czcionek (`_ensure_fonts`), przetwarzanie HTML (`_resolve_vars`,
 (`_render_pdf_bytes`), pakowanie ZIP (`_zip_attachments`) oraz endpointy (`pdf_bp`).
 
 **Sposób generowania.** HTML z szablonu Jinja2 → dostosowanie do xhtml2pdf →
-`pisa.CreatePDF()` → bajty PDF. Bez przeglądarki i procesów zewnętrznych — pełen
+`pisa.CreatePDF()` → bajty PDF. Bez przeglądarki i procesów zewnętrznych – pełen
 proces opisano w [README → Moduł generowania PDF](../../README.md#moduł-generowania-pdf).
 
 **Organizacja szablonów.** Szablony w [templates/formularze/](../../templates/formularze/)
 są współdzielone przez widok HTML i wersję PDF; elementy interfejsu (`.no-print`,
-przyciski, panele) są ukrywane wspólnym arkuszem `_PDF_CSS` — jedno źródło prawdy.
+przyciski, panele) są ukrywane wspólnym arkuszem `_PDF_CSS` – jedno źródło prawdy.
 
 **Komunikacja backendu z modułem.** Endpointy blueprinta `pdf_bp` przyjmują żądania,
 weryfikują dostęp, wołają `_render_pdf_bytes()` i zwracają plik przez `send_file()`.
 Funkcja `_render_pdf_bytes()` jest też wywoływana bezpośrednio przez skrypty w
-`tools/` — ten sam kod obsługuje aplikację i testy (odtwarzalność).
+`tools/` – ten sam kod obsługuje aplikację i testy (odtwarzalność).
 
 **Lista bibliotek.**
 
@@ -266,11 +266,11 @@ Funkcja `_render_pdf_bytes()` jest też wywoływana bezpośrednio przez skrypty 
 | Zał. 5 (2 str.)             | ~150 ms | 131 KB  |
 | Zał. 8 (1 str.)             | ~110 ms | 126 KB  |
 | Zał. 6 (4 str., 120 wpisów) | ~500 ms | 92 KB   |
-| ZIP — komplet 9 załączników | ~1,2 s  | —       |
+| ZIP – komplet 9 załączników | ~1,2 s  | –       |
 
 **Propozycje optymalizacji:**
 
-- _cache czcionek_ — `_ensure_fonts()` już rejestruje czcionki raz na proces (flaga
+- _cache czcionek_ – `_ensure_fonts()` już rejestruje czcionki raz na proces (flaga
   `_fonts_registered`); to główny zysk, dalsze cache'owanie zbędne,
 - generowanie ZIP można by zrównoleglić (`concurrent.futures`), ale przy ~1,2 s dla
   kompletu nie jest to konieczne,
@@ -284,7 +284,7 @@ Funkcja `_render_pdf_bytes()` jest też wywoływana bezpośrednio przez skrypty 
 | Funkcjonalność                            | Status | Realizacja                                                               |
 | ----------------------------------------- | ------ | ------------------------------------------------------------------------ |
 | Generowanie wielu dokumentów jednocześnie | OK     | `_zip_attachments()` w pętli po wybranych załącznikach                   |
-| Podpisy tekstowe                          | OK     | imię i nazwisko + linia na datę (zamiast „pieczątek" — druk mono)        |
+| Podpisy tekstowe                          | OK     | imię i nazwisko + linia na datę (zamiast „pieczątek" – druk mono)        |
 | Eksport zbiorczy                          | OK     | panel na pulpicie + endpoint `/api/pdf/<id>/zip`                         |
 | Poprawność nazw generowanych plików       | OK     | `Praktyka_<id>_<Nazwisko_Imie>.zip`, pliki w środku z czytelnymi nazwami |
 | Pobranie archiwum ZIP                     | OK     | `mimetype application/zip`, `Content-Disposition: attachment`            |
@@ -293,7 +293,7 @@ Funkcja `_render_pdf_bytes()` jest też wywoływana bezpośrednio przez skrypty 
 komplet załączników dla 3 praktyk; eksport ZIP odtwarzalny skryptem
 [tools/generate_pdf_samples.py](../../tools/generate_pdf_samples.py).
 
-**Analiza poprawności:** eksport zbiorczy jest odporny na pojedynczy błąd — gdy
+**Analiza poprawności:** eksport zbiorczy jest odporny na pojedynczy błąd – gdy
 jednego załącznika nie da się wygenerować, pozostałe trafiają do ZIP, a opis błędu
 do pliku `_BLEDY.txt` (potwierdzone w _Zadaniu 6_).
 
@@ -316,7 +316,7 @@ do pliku `_BLEDY.txt` (potwierdzone w _Zadaniu 6_).
 ## Odtworzenie wszystkich testów
 
 ```bash
-# (raz) trzecia kompletna praktyka — daje min. 3 użytkowników
+# (raz) trzecia kompletna praktyka – daje min. 3 użytkowników
 .\venv\Scripts\python.exe tools\seed_extra.py
 
 # przykładowe dokumenty PDF → _pdfout/

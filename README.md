@@ -1,8 +1,8 @@
 # System Rozliczania Praktyk (ApIn2-projekt)
 
 Aplikacja webowa do obsługi dokumentacji studenckich praktyk zawodowych (ANS Elbląg):
-prowadzi praktykę przez cały proces — od porozumienia, przez dziennik i sprawozdanie,
-aż po protokół zaliczenia — i generuje komplet załączników urzędowych (Zał. 1–8) w PDF.
+prowadzi praktykę przez cały proces – od porozumienia, przez dziennik i sprawozdanie,
+aż po protokół zaliczenia – i generuje komplet załączników urzędowych (Zał. 1–8) w PDF.
 
 ## Funkcje
 
@@ -14,7 +14,7 @@ aż po protokół zaliczenia — i generuje komplet załączników urzędowych (
   skala ocen 2–5).
 - **Dziennik praktyki** (120 wpisów dziennych z przypisaniem efektów).
 - **Generowanie PDF** pojedynczych załączników (Zał. 1–8) oraz eksport zbiorczy do
-  archiwum ZIP — w całości w Pythonie (`xhtml2pdf` + `reportlab`), bez zależności od
+  archiwum ZIP – w całości w Pythonie (`xhtml2pdf` + `reportlab`), bez zależności od
   przeglądarki. Zob. sekcję [Moduł generowania PDF](#moduł-generowania-pdf).
 - **REST API** (38 endpointów) z dokumentacją Swagger UI pod `/apidocs/`.
 - **Logowanie** lokalne oraz przez Microsoft OAuth.
@@ -27,24 +27,24 @@ które go wypełniają/podpisują (`→` = wymagana kolejność, `+` = obie stro
 
 | Faza                | Załącznik                                                      | Kto wypełnia / podpisuje                                        |
 | ------------------- | -------------------------------------------------------------- | --------------------------------------------------------------- |
-| **1. Inicjacja**    | Zał. 1 — Porozumienie o organizacji praktyki                   | ZOPZ + Dyrektor                                                 |
-| **1. Inicjacja**    | Zał. 2a — Program i harmonogram praktyki (13 efektów, 120 dni) | ZOPZ → Student → UOPZ                                           |
-| **1. Inicjacja**    | Zał. 3.1 — Karta praktyki, str. 1 (skierowanie)                | Dyrektor (skierowanie) → ZOPZ (zgłoszenie + BHP)                |
-| **2. Realizacja**   | Zał. 6 — Dziennik praktyki (120 wpisów)                        | Student (wpisy) → ZOPZ (zatwierdzenie)                          |
-| **3. Podsumowanie** | Zał. 7 — Sprawozdanie z praktyki                               | Student → ZOPZ (potwierdzenie)                                  |
-| **3. Podsumowanie** | Zał. 3.2 — Karta praktyki, str. 2 (oceny)                      | ZOPZ (ocena zakładowa) → UOPZ (ocena uczelniana + sprawozdania) |
-| **3. Podsumowanie** | Zał. 4 — Potwierdzenie efektów uczenia się                     | ZOPZ (13 efektów) → UOPZ (opinia)                               |
-| **3. Podsumowanie** | Zał. 5 — Kwestionariusz ankiety                                | Student                                                         |
-| **4. Zaliczenie**   | Zał. 8 — Protokół zaliczenia praktyki                          | Dyrektor (protokół) → UOPZ (wpis do USOS)                       |
+| **1. Inicjacja**    | Zał. 1 - Porozumienie o organizacji praktyki                   | ZOPZ + Dyrektor                                                 |
+| **1. Inicjacja**    | Zał. 2a - Program i harmonogram praktyki (13 efektów, 120 dni) | ZOPZ → Student → UOPZ                                           |
+| **1. Inicjacja**    | Zał. 3.1 - Karta praktyki, str. 1 (skierowanie)                | Dyrektor (skierowanie) → ZOPZ (zgłoszenie + BHP)                |
+| **2. Realizacja**   | Zał. 6 - Dziennik praktyki (120 wpisów)                        | Student (wpisy) → ZOPZ (zatwierdzenie)                          |
+| **3. Podsumowanie** | Zał. 7 - Sprawozdanie z praktyki                               | Student → ZOPZ (potwierdzenie)                                  |
+| **3. Podsumowanie** | Zał. 3.2 - Karta praktyki, str. 2 (oceny)                      | ZOPZ (ocena zakładowa) → UOPZ (ocena uczelniana + sprawozdania) |
+| **3. Podsumowanie** | Zał. 4 - Potwierdzenie efektów uczenia się                     | ZOPZ (13 efektów) → UOPZ (opinia)                               |
+| **3. Podsumowanie** | Zał. 5 - Kwestionariusz ankiety                                | Student                                                         |
+| **4. Zaliczenie**   | Zał. 8 - Protokół zaliczenia praktyki                          | Dyrektor (protokół) → UOPZ (wpis do USOS)                       |
 
-> ZOPZ — opiekun zakładowy, UOPZ — opiekun uczelniany.
+> ZOPZ – opiekun zakładowy, UOPZ – opiekun uczelniany.
 
 ## Technologie
 
 - Backend: **Python / Flask**, **SQLAlchemy**, **Flask-Login**
 - Baza danych: **PostgreSQL** (schemat uzupełniany automatycznie przez `ensure_schema()`)
 - Frontend: **SSR (Jinja2)**, HTML5, CSS3, vanilla JavaScript (bez frameworków/CDN)
-- Generowanie PDF: **`xhtml2pdf` (pisa) + `reportlab`** — czysty Python, bez przeglądarki
+- Generowanie PDF: **`xhtml2pdf` (pisa) + `reportlab`** – czysty Python, bez przeglądarki
 
 ## Uruchomienie
 
@@ -53,7 +53,7 @@ wirtualnym `venv`. W obu przypadkach startuje pod `http://localhost:5000/auth/lo
 a przy pierwszym starcie `run.py` automatycznie tworzy schemat bazy (`ensure_schema()`)
 i zakłada konta testowe.
 
-### Wariant A — Docker (zalecany)
+### Wariant A – Docker (zalecany)
 
 Wymaga uruchomionego **Docker Desktop**.
 
@@ -66,7 +66,7 @@ docker compose up --build
 Flask). Kilka rzeczy dzieje się automatycznie:
 
 - `DATABASE_URL` jest **nadpisywany** przez `docker-compose.yml` na
-  `postgresql://postgres:postgres@db:5432/praktyki` — nie musisz instalować PostgreSQL
+  `postgresql://postgres:postgres@db:5432/praktyki` – nie musisz instalować PostgreSQL
   ani zakładać bazy ręcznie (wartość z `.env` jest w tym wariancie ignorowana).
 - kontener `web` startuje dopiero, gdy baza przejdzie `healthcheck`,
 - dane bazy są trwałe w wolumenie `postgres_data`.
@@ -83,7 +83,7 @@ docker compose exec web python seed_demo.py    # dane demonstracyjne (demo@ans.e
 > Po zmianie kodu lub `requirements.txt` uruchom ponownie z flagą `--build`,
 > aby obraz został przebudowany.
 
-### Wariant B — lokalnie (venv)
+### Wariant B – lokalnie (venv)
 
 Wymaga lokalnie zainstalowanego PostgreSQL.
 
@@ -92,7 +92,7 @@ python -m venv venv
 .\venv\Scripts\activate
 pip install -r requirements.txt
 cp .env.example .env        # skopiuj szablon konfiguracji
-# uzupełnij .env (co najmniej DATABASE_URL i SECRET_KEY — patrz komentarze w pliku)
+# uzupełnij .env (co najmniej DATABASE_URL i SECRET_KEY – patrz komentarze w pliku)
 # należy również utworzyć pustą bazę danych w pgAdmin o tej samej nazwie co w DATABASE_URL
 .\venv\Scripts\python.exe run.py
 ```
@@ -109,30 +109,30 @@ Minimalny zestaw do uruchomienia lokalnie:
 | -------------------------------------- | --------------------------------------------------------------- | --------------- |
 | `DATABASE_URL`                         | Connection string PostgreSQL (`postgresql://user:pass@host/db`) | tak             |
 | `SECRET_KEY`                           | Losowy ciąg chroniący podpis sesji (min. 32 znaki)              | tak w produkcji |
-| `MICROSOFT_CLIENT_ID/SECRET/TENANT_ID` | Dane aplikacji z Azure AD — do logowania kontem uczelni         | tak             |
+| `MICROSOFT_CLIENT_ID/SECRET/TENANT_ID` | Dane aplikacji z Azure AD – do logowania kontem uczelni         | tak             |
 
 Logowanie lokalne (e-mail + hasło) działa bez żadnych kluczy OAuth, lecz wymaga potwierdzenia przez administratora, natomiast aby stworzyć nowe konto studenta wymagane jest logowanie przez Microsoft, rejestracja lokalna jest dla UOPZ, ZOPZ bądź dyrektora.
 
 ## Moduł generowania PDF
 
 System tworzy urzędowe załączniki praktyki (Zał. 1–8) jako pliki PDF na podstawie
-tych samych szablonów Jinja2, które renderują widoki HTML — dzięki temu wersja na
+tych samych szablonów Jinja2, które renderują widoki HTML – dzięki temu wersja na
 ekranie i wersja do druku pochodzą z jednego źródła.
 
 ### Architektura i biblioteki
 
 Cały moduł mieści się w pliku [app/api/pdf.py](app/api/pdf.py). Wykorzystuje wyłącznie
-biblioteki Pythona — **nie uruchamia procesów zewnętrznych**:
+biblioteki Pythona – **nie uruchamia procesów zewnętrznych**:
 
-- **`xhtml2pdf` (pisa)** — silnik renderujący HTML/CSS → PDF,
-- **`reportlab`** — warstwa niższego poziomu (osadzanie czcionek TrueType, rysowanie),
-- **`zipfile`** (biblioteka standardowa) — pakowanie eksportu zbiorczego do ZIP.
+- **`xhtml2pdf` (pisa)** – silnik renderujący HTML/CSS → PDF,
+- **`reportlab`** – warstwa niższego poziomu (osadzanie czcionek TrueType, rysowanie),
+- **`zipfile`** (biblioteka standardowa) – pakowanie eksportu zbiorczego do ZIP.
 
 ### Proces generowania (krok po kroku)
 
 1. **Żądanie** trafia do endpointu w blueprincie `pdf_bp` (`/api/pdf/...`).
 2. **`_ensure_fonts()`** rejestruje (raz na proces) czcionki TrueType: _Arial_ dla
-   polskich znaków oraz _Segoe UI Symbol_ dla glifów ✓ ☐ ✗ — domyślna Helvetica w
+   polskich znaków oraz _Segoe UI Symbol_ dla glifów ✓ ☐ ✗ – domyślna Helvetica w
    xhtml2pdf nie zawiera tych znaków i renderowałaby je jako puste kwadraty.
 3. **`_build_context()`** pobiera z bazy dane potrzebne danemu załącznikowi
    (wpisy dziennika, efekty, oceny, protokół itd.) i buduje kontekst szablonu.
@@ -149,7 +149,7 @@ biblioteki Pythona — **nie uruchamia procesów zewnętrznych**:
 
 Eksport zbiorczy (`_zip_attachments()`) generuje wybrane załączniki w pętli i pakuje
 je do ZIP; dokument, którego nie uda się wygenerować, jest pomijany, a jego opis
-trafia do pliku `_BLEDY.txt` w archiwum — jeden uszkodzony załącznik nie psuje
+trafia do pliku `_BLEDY.txt` w archiwum – jeden uszkodzony załącznik nie psuje
 całej paczki (odporność modułu).
 
 ### Endpointy PDF
@@ -163,7 +163,7 @@ całej paczki (odporność modułu).
 ### Uruchomienie i odtwarzanie testów modułu PDF
 
 ```bash
-# 1. (opcjonalnie) trzecia kompletna praktyka — daje min. 3 użytkowników do testów
+# 1. (opcjonalnie) trzecia kompletna praktyka – daje min. 3 użytkowników do testów
 .\venv\Scripts\python.exe tools\seed_extra.py
 
 # 2. wygenerowanie przykładowych dokumentów do _pdfout/ (wszystkie praktyki × Zał. 1–8)
@@ -195,9 +195,9 @@ docker-compose.yml  # uruchomienie web + PostgreSQL w kontenerach
 ## Pozostała dokumentacja:
 
 - **Frontend:** [Dokumentacja/Frontend/README.md](Dokumentacja/Frontend/README.md)
-  — dokumentacja techniczna interfejsu oraz testy i raport błędów.
+  – dokumentacja techniczna interfejsu oraz testy i raport błędów.
 - **Moduł PDF:** [Dokumentacja/PDF/Weryfikacja-PDF.md](Dokumentacja/PDF/Weryfikacja-PDF.md)
-  — testy generowania, analiza techniczna, raport błędów i podglądy dokumentów.
+  – testy generowania, analiza techniczna, raport błędów i podglądy dokumentów.
 - **API backendu:** [Dokumentacja/Backend/API.md](Dokumentacja/Backend/API.md)
   oraz specyfikacja [swagger.yaml](swagger.yaml).
 - **Baza danych:** [Dokumentacja/Szkielet-Bazy-Danych.sql](Dokumentacja/Szkielet-Bazy-Danych.sql).
